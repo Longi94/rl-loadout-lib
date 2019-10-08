@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Longi94/rl-loadout.git"
+    "url": "git+https://github.com/Longi94/rl-loadout-lib.git"
   },
   "author": "Long Tran",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Longi94/rl-loadout/issues"
+    "url": "https://github.com/Longi94/rl-loadout-lib/issues"
   },
-  "homepage": "https://github.com/Longi94/rl-loadout/tree/master/lib#readme",
+  "homepage": "https://github.com/Longi94/rl-loadout-lib#readme",
   "keywords": [
     "rocket",
     "league",
