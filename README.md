@@ -6,6 +6,10 @@ Load Rocket League assets into three.js. This library is closely tied with [Rock
 
 ## Quick start
 
+```bash
+npm install rl-loadout-lib
+```
+
 Models are DRACO compressed, you must provide the [decoder](https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco).
 
 ```typescript
