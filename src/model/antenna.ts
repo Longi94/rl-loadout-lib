@@ -5,24 +5,16 @@ import { Quality } from './quality';
 
 export class Antenna extends Item {
 
-  static NONE = new Antenna(
-    -1, '', 'None', Quality.COMMON, false, undefined, undefined, undefined, undefined
-  );
+  static readonly NONE: Antenna = {
+    icon: '', id: -1, name: 'None', paintable: false, quality: Quality.COMMON
+
+  }
 
   model?: string;
   base_texture?: string;
   rgba_map?: string;
   stick?: string;
-  stick_id: number;
-
-  constructor(id: number, icon: string, name: string, quality: Quality, paintable: boolean, model?: string,
-              base_texture?: string, rgba_map?: string, stick?: string) {
-    super(id, icon, name, quality, paintable);
-    this.model = model;
-    this.base_texture = base_texture;
-    this.rgba_map = rgba_map;
-    this.stick = stick;
-  }
+  stick_id?: number;
 }
 
 export class AntennaStick {

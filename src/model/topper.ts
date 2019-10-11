@@ -5,9 +5,10 @@ import { Quality } from './quality';
 
 export class Topper extends Item {
 
-  static NONE = new Topper(
-    -1, '', 'None', Quality.COMMON, false, undefined, undefined, undefined
-  );
+  static readonly NONE: Topper = {
+    icon: '', id: -1, name: 'None', paintable: false, quality: Quality.COMMON
+
+  };
 
   model?: string;
   base_texture?: string;
