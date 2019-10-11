@@ -21,8 +21,8 @@ jobs:
           paths: .
   deploy:
     working_directory: ~/rl-loadout-lib
-    machine:
-      enabled: true
+    docker:
+        - image: circleci/node:10.16
     steps:
       - attach_workspace:
           at: ~/rl-loadout-lib
