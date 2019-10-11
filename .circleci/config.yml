@@ -28,7 +28,7 @@ jobs:
           at: ~/rl-loadout-lib
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/rl-loadout-lib/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/rl-loadout-lib/.npmrc
       - run:
           name: Publish package
           command: npm publish
