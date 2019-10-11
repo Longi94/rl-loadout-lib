@@ -30,9 +30,15 @@ Models are DRACO compressed, you must provide the [decoder](https://github.com/m
 ```typescript
 import { Scene } from 'three';
 import { RocketAssetManager, RocketConfig, PaintConfig } from 'rl-loadout-lib';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-const config = new RocketConfig();
-config.dracoDecoderPath = '/draco/';
+// You must provide the GLTFLoader to avoid issues with multiple instances of three.js and webgl context
+const gltfLoader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('/draco/')
+gltfLoader.setDRACOLoader(dracoLoader);
+const config = new RocketConfig(gltfLoader);
 
 const manager = new RocketAssetManager(config);
 
