@@ -1,6 +1,8 @@
-# rl-loadout-lib
+# rl-loadout-lib ![https://www.npmjs.com/package/rl-loadout-lib](https://img.shields.io/npm/v/rl-loadout-lib)
 
-![https://www.npmjs.com/package/rl-loadout-lib](https://img.shields.io/npm/v/rl-loadout-lib)
+| master | develop |
+| --- | --- |
+| [![CircleCI](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master.svg?style=svg)](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master) | [![CircleCI](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/develop.svg?style=svg)](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/develop) |
 
 Load Rocket League assets into three.js. This library is closely tied with [Rocket Loadout](https://github.com/Longi94/rl-loadout) as the code was originally part of it. It uses GLTF models and TGA textures created and stored for the website.
 
