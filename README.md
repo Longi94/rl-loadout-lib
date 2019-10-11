@@ -1,8 +1,21 @@
-# rl-loadout-lib ![https://www.npmjs.com/package/rl-loadout-lib](https://img.shields.io/npm/v/rl-loadout-lib) [<img src="https://img.shields.io/discord/609050910731010048.svg?colorB=7581dc&logo=discord&logoColor=white">](https://discord.gg/c8cArY9)
+# rl-loadout-lib
 
-| master | develop |
-| --- | --- |
-| [![CircleCI](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master.svg?style=svg)](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master) | [![CircleCI](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/develop.svg?style=svg)](https://circleci.com/gh/Longi94/rl-loadout-lib/tree/develop) |
+[![CircleCI][circleci]][circleci-url]
+[![NPM package][npm]][npm-url]
+[![Build Size][build-size]][build-size-url]
+[![Language Grade][lgtm]][lgtm-url]
+[![Discord][discord]][discord-url]
+
+[circleci]: https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master.svg?style=svg
+[circleci-url]: https://circleci.com/gh/Longi94/rl-loadout-lib/tree/master
+[npm]: https://img.shields.io/npm/v/rl-loadout-lib
+[npm-url]: https://www.npmjs.com/package/rl-loadout-lib
+[build-size]: https://badgen.net/bundlephobia/minzip/rl-loadout-lib
+[build-size-url]: https://bundlephobia.com/result?p=rl-loadout-lib
+[lgtm]: https://img.shields.io/lgtm/grade/javascript/github/Longi94/rl-loadout-lib.svg?label=code%20quality
+[lgtm-url]: https://lgtm.com/projects/g/Longi94/rl-loadout-lib/
+[discord]: https://img.shields.io/discord/609050910731010048.svg?colorB=7581dc&logo=discord&logoColor=white
+[discord-url]: https://discord.gg/c8cArY9
 
 Load Rocket League assets into three.js. This library is closely tied with [Rocket Loadout](https://github.com/Longi94/rl-loadout) as the code was originally part of it. It uses GLTF models and TGA textures created and stored for the website.
 
