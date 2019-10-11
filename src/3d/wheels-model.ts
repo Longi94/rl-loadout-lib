@@ -15,13 +15,14 @@ import { RocketConfig } from '../model/rocket-config';
 
 class RimSkin {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   texture: LayeredTexture;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
 
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color) {
+  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
   }
 
   async load() {
@@ -73,7 +74,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimSkin = new RimSkin(
         getAssetUrl(wheel.rim_base, rocketConfig),
         getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-        paints.wheel
+        paints.wheel,
+        rocketConfig
       );
     }
   }

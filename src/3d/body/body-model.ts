@@ -24,7 +24,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   private readonly body: Body;
 
-  textureLoader = new PromiseLoader(new TgaRgbaLoader());
+  textureLoader: PromiseLoader;
 
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
@@ -46,6 +46,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
 
     this.body = body;
 
@@ -55,7 +56,8 @@ export class BodyModel extends AbstractObject implements Paintable {
       this.chassisSkin = new ChassisSkin(
         getAssetUrl(body.chassis_base, rocketConfig),
         getAssetUrl(body.chassis_n, rocketConfig),
-        paints
+        paints,
+        rocketConfig
       );
     }
   }

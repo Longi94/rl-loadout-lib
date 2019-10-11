@@ -13,13 +13,14 @@ import { RocketConfig } from '../model/rocket-config';
 
 class TopperSkin {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   texture: LayeredTexture;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
 
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color) {
+  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
   }
 
   async load() {
@@ -65,7 +66,8 @@ export class TopperModel extends AbstractObject implements Paintable {
       this.skin = new TopperSkin(
         getAssetUrl(topper.base_texture, rocketConfig),
         getAssetUrl(topper.rgba_map, rocketConfig),
-        paints.topper
+        paints.topper,
+        rocketConfig
       );
     }
   }

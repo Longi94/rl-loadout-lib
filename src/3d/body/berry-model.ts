@@ -14,10 +14,10 @@ import { RocketConfig } from '../../model/rocket-config';
 
 class BerryBodySkin implements BodyTexture {
 
-  private readonly loader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
-  private readonly baseUrl;
-  private readonly blankSkinUrl;
+  private readonly baseUrl: string;
+  private readonly blankSkinUrl: string;
 
   private primary: Color;
 
@@ -27,6 +27,7 @@ class BerryBodySkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;

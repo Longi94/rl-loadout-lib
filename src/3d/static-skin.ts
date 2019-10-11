@@ -14,7 +14,7 @@ import { RocketConfig } from '../model/rocket-config';
 
 export class StaticSkin implements BodyTexture {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   private readonly baseUrl: string;
   private readonly rgbaMapUrl: string;
@@ -44,6 +44,7 @@ export class StaticSkin implements BodyTexture {
   private decalPaintPixels: Set<number>;
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(decal.base_texture, rocketConfig);
     this.rgbaMapUrl = getAssetUrl(decal.rgba_map, rocketConfig);
     this.bodyBaseSkinUrl = getAssetUrl(body.base_skin, rocketConfig);
