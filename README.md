@@ -1,4 +1,4 @@
-# rl-loadout-lib ![https://www.npmjs.com/package/rl-loadout-lib](https://img.shields.io/npm/v/rl-loadout-lib)
+# rl-loadout-lib ![https://www.npmjs.com/package/rl-loadout-lib](https://img.shields.io/npm/v/rl-loadout-lib) [<img src="https://img.shields.io/discord/609050910731010048.svg?colorB=7581dc&logo=discord&logoColor=white">](https://discord.gg/c8cArY9)
 
 | master | develop |
 | --- | --- |
