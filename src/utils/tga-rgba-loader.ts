@@ -508,5 +508,5 @@ function parse(buffer) {
     height: header.height,
     width: header.width,
     data: rgbaData
-  }
+  };
 }
