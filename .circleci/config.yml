@@ -1,0 +1,61 @@
+version: 2.1
+
+jobs:
+  lint:
+    working_directory: ~/rl-loadout-lib
+    docker:
+      - image: circleci/node:10.16
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: lint
+          command: npm run lint
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+  build:
+    working_directory: ~/rl-loadout-lib
+    docker:
+      - image: circleci/node:10.16
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-dependencies and build
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - persist_to_workspace:
+          root: ~/rl-loadout-lib
+          paths: .
+  deploy:
+    working_directory: ~/rl-loadout-lib
+    docker:
+        - image: circleci/node:10.16
+    steps:
+      - attach_workspace:
+          at: ~/rl-loadout-lib
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/rl-loadout-lib/.npmrc
+      - run:
+          name: Publish package
+          command: npm publish
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - lint
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

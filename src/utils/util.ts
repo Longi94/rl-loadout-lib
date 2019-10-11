@@ -23,7 +23,3 @@ export function mergeSets<T>(set1: Set<T>, set2: Set<T>): Set<T> {
     return new Set<T>();
   }
 }
-
-export function isPropertyTrue(object, property: string): boolean {
-  return object[property];
-}

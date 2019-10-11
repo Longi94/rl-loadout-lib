@@ -257,25 +257,39 @@ export const ACCENT_COLORS = [
   '#330008'
 ];
 
-export const PAINT_COLORS = [
-  '#000000', // black
-  '#ffffff', // titanium white
-  '#8f8f8f', // grey
-  '#ff0000', // crimson
-  '#ff5d00', // orange
-  '#e3e300', // saffron
-  '#a9ff00', // lime
-  '#00ba09', // forest green
-  '#00b5e8', // sky blue
-  '#0048ed', // cobalt
-  '#ff38f8', // pink
-  '#8800cc', // purple
-  '#843d00'  // burnt sienna
-];
-
 export const DEFAULT_BLUE_TEAM = BLUE_PRIMARY_COLORS[35];
 export const DEFAULT_ORANGE_TEAM = ORANGE_PRIMARY_COLORS[33];
 export const DEFAULT_ACCENT = ACCENT_COLORS[0];
+
+export const PAINT_NONE = 0; // is this actually used?
+export const PAINT_CRIMSON = 1;
+export const PAINT_LIME = 2;
+export const PAINT_BLACK = 3;
+export const PAINT_SKY_BLUE = 4;
+export const PAINT_COBALT = 5;
+export const PAINT_BURNT_SIENNA = 6;
+export const PAINT_FOREST_GREEN = 7;
+export const PAINT_PURPLE = 8;
+export const PAINT_PINK = 9;
+export const PAINT_ORANGE = 10;
+export const PAINT_GREY = 11;
+export const PAINT_TITANIUM_WHITE = 12;
+export const PAINT_SAFFRON = 13;
+
+export const PAINT_COLORS = Array(14);
+PAINT_COLORS[PAINT_BLACK] = '#000000';
+PAINT_COLORS[PAINT_TITANIUM_WHITE] = '#ffffff';
+PAINT_COLORS[PAINT_GREY] = '#8f8f8f';
+PAINT_COLORS[PAINT_CRIMSON] = '#ff0000';
+PAINT_COLORS[PAINT_ORANGE] = '#ff5d00';
+PAINT_COLORS[PAINT_SAFFRON] = '#e3e300';
+PAINT_COLORS[PAINT_LIME] = '#a9ff00';
+PAINT_COLORS[PAINT_FOREST_GREEN] = '#00ba09';
+PAINT_COLORS[PAINT_SKY_BLUE] = '#00b5e8';
+PAINT_COLORS[PAINT_COBALT] = '#0048ed';
+PAINT_COLORS[PAINT_PINK] = '#ff38f8';
+PAINT_COLORS[PAINT_PURPLE] = '#8800cc';
+PAINT_COLORS[PAINT_BURNT_SIENNA] = '#843d00';
 
 export const BLACK = new Color(0, 0, 0);
 
@@ -291,20 +305,6 @@ export function overBlendColors(foreground: Color, background: Color, foreground
   const g = (foreground.g * foregroundAlpha) + (background.g * (1.0 - foregroundAlpha));
   const b = (foreground.b * foregroundAlpha) + (background.b * (1.0 - foregroundAlpha));
   holder.setRGB(r, g, b);
-}
-
-/**
- * Get the text color for the background to make it readable.
- * https://www.w3.org/TR/AERT/#color-contrast
- *
- * @param backgroundColor color of background in #FFFFFF format
- */
-export function getTextColor(backgroundColor: Color) {
-  if (backgroundColor == undefined) {
-    return 'white';
-  }
-  const o = Math.round(((backgroundColor.r * 76245) + (backgroundColor.g * 149685) + (backgroundColor.b * 29070)) / 1000);
-  return (o > 125) ? 'black' : 'white';
 }
 
 export function getColorsForBody(body: Body): { [team: string]: string[] } {
