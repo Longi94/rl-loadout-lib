@@ -36,7 +36,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 // You must provide the GLTFLoader to avoid issues with multiple instances of three.js and webgl context
 const gltfLoader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('/draco/')
+dracoLoader.setDecoderPath('/draco/');
 gltfLoader.setDRACOLoader(dracoLoader);
 const config = new RocketConfig(gltfLoader);
 

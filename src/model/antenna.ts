@@ -7,8 +7,7 @@ export class Antenna extends Item {
 
   static readonly NONE: Antenna = {
     icon: '', id: -1, name: 'None', paintable: false, quality: Quality.COMMON
-
-  }
+  };
 
   model?: string;
   base_texture?: string;
