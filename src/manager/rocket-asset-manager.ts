@@ -10,7 +10,7 @@ import { Wheel } from '../model/wheel';
 export class RocketAssetManager {
   private readonly rlService: RocketLoadoutService;
 
-  constructor(private readonly config: RocketConfig) {
+  constructor(public readonly config: RocketConfig) {
     this.rlService = new RocketLoadoutService(config.backendHost);
   }
 
