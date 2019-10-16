@@ -4,8 +4,7 @@ import { BodyTexture } from './body-texture';
 import { Color, Texture } from 'three';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { PromiseLoader } from '../../utils/loader';
-import { TgaRgbaLoader } from '../../utils/tga-rgba-loader';
+import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { Layer, LayeredTexture } from '../layered-texture';
 import { getAssetUrl } from '../../utils/network';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../../utils/image';
@@ -26,7 +25,7 @@ class FelineBodySkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new TgaRgbaLoader(rocketConfig.loadingManager));
+    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;

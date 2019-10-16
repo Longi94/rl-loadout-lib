@@ -7,12 +7,25 @@ const DEFAULT_HOST = 'https://rocket-loadout.com';
 export class RocketConfig {
   backendHost: string = DEFAULT_HOST;
   assetHost: string = DEFAULT_BUCKET;
-  loadingManager: LoadingManager = new LoadingManager();
+  gltfLoader: GLTFLoader;
+  loadingManager: LoadingManager = DefaultLoadingManager;
+  textureQuality: TextureQuality = TextureQuality.HIGH;
+  textureFormat: TextureFormat = TextureFormat.TGA;
+  modelQuality: ModelQuality = ModelQuality.HIGH;
 
-  constructor(public readonly gltfLoader: GLTFLoader, loadingManager?: LoadingManager, backendHost?: string,
-              assetHost?: string) {
-    this.loadingManager = loadingManager == undefined ? DefaultLoadingManager : loadingManager;
-    this.backendHost = backendHost == undefined ? DEFAULT_HOST : backendHost;
-    this.assetHost = assetHost == undefined ? DEFAULT_BUCKET : assetHost;
+  public constructor(init?: Partial<RocketConfig>) {
+    Object.assign(this, init);
   }
+}
+
+export enum TextureQuality {
+  LOW, HIGH
+}
+
+export enum TextureFormat {
+  PNG, TGA
+}
+
+export enum ModelQuality {
+  LOW, HIGH
 }
