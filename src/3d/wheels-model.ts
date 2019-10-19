@@ -158,4 +158,11 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimSkin.setPaint(paint);
     }
   }
+
+  visible(visible: boolean) {
+    super.visible(visible);
+    for (const wheel of this.wheels) {
+      wheel.model.visible = visible;
+    }
+  }
 }
