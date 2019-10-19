@@ -165,4 +165,14 @@ export class WheelsModel extends AbstractObject implements Paintable {
       wheel.model.visible = visible;
     }
   }
+
+  setRoll(angle: number) {
+    for (const wheel of this.wheels) {
+      if (wheel.config.right) {
+        wheel.model.rotation.z = -angle;
+      } else {
+        wheel.model.rotation.z = angle;
+      }
+    }
+  }
 }
