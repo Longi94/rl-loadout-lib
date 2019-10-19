@@ -7,11 +7,12 @@ import { traverseMaterials } from '../object';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
 import { RocketConfig } from '../../model/rocket-config';
+import { getAssetUrl } from '../../utils/network';
 
-const BODY_ORANGE = '/textures/Body_Slime1_D.tga';
-const BODY_BLUE = '/textures/Body_Slime2_D.tga';
-const CHASSIS_ORANGE = '/textures/Chassis_Slime_D.tga';
-const CHASSIS_BLUE = '/textures/Chassis_Slime2_D.tga';
+const BODY_ORANGE = 'textures/Body_Slime1_D.tga';
+const BODY_BLUE = 'textures/Body_Slime2_D.tga';
+const CHASSIS_ORANGE = 'textures/Chassis_Slime_D.tga';
+const CHASSIS_BLUE = 'textures/Chassis_Slime2_D.tga';
 
 export class SlimeModel extends BodyModel {
 
@@ -33,10 +34,10 @@ export class SlimeModel extends BodyModel {
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(body, decal, paints, rocketConfig);
 
-    this.bodyOrangeUrl = rocketConfig.assetHost + BODY_ORANGE;
-    this.bodyBlueUrl = rocketConfig.assetHost + BODY_BLUE;
-    this.chassisOrangeUrl = rocketConfig.assetHost + CHASSIS_ORANGE;
-    this.chassisBlueUrl = rocketConfig.assetHost + CHASSIS_BLUE;
+    this.bodyOrangeUrl = getAssetUrl(BODY_ORANGE, rocketConfig);
+    this.bodyBlueUrl = getAssetUrl(BODY_BLUE, rocketConfig);
+    this.chassisOrangeUrl = getAssetUrl(CHASSIS_ORANGE, rocketConfig);
+    this.chassisBlueUrl = getAssetUrl(CHASSIS_BLUE, rocketConfig);
   }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig): BodyTexture {
