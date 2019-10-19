@@ -20,7 +20,7 @@ export function getAssetUrl(path: string, rocketConfig: RocketConfig): string {
   }
   if (path.startsWith('textures/') && path.endsWith('.tga')) {
     if (rocketConfig.textureQuality == TextureQuality.LOW) {
-      path = path.replace('.tga', '_small.tga');
+      path = path.replace('.tga', '_S.tga');
     }
     if (rocketConfig.textureFormat == TextureFormat.PNG) {
       path = path.replace('.tga', '.png');
