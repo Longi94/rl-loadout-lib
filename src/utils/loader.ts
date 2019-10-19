@@ -35,14 +35,14 @@ export class ImageTextureLoader {
   load(url: string, onLoad: (buffer: any) => void, onProgress?: (event: ProgressEvent) => void,
        onError?: (event: ErrorEvent) => void) {
     this.loader.load(url, img => {
-      if (this.format == TextureFormat.TGA) {
+      if (this.format === TextureFormat.TGA) {
         onLoad(img);
       }
 
       const canvas = new OffscreenCanvas(img.width, img.height);
       const context = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
       context.drawImage(img, 0, 0 );
-      const imageData = context.getImageData(0, 0, img.width, img.height)
+      const imageData = context.getImageData(0, 0, img.width, img.height);
       onLoad(imageData);
     }, onProgress, onError);
   }
