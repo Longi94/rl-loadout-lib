@@ -124,9 +124,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
       position.copy(conf.position);
 
       if (!conf.right) {
-        wheel.rotation.set(0, Math.PI, 0);
+        wheel.rotation.set(-Math.PI / 2, 0, 0);
         position.add(new Vector3(0, 0, -offset));
       } else {
+        wheel.rotation.set(Math.PI / 2, 0, 0);
         position.add(new Vector3(0, 0, offset));
       }
 
@@ -140,15 +141,15 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
-  addToScene(scene: Scene) {
+  addToJoints() {
     for (const wheel of this.wheels) {
-      scene.add(wheel.model);
+      wheel.config.joint.add(wheel.model);
     }
   }
 
-  removeFromScene(scene: Scene) {
+  removeFromJoints() {
     for (const wheel of this.wheels) {
-      scene.remove(wheel.model);
+      wheel.config.joint.remove(wheel.model);
     }
   }
 
