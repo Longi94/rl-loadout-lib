@@ -7,21 +7,21 @@ import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
 import { Layer, LayeredTexture } from './layered-texture';
-import { PromiseLoader } from '../utils/loader';
-import { TgaRgbaLoader } from '../utils/tga-rgba-loader';
+import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../utils/image';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
 
 class RimSkin {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   texture: LayeredTexture;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
 
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color) {
+  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {
@@ -73,7 +73,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimSkin = new RimSkin(
         getAssetUrl(wheel.rim_base, rocketConfig),
         getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-        paints.wheel
+        paints.wheel,
+        rocketConfig
       );
     }
   }

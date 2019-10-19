@@ -1,8 +1,7 @@
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { PromiseLoader } from '../../utils/loader';
-import { TgaRgbaLoader } from '../../utils/tga-rgba-loader';
+import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
@@ -24,7 +23,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   private readonly body: Body;
 
-  textureLoader = new PromiseLoader(new TgaRgbaLoader());
+  textureLoader: PromiseLoader;
 
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
@@ -46,6 +45,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
 
     this.body = body;
 
@@ -55,7 +55,8 @@ export class BodyModel extends AbstractObject implements Paintable {
       this.chassisSkin = new ChassisSkin(
         getAssetUrl(body.chassis_base, rocketConfig),
         getAssetUrl(body.chassis_n, rocketConfig),
-        paints
+        paints,
+        rocketConfig
       );
     }
   }

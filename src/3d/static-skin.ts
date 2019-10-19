@@ -2,8 +2,7 @@ import { Color, Texture } from 'three';
 import { Decal } from '../model/decal';
 import { getAssetUrl } from '../utils/network';
 import { BodyTexture } from './body/body-texture';
-import { PromiseLoader } from '../utils/loader';
-import { TgaRgbaLoader } from '../utils/tga-rgba-loader';
+import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { Layer, LayeredTexture } from './layered-texture';
 import { Body } from '../model/body';
 import { applyMaskToChannel, getChannel, getMaskPixels, ImageChannel, invertChannel, opaque } from '../utils/image';
@@ -14,7 +13,7 @@ import { RocketConfig } from '../model/rocket-config';
 
 export class StaticSkin implements BodyTexture {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   private readonly baseUrl: string;
   private readonly rgbaMapUrl: string;
@@ -44,6 +43,7 @@ export class StaticSkin implements BodyTexture {
   private decalPaintPixels: Set<number>;
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(decal.base_texture, rocketConfig);
     this.rgbaMapUrl = getAssetUrl(decal.rgba_map, rocketConfig);
     this.bodyBaseSkinUrl = getAssetUrl(body.base_skin, rocketConfig);

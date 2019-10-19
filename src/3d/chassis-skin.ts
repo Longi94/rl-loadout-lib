@@ -1,13 +1,13 @@
-import { PromiseLoader } from '../utils/loader';
-import { TgaRgbaLoader } from '../utils/tga-rgba-loader';
+import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { Color } from 'three';
 import { Layer, LayeredTexture } from './layered-texture';
 import { PaintConfig } from '../model/paint-config';
 import { getChannel, getMaskPixels, ImageChannel, opaque } from '../utils/image';
+import { RocketConfig } from '../model/rocket-config';
 
 export class ChassisSkin {
 
-  private tgaLoader = new PromiseLoader(new TgaRgbaLoader());
+  private tgaLoader: PromiseLoader;
   private paint: Color;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
@@ -17,7 +17,8 @@ export class ChassisSkin {
   private accentLayer: Layer;
   private accentPixels: Set<number>;
 
-  constructor(private baseUrl: string, private rgbaMapUrl: string, paints: PaintConfig) {
+  constructor(private baseUrl: string, private rgbaMapUrl: string, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.tgaLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.paint = paints.body;
     this.accent = paints.accent;
   }
