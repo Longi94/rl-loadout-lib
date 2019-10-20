@@ -125,10 +125,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
       if (!conf.right) {
         wheel.rotation.set(-Math.PI / 2, 0, 0);
-        position.add(new Vector3(0, 0, -offset));
+        position.add(new Vector3(0, offset, 0));
       } else {
         wheel.rotation.set(Math.PI / 2, 0, 0);
-        position.add(new Vector3(0, 0, offset));
+        position.add(new Vector3(0, -offset, 0));
       }
 
       wheel.scale.set(radiusScale, radiusScale, widthScale);

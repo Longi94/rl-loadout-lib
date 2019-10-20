@@ -144,7 +144,6 @@ export class BodyModel extends AbstractObject implements Paintable {
 
         const wheelType = object.name.substr(0, 2).toLowerCase();
 
-        config.position = new Vector3();
         config.front = wheelType[0] === 'f';
         config.right = wheelType[1] === 'r';
         config.joint = object as Bone;

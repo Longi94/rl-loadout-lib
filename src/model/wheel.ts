@@ -26,7 +26,7 @@ export class Wheel extends Item {
 export class WheelConfig {
   right: boolean;
   front: boolean;
-  position: Vector3;
+  position: Vector3 = new Vector3();
   width: number = BASE_WHEEL_MESH_WIDTH;
   radius: number = BASE_WHEEL_MESH_RADIUS;
   offset = 0;
