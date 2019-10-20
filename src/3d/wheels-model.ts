@@ -124,10 +124,11 @@ export class WheelsModel extends AbstractObject implements Paintable {
       position.copy(conf.position);
 
       if (!conf.right) {
-        wheel.rotation.set(0, Math.PI, 0);
-        position.add(new Vector3(0, 0, -offset));
+        wheel.rotation.set(-Math.PI / 2, 0, 0);
+        position.add(new Vector3(0, offset, 0));
       } else {
-        position.add(new Vector3(0, 0, offset));
+        wheel.rotation.set(Math.PI / 2, 0, 0);
+        position.add(new Vector3(0, -offset, 0));
       }
 
       wheel.scale.set(radiusScale, radiusScale, widthScale);
@@ -140,21 +141,38 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
-  addToScene(scene: Scene) {
+  addToJoints() {
     for (const wheel of this.wheels) {
-      scene.add(wheel.model);
+      wheel.config.joint.add(wheel.model);
     }
   }
 
-  removeFromScene(scene: Scene) {
+  removeFromJoints() {
     for (const wheel of this.wheels) {
-      scene.remove(wheel.model);
+      wheel.config.joint.remove(wheel.model);
     }
   }
 
   setPaintColor(paint: Color) {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
+    }
+  }
+
+  visible(visible: boolean) {
+    super.visible(visible);
+    for (const wheel of this.wheels) {
+      wheel.model.visible = visible;
+    }
+  }
+
+  setRoll(angle: number) {
+    for (const wheel of this.wheels) {
+      if (wheel.config.right) {
+        wheel.model.rotation.z = -angle;
+      } else {
+        wheel.model.rotation.z = angle;
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Vector3 } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
 import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
@@ -17,6 +17,7 @@ import { RocketConfig } from '../../model/rocket-config';
 import { WheelsModel } from '../wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
+import { MAX_WHEEL_YAW } from '../constants';
 
 
 export class BodyModel extends AbstractObject implements Paintable {
@@ -35,6 +36,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
   wheelConfig: WheelConfig[];
+  frontPivots: Bone[] = [];
 
   hatSocket: Object3D;
   antennaSocket: Object3D;
@@ -117,6 +119,12 @@ export class BodyModel extends AbstractObject implements Paintable {
           this.bodyMaterial = mat;
         } else if (matName.includes('chassis')) {
           this.chassisMaterial = mat;
+
+          const mesh = object as SkinnedMesh;
+          // @ts-ignore
+          this.frontPivots.push(mesh.skeleton.getBoneByName('FL_Pivot_jnt'));
+          // @ts-ignore
+          this.frontPivots.push(mesh.skeleton.getBoneByName('FR_Pivot_jnt'));
         } else if (matName === 'window_material') {
           mat.envMapIntensity = 3.0;
           mat.needsUpdate = true;
@@ -136,9 +144,9 @@ export class BodyModel extends AbstractObject implements Paintable {
 
         const wheelType = object.name.substr(0, 2).toLowerCase();
 
-        config.position = object.localToWorld(new Vector3());
         config.front = wheelType[0] === 'f';
         config.right = wheelType[1] === 'r';
+        config.joint = object as Bone;
 
         if (this.wheelSettings != undefined) {
           if (config.front) {
@@ -160,12 +168,12 @@ export class BodyModel extends AbstractObject implements Paintable {
   addWheelsModel(wheelsModel: WheelsModel) {
     this.wheelsModel = wheelsModel;
     this.wheelsModel.applyWheelConfig(this.wheelConfig);
-    this.wheelsModel.addToScene(this.scene);
+    this.wheelsModel.addToJoints();
   }
 
   clearWheelsModel() {
     if (this.wheelsModel != undefined) {
-      this.wheelsModel.removeFromScene(this.scene);
+      this.wheelsModel.removeFromJoints();
       this.wheelsModel = undefined;
     }
   }
@@ -234,5 +242,15 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   setDecalPaintColor(color: Color) {
     this.bodySkin.setPaint(color);
+  }
+
+  setFrontWheelYaw(angle: number, clamped: boolean = true) {
+    if (clamped) {
+      angle = Math.max(Math.min(angle, MAX_WHEEL_YAW), -MAX_WHEEL_YAW);
+    }
+
+    for (const pivot of this.frontPivots) {
+      pivot.rotation.z = angle;
+    }
   }
 }

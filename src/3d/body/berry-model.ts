@@ -109,9 +109,9 @@ export class BerryModel extends BodyModel {
         const newConfig = config.clone();
 
         if (newConfig.right) {
-          newConfig.position.setZ(newConfig.position.z + newConfig.width);
+          newConfig.position.setY(newConfig.position.y - newConfig.width);
         } else {
-          newConfig.position.setZ(newConfig.position.z - newConfig.width);
+          newConfig.position.setY(newConfig.position.y + newConfig.width);
         }
 
         confToAdd.push(newConfig);

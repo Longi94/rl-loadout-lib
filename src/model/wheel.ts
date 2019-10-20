@@ -1,7 +1,7 @@
 /* tslint:disable:variable-name */
 
 import { Item } from './item';
-import { Vector3 } from 'three';
+import { Bone, Vector3 } from 'three';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../3d/constants';
 import { Quality } from './quality';
 
@@ -26,10 +26,11 @@ export class Wheel extends Item {
 export class WheelConfig {
   right: boolean;
   front: boolean;
-  position: Vector3;
+  position: Vector3 = new Vector3();
   width: number = BASE_WHEEL_MESH_WIDTH;
   radius: number = BASE_WHEEL_MESH_RADIUS;
   offset = 0;
+  joint: Bone;
 
   clone(): WheelConfig {
     const newObj = new WheelConfig();
@@ -41,6 +42,7 @@ export class WheelConfig {
     newObj.offset = this.offset;
     newObj.position = new Vector3();
     newObj.position.copy(this.position);
+    newObj.joint = this.joint;
 
     return newObj;
   }
