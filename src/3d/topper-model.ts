@@ -5,7 +5,7 @@ import { getAssetUrl } from '../utils/network';
 import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
-import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
+import { ImageDataLoader, PromiseLoader } from '../utils/loader';
 import { Layer, LayeredTexture } from './layered-texture';
 import { getChannel, getMaskPixels, ImageChannel } from '../utils/image';
 import { RocketConfig } from '../model/rocket-config';
@@ -19,7 +19,7 @@ class TopperSkin {
   private paintPixels: Set<number>;
 
   constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {

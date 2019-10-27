@@ -1,7 +1,7 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Vector3 } from 'three';
+import { Bone, Color, LinearEncoding, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
+import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
@@ -25,6 +25,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   private readonly body: Body;
 
   textureLoader: PromiseLoader;
+  imageTextureLoader: PromiseLoader;
 
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
@@ -32,6 +33,9 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   bodySkin: BodyTexture;
   chassisSkin: ChassisSkin;
+
+  chassisNUrl: string;
+  chassisBaseUrl: string;
 
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
@@ -47,13 +51,16 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
-    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.textureLoader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.chassisNUrl = getAssetUrl(body.chassis_n, rocketConfig);
+    this.chassisBaseUrl = getAssetUrl(body.chassis_base, rocketConfig);
 
     this.body = body;
 
     this.bodySkin = this.initBodySkin(body, decal, paints, rocketConfig);
 
-    if (body.chassis_base) {
+    if (body.chassis_paintable) {
       this.chassisSkin = new ChassisSkin(
         getAssetUrl(body.chassis_base, rocketConfig),
         getAssetUrl(body.chassis_n, rocketConfig),
@@ -79,6 +86,8 @@ export class BodyModel extends AbstractObject implements Paintable {
   async load() {
     const superTask = super.load();
     const bodySkinTask = this.bodySkin.load();
+    const chassisNTask = this.imageTextureLoader.load(this.chassisNUrl);
+    const chassisBaseTask = this.imageTextureLoader.load(this.chassisBaseUrl);
 
     if (this.chassisSkin != undefined) {
       await this.chassisSkin.load();
@@ -91,6 +100,10 @@ export class BodyModel extends AbstractObject implements Paintable {
 
     if (this.chassisSkin) {
       this.chassisMaterial.map = this.chassisSkin.texture.texture;
+      this.chassisMaterial.needsUpdate = true;
+    } else {
+      this.chassisMaterial.normalMap = await chassisNTask;
+      this.chassisMaterial.map = await chassisBaseTask;
       this.chassisMaterial.needsUpdate = true;
     }
   }

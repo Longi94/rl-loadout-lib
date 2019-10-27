@@ -1,4 +1,4 @@
-import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
+import { ImageDataLoader, PromiseLoader } from '../utils/loader';
 import { Color } from 'three';
 import { Layer, LayeredTexture } from './layered-texture';
 import { PaintConfig } from '../model/paint-config';
@@ -18,7 +18,7 @@ export class ChassisSkin {
   private accentPixels: Set<number>;
 
   constructor(private baseUrl: string, private rgbaMapUrl: string, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.tgaLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.tgaLoader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.paint = paints.body;
     this.accent = paints.accent;
   }

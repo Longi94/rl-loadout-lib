@@ -18,7 +18,7 @@ export function getAssetUrl(path: string, rocketConfig: RocketConfig): string {
   if (path == undefined || path.length === 0) {
     return undefined;
   }
-  if (path.startsWith('textures/') && path.endsWith('.tga')) {
+  if (path.endsWith('.tga')) {
     if (rocketConfig.textureQuality === TextureQuality.LOW) {
       path = path.replace('.tga', '_S.tga');
     }

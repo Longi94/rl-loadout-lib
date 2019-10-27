@@ -7,7 +7,7 @@ import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
 import { Layer, LayeredTexture } from './layered-texture';
-import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
+import { ImageDataLoader, PromiseLoader } from '../utils/loader';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../utils/image';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
@@ -21,7 +21,7 @@ class RimSkin {
   private paintPixels: Set<number>;
 
   constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {

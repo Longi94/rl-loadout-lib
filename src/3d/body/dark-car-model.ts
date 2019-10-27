@@ -3,7 +3,7 @@ import { Color, Texture } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Layer, LayeredTexture } from '../layered-texture';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
+import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
 import { getAssetUrl } from '../../utils/network';
@@ -26,7 +26,7 @@ class DarkCarBodySkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;
