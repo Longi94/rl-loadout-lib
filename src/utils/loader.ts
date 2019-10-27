@@ -67,6 +67,7 @@ export class ImageTextureLoader {
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;
       texture.encoding = LinearEncoding;
+      texture.flipY = false;
       onLoad(texture);
     }, onProgress, onError);
   }
