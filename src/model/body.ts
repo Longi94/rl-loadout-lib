@@ -15,7 +15,8 @@ export class Body extends Item {
     model: 'models/Body_Octane_SF.glb',
     name: 'Octane',
     paintable: true,
-    quality: Quality.COMMON
+    quality: Quality.COMMON,
+    chassis_paintable: false
   };
 
   blank_skin: string;
@@ -23,4 +24,5 @@ export class Body extends Item {
   model: string;
   chassis_base?: string;
   chassis_n?: string;
+  chassis_paintable: boolean;
 }
