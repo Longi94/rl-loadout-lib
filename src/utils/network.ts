@@ -26,5 +26,8 @@ export function getAssetUrl(path: string, rocketConfig: RocketConfig): string {
       path = path.replace('.tga', '.png');
     }
   }
+  if (path.endsWith('.glb') && rocketConfig.useCompressedModels && !path.endsWith('.draco.glb')) {
+    path = path.replace('.glb', '.draco.glb');
+  }
   return `${rocketConfig.assetHost}/${path}`;
 }
