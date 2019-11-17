@@ -15,12 +15,18 @@ export class Wheel extends Item {
     paintable: true,
     quality: Quality.COMMON,
     rim_base: 'wheel/WHEEL_Star/OEM_D.tga',
-    rim_rgb_map: 'wheel/WHEEL_Star/OEM_RGB.tga'
+    rim_rgb_map: 'wheel/WHEEL_Star/OEM_RGB.tga',
+    rim_n: 'wheel/WHEEL_Star/OEM_N.tga',
+    tire_base: 'wheel/WHEEL_Star/Tire_Swarm_Tyr_Diffuse.tga',
+    tire_n: 'wheel/WHEEL_Star/Tire_Swarm_Tyr_Normal.tga'
   };
 
   model: string;
   rim_base: string;
   rim_rgb_map: string;
+  rim_n: string;
+  tire_base: string;
+  tire_n: string;
 }
 
 export class WheelConfig {

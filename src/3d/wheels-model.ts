@@ -7,7 +7,7 @@ import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
 import { Layer, LayeredTexture } from './layered-texture';
-import { ImageDataLoader, PromiseLoader } from '../utils/loader';
+import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../utils/image';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
@@ -63,12 +63,21 @@ class WheelModel {
 
 export class WheelsModel extends AbstractObject implements Paintable {
 
+  private textureLoader: PromiseLoader;
+
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
   rimSkin: RimSkin;
 
+  tireMaterial: MeshStandardMaterial;
+
+  rimNUrl: string;
+  tireBaseUrl: string;
+  tireNUrl: string;
+
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     if (wheel.rim_base && wheel.rim_rgb_map) {
       this.rimSkin = new RimSkin(
         getAssetUrl(wheel.rim_base, rocketConfig),
@@ -77,6 +86,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
         rocketConfig
       );
     }
+
+    this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
+    this.tireBaseUrl = getAssetUrl(wheel.tire_base, rocketConfig);
+    this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
   }
 
   dispose() {
@@ -88,12 +101,19 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   async load() {
     const superTask = super.load();
+    const rimNTask = this.textureLoader.load(this.rimNUrl);
+    const tireBaseTask = this.textureLoader.load(this.tireBaseUrl);
+    const tireNTask = this.textureLoader.load(this.tireNUrl);
 
     if (this.rimSkin) {
       await this.rimSkin.load();
     }
 
     await superTask;
+
+    this.rimMaterial.normalMap = await rimNTask;
+    this.tireMaterial.map = await tireBaseTask;
+    this.tireMaterial.normalMap = await tireNTask;
 
     if (this.rimSkin) {
       this.rimMaterial.map = this.rimSkin.texture.texture;
@@ -107,6 +127,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
         const mat = (object as Mesh).material as MeshStandardMaterial;
         if (mat.name.includes('rim')) {
           this.rimMaterial = mat;
+        } else if (mat.name.includes('tire')) {
+          this.tireMaterial = mat;
         }
       }
     });
