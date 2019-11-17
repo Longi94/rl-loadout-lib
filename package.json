@@ -27,6 +27,7 @@
     "three"
   ],
   "dependencies": {
+    "pngjs": "^3.4.0",
     "three": "^0.108.0"
   },
   "devDependencies": {

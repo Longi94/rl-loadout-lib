@@ -1,7 +1,8 @@
 import { TextureFormat } from '../model/rocket-config';
-import { ImageLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
+import { FileLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
 import { TgaRgbaLoader } from './tga-rgba-loader';
 import { TGALoader } from 'three/examples/jsm/loaders/TGALoader';
+import { PNG } from 'pngjs/browser';
 
 export class PromiseLoader {
 
@@ -29,7 +30,8 @@ export class ImageDataLoader {
     if (this.format === TextureFormat.TGA) {
       this.loader = new TgaRgbaLoader(loadingManager);
     } else {
-      this.loader = new ImageLoader(loadingManager);
+      this.loader = new FileLoader(loadingManager);
+      this.loader.setResponseType('arraybuffer');
     }
   }
 
@@ -40,11 +42,12 @@ export class ImageDataLoader {
         onLoad(img);
       }
 
-      const canvas = new OffscreenCanvas(img.width, img.height);
-      const context = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
-      context.drawImage(img, 0, 0);
-      const imageData = context.getImageData(0, 0, img.width, img.height);
-      onLoad(imageData);
+      new PNG({filterType: -1}).parse(img, function(error, data) {
+        if (error) {
+          console.error(error);
+        }
+        onLoad(data);
+      });
     }, onProgress, onError);
   }
 }
