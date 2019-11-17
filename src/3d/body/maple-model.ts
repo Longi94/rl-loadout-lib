@@ -8,10 +8,10 @@ import { Body } from '../../model/body';
 import { RocketConfig } from '../../model/rocket-config';
 import { getAssetUrl } from '../../utils/network';
 
-const BODY_ORANGE = `textures/Body_Maple1_D.tga`;
-const BODY_BLUE = `textures/Body_Maple2_D.tga`;
-const CHASSIS_ORANGE = `textures/Chassis_Maple1_D.tga`;
-const CHASSIS_BLUE = `textures/Chassis_Maple2_D.tga`;
+const BODY_ORANGE = `body/body_maple/Body_Maple1_D.tga`;
+const BODY_BLUE = `body/body_maple/Body_Maple2_D.tga`;
+const CHASSIS_ORANGE = `body/body_maple/Chassis_Maple1_D.tga`;
+const CHASSIS_BLUE = `body/body_maple/Chassis_Maple2_D.tga`;
 
 export class MapleModel extends BodyModel {
 
