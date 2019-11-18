@@ -51,8 +51,14 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - lint
-      - build
+      - lint:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
+      - build:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - deploy:
           requires:
             - build
