@@ -42,11 +42,13 @@ export class ImageDataLoader {
         onLoad(img);
       }
 
-      new PNG({filterType: -1}).parse(img, function(error, data) {
+      new PNG({filterType: -1}).parse(img, (error, data) => {
         if (error) {
           console.error(error);
+          onError(error);
+        } else {
+          onLoad(data);
         }
-        onLoad(data);
       });
     }, onProgress, onError);
   }
