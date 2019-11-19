@@ -12,6 +12,7 @@ export class RocketConfig {
   textureQuality: TextureQuality = TextureQuality.HIGH;
   textureFormat: TextureFormat = TextureFormat.TGA;
   modelQuality: ModelQuality = ModelQuality.HIGH;
+  useCompressedModels = false;
 
   public constructor(init?: Partial<RocketConfig>) {
     Object.assign(this, init);

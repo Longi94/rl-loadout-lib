@@ -8,9 +8,12 @@ import {
   BODY_FELINE_ID,
   BODY_GREY_CAR_ID,
   BODY_MAPLE_ID,
-  BODY_SLIME_ID
+  BODY_SLIME_ID,
+  BODY_RYE_TIER2_ID,
+  BODY_RYE_TIER1_ID, BODY_RON_ID
 } from '../../utils/ids';
 import { PaintConfig } from '../../model/paint-config';
+import { RocketConfig } from '../../model/rocket-config';
 import { MapleModel } from './maple-model';
 import { DarkCarModel } from './dark-car-model';
 import { EggplantModel } from './eggplant-model';
@@ -18,7 +21,9 @@ import { SlimeModel } from './slime-model';
 import { FelineModel } from './feline-model';
 import { GreyCarModel } from './grey-car-model';
 import { BerryModel } from './berry-model';
-import { RocketConfig } from '../../model/rocket-config';
+import { RyeTier2Model } from './rye-tier2-model';
+import { RyeTier1Model } from './rye-tier1-model';
+import { RonModel } from './ron-model';
 
 export function createBodyModel(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyModel {
   switch (body.id) {
@@ -36,6 +41,12 @@ export function createBodyModel(body: Body, decal: Decal, paints: PaintConfig, r
       return new FelineModel(body, decal, paints, rocketConfig);
     case BODY_GREY_CAR_ID:
       return new GreyCarModel(body, decal, paints, rocketConfig);
+    case BODY_RYE_TIER1_ID:
+      return new RyeTier1Model(body, decal, paints, rocketConfig);
+    case BODY_RYE_TIER2_ID:
+      return new RyeTier2Model(body, decal, paints, rocketConfig);
+    case BODY_RON_ID:
+      return new RonModel(body, decal, paints, rocketConfig);
     default:
       return new BodyModel(body, decal, paints, rocketConfig);
   }

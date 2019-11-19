@@ -92,7 +92,7 @@ export abstract class AbstractObject {
   }
 }
 
-export function traverseMaterials(object, callback) {
+export function traverseMaterials(object, callback: (mat) => void) {
   object.traverse((node) => {
     if (!node.isMesh) {
       return;

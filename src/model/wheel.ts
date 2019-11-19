@@ -8,19 +8,25 @@ import { Quality } from './quality';
 export class Wheel extends Item {
 
   static readonly DEFAULT: Wheel = {
-    icon: 'icons/Wheel_Star_Thumbnail.jpg',
+    icon: 'wheel/WHEEL_Star/WHEEL_Star_TThumbnail.jpg',
     id: 376,
-    model: 'models/WHEEL_Star_SM.glb',
+    model: 'wheel/WHEEL_Star/WHEEL_Star_SM.glb',
     name: 'OEM',
     paintable: true,
     quality: Quality.COMMON,
-    rim_base: 'textures/OEM_D.tga',
-    rim_rgb_map: 'textures/OEM_RGB.tga'
+    rim_base: 'wheel/WHEEL_Star/OEM_D.tga',
+    rim_rgb_map: 'wheel/WHEEL_Star/OEM_RGB.tga',
+    rim_n: 'wheel/WHEEL_Star/OEM_N.tga',
+    tire_base: 'wheel/WHEEL_Star/Tire_Swarm_Tyr_Diffuse.tga',
+    tire_n: 'wheel/WHEEL_Star/Tire_Swarm_Tyr_Normal.tga'
   };
 
   model: string;
   rim_base: string;
   rim_rgb_map: string;
+  rim_n: string;
+  tire_base: string;
+  tire_n: string;
 }
 
 export class WheelConfig {

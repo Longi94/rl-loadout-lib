@@ -6,16 +6,17 @@ import { Quality } from './quality';
 export class Body extends Item {
 
   static readonly DEFAULT: Body = {
-    base_skin: 'textures/Pepe_Body_D.tga',
-    blank_skin: 'textures/Pepe_Body_BlankSkin_RGB.tga',
-    chassis_base: null,
-    chassis_n: null,
-    icon: 'icons/Body_Octane_Thumbnail.jpg',
+    base_skin: 'body/Body_Octane/Pepe_Body_D.tga',
+    blank_skin: 'body/Body_Octane/Pepe_Body_BlankSkin.tga',
+    chassis_base: 'body/Body_Octane/Chasis_Pepe_D.tga',
+    chassis_n: 'body/Body_Octane/Chasis_Pepe_N.tga',
+    icon: 'body/Body_Octane/Body_Octane_Thumbnail.jpg',
     id: 23,
-    model: 'models/Body_Octane_SF.glb',
+    model: 'body/Body_Octane/Body_Octane_SF.glb',
     name: 'Octane',
     paintable: true,
-    quality: Quality.COMMON
+    quality: Quality.COMMON,
+    chassis_paintable: false
   };
 
   blank_skin: string;
@@ -23,4 +24,5 @@ export class Body extends Item {
   model: string;
   chassis_base?: string;
   chassis_n?: string;
+  chassis_paintable: boolean;
 }

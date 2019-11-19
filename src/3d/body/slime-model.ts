@@ -9,10 +9,10 @@ import { Body } from '../../model/body';
 import { RocketConfig } from '../../model/rocket-config';
 import { getAssetUrl } from '../../utils/network';
 
-const BODY_ORANGE = 'textures/Body_Slime1_D.tga';
-const BODY_BLUE = 'textures/Body_Slime2_D.tga';
-const CHASSIS_ORANGE = 'textures/Chassis_Slime_D.tga';
-const CHASSIS_BLUE = 'textures/Chassis_Slime2_D.tga';
+const BODY_ORANGE = 'body/body_slime/Body_Slime1_D.tga';
+const BODY_BLUE = 'body/body_slime/Body_Slime2_D.tga';
+const CHASSIS_ORANGE = 'body/body_slime/Chassis_Slime_D.tga';
+const CHASSIS_BLUE = 'body/body_slime/Chassis_Slime2_D.tga';
 
 export class SlimeModel extends BodyModel {
 

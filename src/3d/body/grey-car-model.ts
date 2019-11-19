@@ -4,7 +4,7 @@ import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
+import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
 import { Layer, LayeredTexture } from '../layered-texture';
 import { getAssetUrl } from '../../utils/network';
 import { getChannel, ImageChannel } from '../../utils/image';
@@ -18,7 +18,7 @@ class GreyCarSkin implements BodyTexture {
   private readonly baseUrl: string;
   private readonly blankSkinUrl: string;
 
-  private primary: Color;
+  primary: Color;
 
   private texture: LayeredTexture;
 
@@ -26,7 +26,7 @@ class GreyCarSkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;
@@ -51,7 +51,8 @@ class GreyCarSkin implements BodyTexture {
     for (let i = 0; i < primaryMask.length; i++) {
       if (primaryMask[i] < 42) {
         primaryMask[i] = 0;
-      } else if (bodyMask[i] < 255) {
+      }
+      if (bodyMask[i] < 255) {
         this.primaryPixels.add(i * 4);
       }
     }
@@ -89,6 +90,11 @@ class GreyCarSkin implements BodyTexture {
 
 
 export class GreyCarModel extends BodyModel {
+
+  async load(): Promise<void> {
+    await super.load();
+    this.setPrimaryColor((this.bodySkin as GreyCarSkin).primary);
+  }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
     return new GreyCarSkin(body, paints, rocketConfig);
