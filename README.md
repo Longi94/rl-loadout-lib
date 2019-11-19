@@ -38,7 +38,9 @@ const gltfLoader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/draco/');
 gltfLoader.setDRACOLoader(dracoLoader);
-const config = new RocketConfig(gltfLoader);
+const config = new RocketConfig({
+  gltfLoader
+});
 
 const manager = new RocketAssetManager(config);
 
