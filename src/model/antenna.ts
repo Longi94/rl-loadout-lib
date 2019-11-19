@@ -12,6 +12,7 @@ export class Antenna extends Item {
   model?: string;
   base_texture?: string;
   rgba_map?: string;
+  normal_map?: string;
   stick?: string;
   stick_id?: number;
 }
