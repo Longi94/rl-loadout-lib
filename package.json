@@ -27,11 +27,14 @@
     "three"
   ],
   "dependencies": {
-    "pngjs": "^3.4.0",
-    "three": "^0.108.0"
+    "pngjs": "^3.4.0"
+  },
+  "peerDependencies": {
+    "three": "^0.110.0"
   },
   "devDependencies": {
     "tslint": "^5.20.0",
-    "typescript": "~3.5.3"
+    "typescript": "~3.7.2",
+    "three": "^0.110.0"
   }
 }
