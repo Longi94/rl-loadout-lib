@@ -1,11 +1,14 @@
-import { FileLoader } from 'three';
+import { FileLoader, LoadingManager } from 'three';
 
 export class TgaRgbaLoader {
   path: string;
 
+  constructor(private readonly loadingManager?: LoadingManager) {
+  }
+
   load(url: string, onLoad: (buffer: any) => void, onProgress?: (event: ProgressEvent) => void,
        onError?: (event: ErrorEvent) => void) {
-    let fileLoader = new FileLoader();
+    let fileLoader = new FileLoader(this.loadingManager);
     fileLoader.setResponseType('arraybuffer');
     fileLoader.setPath(this.path);
 
@@ -508,5 +511,5 @@ function parse(buffer) {
     height: header.height,
     width: header.width,
     data: rgbaData
-  }
+  };
 }

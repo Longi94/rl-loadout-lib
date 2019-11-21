@@ -4,8 +4,7 @@ import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { PromiseLoader } from '../../utils/loader';
-import { TgaRgbaLoader } from '../../utils/tga-rgba-loader';
+import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
 import { Layer, LayeredTexture } from '../layered-texture';
 import { getAssetUrl } from '../../utils/network';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../../utils/image';
@@ -13,10 +12,10 @@ import { RocketConfig } from '../../model/rocket-config';
 
 class EggplantBodySkin implements BodyTexture {
 
-  private readonly loader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
-  private readonly baseUrl;
-  private readonly blankSkinUrl;
+  private readonly baseUrl: string;
+  private readonly blankSkinUrl: string;
 
   private primary: Color;
 
@@ -26,6 +25,7 @@ class EggplantBodySkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;

@@ -3,8 +3,7 @@ import { Color, Texture } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Layer, LayeredTexture } from '../layered-texture';
-import { PromiseLoader } from '../../utils/loader';
-import { TgaRgbaLoader } from '../../utils/tga-rgba-loader';
+import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
 import { getAssetUrl } from '../../utils/network';
@@ -14,10 +13,10 @@ import { RocketConfig } from '../../model/rocket-config';
 
 class DarkCarBodySkin implements BodyTexture {
 
-  private readonly loader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
-  private readonly baseUrl;
-  private readonly blankSkinUrl;
+  private readonly baseUrl: string;
+  private readonly blankSkinUrl: string;
 
   private primary: Color;
 
@@ -27,6 +26,7 @@ class DarkCarBodySkin implements BodyTexture {
   private primaryPixels: Set<number>;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;

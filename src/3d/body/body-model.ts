@@ -1,8 +1,7 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from 'three';
+import { Bone, Color, LinearEncoding, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { PromiseLoader } from '../../utils/loader';
-import { TgaRgbaLoader } from '../../utils/tga-rgba-loader';
+import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
@@ -18,13 +17,15 @@ import { RocketConfig } from '../../model/rocket-config';
 import { WheelsModel } from '../wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
+import { MAX_WHEEL_YAW } from '../constants';
 
 
 export class BodyModel extends AbstractObject implements Paintable {
 
   private readonly body: Body;
 
-  textureLoader = new PromiseLoader(new TgaRgbaLoader());
+  textureLoader: PromiseLoader;
+  imageTextureLoader: PromiseLoader;
 
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
@@ -33,9 +34,13 @@ export class BodyModel extends AbstractObject implements Paintable {
   bodySkin: BodyTexture;
   chassisSkin: ChassisSkin;
 
+  chassisNUrl: string;
+  chassisBaseUrl: string;
+
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
   wheelConfig: WheelConfig[];
+  frontPivots: Bone[] = [];
 
   hatSocket: Object3D;
   antennaSocket: Object3D;
@@ -46,16 +51,21 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.chassisNUrl = getAssetUrl(body.chassis_n, rocketConfig);
+    this.chassisBaseUrl = getAssetUrl(body.chassis_base, rocketConfig);
 
     this.body = body;
 
     this.bodySkin = this.initBodySkin(body, decal, paints, rocketConfig);
 
-    if (body.chassis_base) {
+    if (body.chassis_paintable) {
       this.chassisSkin = new ChassisSkin(
         getAssetUrl(body.chassis_base, rocketConfig),
         getAssetUrl(body.chassis_n, rocketConfig),
-        paints
+        paints,
+        rocketConfig
       );
     }
   }
@@ -76,6 +86,8 @@ export class BodyModel extends AbstractObject implements Paintable {
   async load() {
     const superTask = super.load();
     const bodySkinTask = this.bodySkin.load();
+    const chassisNTask = this.imageTextureLoader.load(this.chassisNUrl);
+    const chassisBaseTask = this.imageTextureLoader.load(this.chassisBaseUrl);
 
     if (this.chassisSkin != undefined) {
       await this.chassisSkin.load();
@@ -88,6 +100,10 @@ export class BodyModel extends AbstractObject implements Paintable {
 
     if (this.chassisSkin) {
       this.chassisMaterial.map = this.chassisSkin.texture.texture;
+      this.chassisMaterial.needsUpdate = true;
+    } else {
+      this.chassisMaterial.normalMap = await chassisNTask;
+      this.chassisMaterial.map = await chassisBaseTask;
       this.chassisMaterial.needsUpdate = true;
     }
   }
@@ -116,6 +132,12 @@ export class BodyModel extends AbstractObject implements Paintable {
           this.bodyMaterial = mat;
         } else if (matName.includes('chassis')) {
           this.chassisMaterial = mat;
+
+          const mesh = object as SkinnedMesh;
+          // @ts-ignore
+          this.frontPivots.push(mesh.skeleton.getBoneByName('FL_Pivot_jnt'));
+          // @ts-ignore
+          this.frontPivots.push(mesh.skeleton.getBoneByName('FR_Pivot_jnt'));
         } else if (matName === 'window_material') {
           mat.envMapIntensity = 3.0;
           mat.needsUpdate = true;
@@ -135,9 +157,9 @@ export class BodyModel extends AbstractObject implements Paintable {
 
         const wheelType = object.name.substr(0, 2).toLowerCase();
 
-        config.position = object.localToWorld(new Vector3());
         config.front = wheelType[0] === 'f';
         config.right = wheelType[1] === 'r';
+        config.joint = object as Bone;
 
         if (this.wheelSettings != undefined) {
           if (config.front) {
@@ -159,12 +181,12 @@ export class BodyModel extends AbstractObject implements Paintable {
   addWheelsModel(wheelsModel: WheelsModel) {
     this.wheelsModel = wheelsModel;
     this.wheelsModel.applyWheelConfig(this.wheelConfig);
-    this.wheelsModel.addToScene(this.scene);
+    this.wheelsModel.addToJoints();
   }
 
   clearWheelsModel() {
     if (this.wheelsModel != undefined) {
-      this.wheelsModel.removeFromScene(this.scene);
+      this.wheelsModel.removeFromJoints();
       this.wheelsModel = undefined;
     }
   }
@@ -233,5 +255,15 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   setDecalPaintColor(color: Color) {
     this.bodySkin.setPaint(color);
+  }
+
+  setFrontWheelYaw(angle: number, clamped: boolean = true) {
+    if (clamped) {
+      angle = Math.max(Math.min(angle, MAX_WHEEL_YAW), -MAX_WHEEL_YAW);
+    }
+
+    for (const pivot of this.frontPivots) {
+      pivot.rotation.z = angle;
+    }
   }
 }

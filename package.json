@@ -1,6 +1,6 @@
 {
   "name": "rl-loadout-lib",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "description": "Load Rocket League assets into three.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,8 +8,9 @@
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint",
-    "preversion": "npm run lint"
+    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled by NGCC. This is not allowed.\\nPlease delete and rebuild the package, without compiling with NGCC, before attempting to publish.\\nNote that NGCC may have been run by importing this package into another project that is being built with Ivy enabled.\\n')\" && exit 1",
+    "preversion": "npm run lint",
+    "prepublishOnly__ivy_ngcc_bak": "npm run lint"
   },
   "repository": {
     "type": "git",
@@ -27,10 +28,23 @@
     "three"
   ],
   "dependencies": {
-    "three": "^0.108.0"
+    "pngjs": "^3.4.0"
+  },
+  "peerDependencies": {
+    "three": "^0.110.0"
   },
   "devDependencies": {
     "tslint": "^5.20.0",
-    "typescript": "~3.5.3"
+    "typescript": "~3.7.2",
+    "three": "^0.110.0"
+  },
+  "__processed_by_ivy_ngcc__": {
+    "fesm2015": "9.0.0-rc.3",
+    "fesm5": "9.0.0-rc.3",
+    "es2015": "9.0.0-rc.3",
+    "esm2015": "9.0.0-rc.3",
+    "esm5": "9.0.0-rc.3",
+    "main": "9.0.0-rc.3",
+    "module": "9.0.0-rc.3"
   }
 }

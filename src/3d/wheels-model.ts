@@ -7,21 +7,21 @@ import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
 import { Layer, LayeredTexture } from './layered-texture';
-import { PromiseLoader } from '../utils/loader';
-import { TgaRgbaLoader } from '../utils/tga-rgba-loader';
+import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../utils/image';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
 
 class RimSkin {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   texture: LayeredTexture;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
 
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color) {
+  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {
@@ -63,19 +63,33 @@ class WheelModel {
 
 export class WheelsModel extends AbstractObject implements Paintable {
 
+  private textureLoader: PromiseLoader;
+
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
   rimSkin: RimSkin;
 
+  tireMaterial: MeshStandardMaterial;
+
+  rimNUrl: string;
+  tireBaseUrl: string;
+  tireNUrl: string;
+
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     if (wheel.rim_base && wheel.rim_rgb_map) {
       this.rimSkin = new RimSkin(
         getAssetUrl(wheel.rim_base, rocketConfig),
         getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-        paints.wheel
+        paints.wheel,
+        rocketConfig
       );
     }
+
+    this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
+    this.tireBaseUrl = getAssetUrl(wheel.tire_base, rocketConfig);
+    this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
   }
 
   dispose() {
@@ -87,12 +101,19 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   async load() {
     const superTask = super.load();
+    const rimNTask = this.textureLoader.load(this.rimNUrl);
+    const tireBaseTask = this.textureLoader.load(this.tireBaseUrl);
+    const tireNTask = this.textureLoader.load(this.tireNUrl);
 
     if (this.rimSkin) {
       await this.rimSkin.load();
     }
 
     await superTask;
+
+    this.rimMaterial.normalMap = await rimNTask;
+    this.tireMaterial.map = await tireBaseTask;
+    this.tireMaterial.normalMap = await tireNTask;
 
     if (this.rimSkin) {
       this.rimMaterial.map = this.rimSkin.texture.texture;
@@ -106,6 +127,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
         const mat = (object as Mesh).material as MeshStandardMaterial;
         if (mat.name.includes('rim')) {
           this.rimMaterial = mat;
+        } else if (mat.name.includes('tire')) {
+          this.tireMaterial = mat;
         }
       }
     });
@@ -123,10 +146,11 @@ export class WheelsModel extends AbstractObject implements Paintable {
       position.copy(conf.position);
 
       if (!conf.right) {
-        wheel.rotation.set(0, Math.PI, 0);
-        position.add(new Vector3(0, 0, -offset));
+        wheel.rotation.set(-Math.PI / 2, 0, 0);
+        position.add(new Vector3(0, offset, 0));
       } else {
-        position.add(new Vector3(0, 0, offset));
+        wheel.rotation.set(Math.PI / 2, 0, 0);
+        position.add(new Vector3(0, -offset, 0));
       }
 
       wheel.scale.set(radiusScale, radiusScale, widthScale);
@@ -139,21 +163,38 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
-  addToScene(scene: Scene) {
+  addToJoints() {
     for (const wheel of this.wheels) {
-      scene.add(wheel.model);
+      wheel.config.joint.add(wheel.model);
     }
   }
 
-  removeFromScene(scene: Scene) {
+  removeFromJoints() {
     for (const wheel of this.wheels) {
-      scene.remove(wheel.model);
+      wheel.config.joint.remove(wheel.model);
     }
   }
 
   setPaintColor(paint: Color) {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
+    }
+  }
+
+  visible(visible: boolean) {
+    super.visible(visible);
+    for (const wheel of this.wheels) {
+      wheel.model.visible = visible;
+    }
+  }
+
+  setRoll(angle: number) {
+    for (const wheel of this.wheels) {
+      if (wheel.config.right) {
+        wheel.model.rotation.z = -angle;
+      } else {
+        wheel.model.rotation.z = angle;
+      }
     }
   }
 }

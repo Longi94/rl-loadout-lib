@@ -86,9 +86,13 @@ export abstract class AbstractObject {
   dispose() {
     this.scene.dispose();
   }
+
+  visible(visible: boolean) {
+    this.scene.visible = visible;
+  }
 }
 
-export function traverseMaterials(object, callback) {
+export function traverseMaterials(object, callback: (mat) => void) {
   object.traverse((node) => {
     if (!node.isMesh) {
       return;

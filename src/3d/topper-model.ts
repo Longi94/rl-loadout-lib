@@ -5,21 +5,21 @@ import { getAssetUrl } from '../utils/network';
 import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
-import { PromiseLoader } from '../utils/loader';
-import { TgaRgbaLoader } from '../utils/tga-rgba-loader';
+import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { Layer, LayeredTexture } from './layered-texture';
 import { getChannel, getMaskPixels, ImageChannel } from '../utils/image';
 import { RocketConfig } from '../model/rocket-config';
 
 class TopperSkin {
 
-  private readonly loader: PromiseLoader = new PromiseLoader(new TgaRgbaLoader());
+  private readonly loader: PromiseLoader;
 
   texture: LayeredTexture;
   private paintLayer: Layer;
   private paintPixels: Set<number>;
 
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color) {
+  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {
@@ -55,18 +55,28 @@ class TopperSkin {
 
 export class TopperModel extends AbstractObject implements Paintable {
 
+  private textureLoader: PromiseLoader;
+
   material: MeshStandardMaterial;
   skin: TopperSkin;
 
+  normalMapUrl: string;
+  baseTextureUrl: string;
+
   constructor(topper: Topper, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(topper.model, rocketConfig), rocketConfig.gltfLoader);
+    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    this.normalMapUrl = getAssetUrl(topper.normal_map, rocketConfig);
 
-    if (topper.base_texture && topper.rgba_map) {
+    if (topper.rgba_map) {
       this.skin = new TopperSkin(
         getAssetUrl(topper.base_texture, rocketConfig),
         getAssetUrl(topper.rgba_map, rocketConfig),
-        paints.topper
+        paints.topper,
+        rocketConfig
       );
+    } else {
+      this.baseTextureUrl = getAssetUrl(topper.base_texture, rocketConfig);
     }
   }
 
@@ -86,16 +96,18 @@ export class TopperModel extends AbstractObject implements Paintable {
 
   async load() {
     const superTask = super.load();
-
-    if (this.skin) {
-      await this.skin.load();
-    }
+    const normalMapTask = this.textureLoader.load(this.normalMapUrl);
+    const skinTask = this.skin ? this.skin.load() : this.textureLoader.load(this.baseTextureUrl);
 
     await superTask;
+    const skin = await skinTask;
+    this.material.normalMap = await normalMapTask;
 
     if (this.skin) {
       this.material.map = this.skin.texture.texture;
       this.material.needsUpdate = true;
+    } else {
+      this.material.map = skin;
     }
   }
 
