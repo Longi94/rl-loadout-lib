@@ -1,11 +1,10 @@
-import { Bone, Color, LinearEncoding, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
 import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
-import { StaticSkin } from '../static-skin';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { PaintConfig } from '../../model/paint-config';
@@ -18,6 +17,7 @@ import { WheelsModel } from '../wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { MAX_WHEEL_YAW } from '../constants';
+import { StaticSkinWebGL } from '../../webgl/static-skin-webgl';
 
 
 export class BodyModel extends AbstractObject implements Paintable {
@@ -71,7 +71,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new StaticSkin(body, decal, paints, rocketConfig);
+    return new StaticSkinWebGL(body, decal, paints, rocketConfig);
   }
 
   dispose() {
@@ -237,7 +237,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     this.bodySkin.dispose();
-    this.bodySkin = new StaticSkin(this.body, decal, paints, rocketConfig);
+    this.bodySkin = new StaticSkinWebGL(this.body, decal, paints, rocketConfig);
     await this.bodySkin.load();
     this.applyDecal();
   }
