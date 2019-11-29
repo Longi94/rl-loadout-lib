@@ -6,7 +6,7 @@ import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { Body } from '../model/body';
 import { PaintConfig } from '../model/paint-config';
 import { RocketConfig } from '../model/rocket-config';
-import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
+import { bindEmptyTexture, createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 
 
 // language=GLSL
@@ -42,10 +42,15 @@ const FRAGMENT_SHADER = `
 
     uniform sampler2D u_base;
     uniform sampler2D u_rgba_map;
+    uniform sampler2D u_decal_map;
 
     uniform vec4 u_primary;
+    uniform vec4 u_accent;
     uniform vec4 u_body_paint;
     uniform vec4 u_paint;
+    uniform vec4 u_decal_paint;
+
+    uniform int u_is_blank;
 
     // the texCoords passed in from the vertex shader.
     varying vec2 v_texCoord;
@@ -64,15 +69,34 @@ const FRAGMENT_SHADER = `
         vec4 base = texture2D(u_base, v_texCoord);
         vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
 
+        // base body color
         gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
+        // body paint
         if (u_body_paint.r >= 0.0) {
             gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_body_paint.rgb, 1.0 - rgba_map.r);
         }
 
+        // primary color
         if (rgba_map.r > 0.58823529411) { // red 150
             gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, rgba_map.r);
         }
+
+        if (u_is_blank == 0) {
+
+            vec4 decal_map = texture2D(u_decal_map, v_texCoord);
+
+            // accent color
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_accent.rgb, decal_map.a);
+
+            // decal paint
+            if (u_decal_paint.r >= 0.0) {
+                gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_decal_paint.rgb, decal_map.g);
+            }
+        }
+
+        // accent color on body
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_accent.rgb, rgba_map.g);
     }
 `;
 
@@ -101,9 +125,12 @@ export class StaticSkinWebGL implements BodyTexture {
   private primaryLocation: WebGLUniformLocation;
   private bodyPaintLocation: WebGLUniformLocation;
   private paintLocation: WebGLUniformLocation;
+  private accentLocation: WebGLUniformLocation;
+  private decalPaintLocation: WebGLUniformLocation;
 
   private baseTexture: WebGLTexture;
   private rgbaMapTexture: WebGLTexture;
+  private decalMapTexture: WebGLTexture;
 
   private texCoordBuffer: WebGLBuffer;
   private positionBuffer: WebGLBuffer;
@@ -163,13 +190,19 @@ export class StaticSkinWebGL implements BodyTexture {
     // look up where the vertex data needs to go.
     const baseLocation = this.gl.getUniformLocation(this.program, 'u_base');
     const rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
+    const decalMapLocation = this.gl.getUniformLocation(this.program, 'u_decal_map');
     const resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+    const isBlankLocation = this.gl.getUniformLocation(this.program, 'u_is_blank');
     const positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
     const texCoordLocation = this.gl.getAttribLocation(this.program, 'a_texCoord');
 
     this.primaryLocation = this.gl.getUniformLocation(this.program, 'u_primary');
     this.bodyPaintLocation = this.gl.getUniformLocation(this.program, 'u_body_paint');
     this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
+    this.accentLocation = this.gl.getUniformLocation(this.program, 'u_accent');
+    this.decalPaintLocation = this.gl.getUniformLocation(this.program, 'u_decal_paint');
+
+    this.gl.uniform1i(isBlankLocation, this.decalRgbaMap != undefined ? 0 : 1);
 
     // provide texture coordinates for the rectangle.
     this.texCoordBuffer = this.gl.createBuffer();
@@ -187,13 +220,22 @@ export class StaticSkinWebGL implements BodyTexture {
     this.baseTexture = createTextureFromImage(this.gl, this.base);
     this.rgbaMapTexture = createTextureFromImage(this.gl, this.bodyBlankSkin);
 
+    if (this.decalRgbaMap != undefined) {
+      this.decalMapTexture = createTextureFromImage(this.gl, this.decalRgbaMap);
+    } else {
+      this.decalMapTexture = bindEmptyTexture(this.gl);
+    }
+
     this.gl.uniform1i(baseLocation, 0);
     this.gl.uniform1i(rgbaMapLocation, 1);
+    this.gl.uniform1i(decalMapLocation, 2);
 
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.baseTexture);
     this.gl.activeTexture(this.gl.TEXTURE1);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaMapTexture);
+    this.gl.activeTexture(this.gl.TEXTURE2);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.decalMapTexture);
 
     // set the resolution
     this.gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
@@ -230,11 +272,18 @@ export class StaticSkinWebGL implements BodyTexture {
 
   private update() {
     this.gl.uniform4f(this.primaryLocation, this.primary.r, this.primary.g, this.primary.b, 1);
+    this.gl.uniform4f(this.accentLocation, this.accent.r, this.accent.g, this.accent.b, 1);
 
     if (this.bodyPaint != undefined) {
       this.gl.uniform4f(this.bodyPaintLocation, this.bodyPaint.r, this.bodyPaint.g, this.bodyPaint.b, 1);
     } else {
       this.gl.uniform4f(this.bodyPaintLocation, -1, -1, -1, -1);
+    }
+
+    if (this.paint != undefined) {
+      this.gl.uniform4f(this.decalPaintLocation, this.paint.r, this.paint.g, this.paint.b, 1);
+    } else {
+      this.gl.uniform4f(this.decalPaintLocation, -1, -1, -1, -1);
     }
 
     // Draw the rectangle.
@@ -251,9 +300,12 @@ export class StaticSkinWebGL implements BodyTexture {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     this.gl.activeTexture(this.gl.TEXTURE1);
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.activeTexture(this.gl.TEXTURE2);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     this.gl.deleteTexture(this.baseTexture);
     this.gl.deleteTexture(this.rgbaMapTexture);
+    this.gl.deleteTexture(this.decalMapTexture);
     this.gl.deleteBuffer(this.texCoordBuffer);
     this.gl.deleteBuffer(this.positionBuffer);
   }

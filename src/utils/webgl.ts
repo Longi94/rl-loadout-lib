@@ -65,3 +65,7 @@ export function createTextureFromImage(gl: WebGLRenderingContext, image) {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
   return texture;
 }
+
+export function bindEmptyTexture(gl: WebGLRenderingContext) {
+  return createTextureFromImage(gl, new ImageData(1, 1));
+}
