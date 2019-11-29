@@ -6,7 +6,7 @@ import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { Body } from '../model/body';
 import { PaintConfig } from '../model/paint-config';
 import { RocketConfig } from '../model/rocket-config';
-import { bindEmptyTexture, createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
+import { bindColor, bindEmptyTexture, createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 
 
 // language=GLSL
@@ -47,7 +47,6 @@ const FRAGMENT_SHADER = `
     uniform vec4 u_primary;
     uniform vec4 u_accent;
     uniform vec4 u_body_paint;
-    uniform vec4 u_paint;
     uniform vec4 u_decal_paint;
 
     uniform int u_is_blank;
@@ -124,7 +123,6 @@ export class StaticDecalTextureWebGL implements BodyTexture {
 
   private primaryLocation: WebGLUniformLocation;
   private bodyPaintLocation: WebGLUniformLocation;
-  private paintLocation: WebGLUniformLocation;
   private accentLocation: WebGLUniformLocation;
   private decalPaintLocation: WebGLUniformLocation;
 
@@ -198,7 +196,6 @@ export class StaticDecalTextureWebGL implements BodyTexture {
 
     this.primaryLocation = this.gl.getUniformLocation(this.program, 'u_primary');
     this.bodyPaintLocation = this.gl.getUniformLocation(this.program, 'u_body_paint');
-    this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
     this.accentLocation = this.gl.getUniformLocation(this.program, 'u_accent');
     this.decalPaintLocation = this.gl.getUniformLocation(this.program, 'u_decal_paint');
 
@@ -271,20 +268,10 @@ export class StaticDecalTextureWebGL implements BodyTexture {
   }
 
   private update() {
-    this.gl.uniform4f(this.primaryLocation, this.primary.r, this.primary.g, this.primary.b, 1);
-    this.gl.uniform4f(this.accentLocation, this.accent.r, this.accent.g, this.accent.b, 1);
-
-    if (this.bodyPaint != undefined) {
-      this.gl.uniform4f(this.bodyPaintLocation, this.bodyPaint.r, this.bodyPaint.g, this.bodyPaint.b, 1);
-    } else {
-      this.gl.uniform4f(this.bodyPaintLocation, -1, -1, -1, -1);
-    }
-
-    if (this.paint != undefined) {
-      this.gl.uniform4f(this.decalPaintLocation, this.paint.r, this.paint.g, this.paint.b, 1);
-    } else {
-      this.gl.uniform4f(this.decalPaintLocation, -1, -1, -1, -1);
-    }
+    bindColor(this.gl, this.primaryLocation, this.primary);
+    bindColor(this.gl, this.accentLocation, this.accent);
+    bindColor(this.gl, this.bodyPaintLocation, this.bodyPaint);
+    bindColor(this.gl, this.decalPaintLocation, this.paint);
 
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);

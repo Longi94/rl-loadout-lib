@@ -1,3 +1,5 @@
+import { Color } from 'three';
+
 export function initShaderProgram(gl, vsSource, fsSource): WebGLProgram {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
@@ -68,4 +70,12 @@ export function createTextureFromImage(gl: WebGLRenderingContext, image) {
 
 export function bindEmptyTexture(gl: WebGLRenderingContext) {
   return createTextureFromImage(gl, new ImageData(1, 1));
+}
+
+export function bindColor(gl: WebGLRenderingContext, loc: WebGLUniformLocation, color: Color) {
+  if (color != undefined) {
+    gl.uniform4f(loc, color.r, color.g, color.b, 1);
+  } else {
+    gl.uniform4f(loc, -1, -1, -1, -1);
+  }
 }
