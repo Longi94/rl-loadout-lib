@@ -1,59 +1,109 @@
 import { BodyModel } from './body-model';
-import { Color, Texture } from 'three';
+import { Color } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
-import { Layer, LayeredTexture } from '../layered-texture';
 import { getAssetUrl } from '../../utils/network';
-import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../../utils/image';
 import { RocketConfig } from '../../model/rocket-config';
+import { bindColor, createTextureFromImage } from '../../utils/webgl';
+import { WebGLCanvasTexture } from '../../webgl/webgl-texture';
 
-class EggplantBodySkin implements BodyTexture {
+// language=GLSL
+const FRAGMENT_SHADER = `
+    precision mediump float;
 
-  private readonly loader: PromiseLoader;
+    uniform sampler2D u_base;
+    uniform sampler2D u_rgba_map;
 
-  private readonly baseUrl: string;
+    uniform vec4 u_primary;
+
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
+
+    vec3 blendNormal(vec3 base, vec3 blend) {
+        return blend;
+    }
+
+    vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
+        return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
+    }
+
+    void main() {
+        gl_FragColor = vec4(0.1988877, 0.1988877, 0.1988877, 1.0);
+        // Look up a color from the texture.
+        vec4 base = texture2D(u_base, v_texCoord);
+        vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
+
+        // base body color TODO somehow use base texture?
+        // gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
+
+        // primary color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, 1.0 - rgba_map.a);
+    }
+`;
+
+
+class EggplantBodySkin extends WebGLCanvasTexture implements BodyTexture {
+
+  protected fragmentShader: string = FRAGMENT_SHADER;
+
   private readonly blankSkinUrl: string;
+
+  private bodyBlankSkin: HTMLImageElement;
 
   private primary: Color;
 
-  private texture: LayeredTexture;
+  private primaryLocation: WebGLUniformLocation;
+  private rgbaMapLocation: WebGLUniformLocation;
 
-  private primaryLayer: Layer;
-  private primaryPixels: Set<number>;
+  private rgbaMapTexture: WebGLTexture;
 
   constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
+    super(getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;
   }
 
   async load() {
-    const baseTask = this.loader.load(this.baseUrl);
+    const superTask = super.load();
     const rgbaMapTask = this.loader.load(this.blankSkinUrl);
 
-    const baseResult = await baseTask;
+    this.bodyBlankSkin = await rgbaMapTask;
+    await superTask;
+  }
 
-    const baseSkinMap = baseResult.data;
-    const blankSkinMap = (await rgbaMapTask).data;
+  protected initWebGL(width: number, height: number) {
+    this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
+    this.primaryLocation = this.gl.getUniformLocation(this.program, 'u_primary');
+    super.initWebGL(width, height);
+  }
 
-    this.texture = new LayeredTexture(baseSkinMap, baseResult.width, baseResult.height);
+  protected createTextures() {
+    super.createTextures();
+    this.rgbaMapTexture = createTextureFromImage(this.gl, this.bodyBlankSkin);
+  }
 
-    const primaryMask = getChannel(blankSkinMap, ImageChannel.A);
-    invertChannel(primaryMask);
-    this.primaryLayer = new Layer(primaryMask, this.primary);
-    this.primaryPixels = getMaskPixels(primaryMask);
+  protected setTextureLocations() {
+    super.setTextureLocations();
+    this.gl.uniform1i(this.rgbaMapLocation, 1);
+  }
 
-    this.texture.addLayer(new Layer(true, new Color(0.1988877, 0.1988877, 0.1988877)));
-    this.texture.addLayer(this.primaryLayer);
-    this.texture.update();
+  protected bindTextures() {
+    super.bindTextures();
+    this.gl.activeTexture(this.gl.TEXTURE1);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaMapTexture);
+  }
+
+  protected update() {
+    bindColor(this.gl, this.primaryLocation, this.primary);
+    super.update();
   }
 
   dispose() {
-    this.texture.dispose();
+    super.dispose();
+    this.bodyBlankSkin = undefined;
+    this.gl.deleteTexture(this.rgbaMapTexture);
   }
 
   setAccent(color: Color) {
@@ -67,12 +117,7 @@ class EggplantBodySkin implements BodyTexture {
 
   setPrimary(color: Color) {
     this.primary = color;
-    this.primaryLayer.data = color;
-    this.texture.update(this.primaryPixels);
-  }
-
-  getTexture(): Texture {
-    return this.texture.texture;
+    this.update();
   }
 }
 
