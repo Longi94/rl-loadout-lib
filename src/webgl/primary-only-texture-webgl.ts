@@ -12,7 +12,7 @@ export class PrimaryOnlyTextureWebGL extends WebGLCanvasTexture implements BodyT
 
   private bodyBlankSkin: HTMLImageElement;
 
-  private primary: Color;
+  primary: Color;
 
   private primaryLocation: WebGLUniformLocation;
   private rgbaMapLocation: WebGLUniformLocation;
