@@ -35,7 +35,7 @@ const FRAGMENT_SHADER = `
 
         // base body color
         gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
-        
+
         // black base
         if (rgba_map.r > 0.16470588235) {
             gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, vec3(0.04943346, 0.04943346, 0.04943346), rgba_map.r);

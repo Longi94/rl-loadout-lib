@@ -103,7 +103,8 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
   private decalMapTexture: WebGLTexture;
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(decal.base_texture != undefined ? getAssetUrl(decal.base_texture, rocketConfig) : getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
+    super(decal.base_texture != undefined ? getAssetUrl(decal.base_texture, rocketConfig) :
+      getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
     this.rgbaMapUrl = getAssetUrl(decal.rgba_map, rocketConfig);
     this.bodyBlankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
 
