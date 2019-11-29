@@ -1,7 +1,7 @@
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../../utils/loader';
+import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
@@ -50,7 +50,6 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
-    this.textureLoader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.chassisNUrl = getAssetUrl(body.chassis_n, rocketConfig);
 

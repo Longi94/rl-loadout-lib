@@ -1,9 +1,7 @@
 {
   "extends": "tslint:recommended",
   "linterOptions": {
-    "exclude": [
-      "src/utils/tga-rgba-loader.ts"
-    ]
+    "exclude": []
   },
   "rules": {
     "array-type": false,
