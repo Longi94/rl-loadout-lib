@@ -194,7 +194,6 @@ export class StaticDecalTextureWebGL extends WebGLCanvasTexture implements BodyT
     super.dispose();
     this.decalRgbaMap = undefined;
     this.bodyBlankSkin = undefined;
-
     this.gl.deleteTexture(this.rgbaMapTexture);
     this.gl.deleteTexture(this.decalMapTexture);
   }
