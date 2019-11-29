@@ -1,86 +1,52 @@
 import { BodyModel } from './body-model';
-import { Color, Texture } from 'three';
+import { Color } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
-import { Layer, LayeredTexture } from '../layered-texture';
-import { getAssetUrl } from '../../utils/network';
-import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../../utils/image';
 import { WheelConfig } from '../../model/wheel';
 import { RocketConfig } from '../../model/rocket-config';
+import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 
-class BerryBodySkin implements BodyTexture {
+// language=GLSL
+const FRAGMENT_SHADER = `
+    precision mediump float;
 
-  private readonly loader: PromiseLoader;
+    uniform sampler2D u_base;
+    uniform sampler2D u_rgba_map;
 
-  private readonly baseUrl: string;
-  private readonly blankSkinUrl: string;
+    uniform vec4 u_primary;
 
-  private primary: Color;
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
 
-  private texture: LayeredTexture;
+    vec3 blendNormal(vec3 base, vec3 blend) {
+        return blend;
+    }
 
-  private primaryLayer: Layer;
-  private primaryPixels: Set<number>;
+    vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
+        return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
+    }
 
-  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
-    this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
-    this.primary = paints.primary;
-  }
+    void main() {
+        gl_FragColor = vec4(0.25, 0.25, 0.25, 1.0);
+        // Look up a color from the texture.
+        vec4 base = texture2D(u_base, v_texCoord);
+        vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
 
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    const rgbaMapTask = this.loader.load(this.blankSkinUrl);
+        // base body color TODO somehow use base texture?
+        // gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
-    const baseResult = await baseTask;
+        // primary color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, 1.0 - rgba_map.a);
+    }
+`;
 
-    const baseSkinMap = baseResult.data;
-    const blankSkinMap = (await rgbaMapTask).data;
-
-    this.texture = new LayeredTexture(baseSkinMap, baseResult.width, baseResult.height);
-
-    const primaryMask = getChannel(blankSkinMap, ImageChannel.A);
-    invertChannel(primaryMask);
-    this.primaryLayer = new Layer(primaryMask, this.primary);
-    this.primaryPixels = getMaskPixels(primaryMask);
-
-    this.texture.addLayer(new Layer(true, new Color(0.25, 0.25, 0.25)));
-    this.texture.addLayer(this.primaryLayer);
-    this.texture.update();
-  }
-
-  dispose() {
-    this.texture.dispose();
-  }
-
-  setAccent(color: Color) {
-  }
-
-  setBodyPaint(color: Color) {
-  }
-
-  setPaint(color: Color) {
-  }
-
-  setPrimary(color: Color) {
-    this.primary = color;
-    this.primaryLayer.data = color;
-    this.texture.update(this.primaryPixels);
-  }
-
-  getTexture(): Texture {
-    return this.texture.texture;
-  }
-}
 
 export class BerryModel extends BodyModel {
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new BerryBodySkin(body, paints, rocketConfig);
+    return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
   }
 
   setPaintColor(color: Color) {

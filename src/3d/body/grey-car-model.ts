@@ -1,103 +1,60 @@
 import { BodyModel } from './body-model';
-import { Color, Texture } from 'three';
+import { Color } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
-import { Layer, LayeredTexture } from '../layered-texture';
-import { getAssetUrl } from '../../utils/network';
-import { getChannel, ImageChannel } from '../../utils/image';
 import { RocketConfig } from '../../model/rocket-config';
+import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 
+// language=GLSL
+const FRAGMENT_SHADER = `
+    precision mediump float;
 
-class GreyCarSkin implements BodyTexture {
+    uniform sampler2D u_base;
+    uniform sampler2D u_rgba_map;
 
-  private readonly loader: PromiseLoader;
+    uniform vec4 u_primary;
 
-  private readonly baseUrl: string;
-  private readonly blankSkinUrl: string;
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
 
-  primary: Color;
-
-  private texture: LayeredTexture;
-
-  private primaryLayer: Layer;
-  private primaryPixels: Set<number>;
-
-  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
-    this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
-    this.primary = paints.primary;
-  }
-
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    const rgbaMapTask = this.loader.load(this.blankSkinUrl);
-
-    const baseResult = await baseTask;
-
-    const baseSkinMap = baseResult.data;
-    const blankSkinMap = (await rgbaMapTask).data;
-
-    this.texture = new LayeredTexture(baseSkinMap, baseResult.width, baseResult.height);
-
-    const primaryMask = getChannel(blankSkinMap, ImageChannel.R);
-    const bodyMask = getChannel(blankSkinMap, ImageChannel.A);
-
-    this.primaryPixels = new Set<number>();
-
-    for (let i = 0; i < primaryMask.length; i++) {
-      if (primaryMask[i] < 42) {
-        primaryMask[i] = 0;
-      }
-      if (bodyMask[i] < 255) {
-        this.primaryPixels.add(i * 4);
-      }
+    vec3 blendNormal(vec3 base, vec3 blend) {
+        return blend;
     }
 
-    this.primaryLayer = new Layer(primaryMask, this.primary);
+    vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
+        return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
+    }
 
-    this.texture.addLayer(this.primaryLayer);
-    this.texture.addLayer(new Layer(bodyMask, new Color(0.329729, 0.329729, 0.329729)));
-    this.texture.update();
-  }
+    void main() {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        // Look up a color from the texture.
+        vec4 base = texture2D(u_base, v_texCoord);
+        vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
 
-  dispose() {
-    this.texture.dispose();
-  }
+        // base body color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
-  setAccent(color: Color) {
-  }
+        // primary color
+        if (rgba_map.r > 0.16470588235) {
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, rgba_map.r);
+        }
 
-  setBodyPaint(color: Color) {
-  }
-
-  setPaint(color: Color) {
-  }
-
-  setPrimary(color: Color) {
-    this.primary = color;
-    this.primaryLayer.data = color;
-    this.texture.update(this.primaryPixels);
-  }
-
-  getTexture(): Texture {
-    return this.texture.texture;
-  }
-}
-
+        // grey color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, vec3(0.329729, 0.329729, 0.329729), rgba_map.a);
+    }
+`;
 
 export class GreyCarModel extends BodyModel {
 
   async load(): Promise<void> {
     await super.load();
-    this.setPrimaryColor((this.bodySkin as GreyCarSkin).primary);
+    this.setPrimaryColor((this.bodySkin as PrimaryOnlyTexture).primary);
   }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new GreyCarSkin(body, paints, rocketConfig);
+    return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
   }
 
   setPaintColor(color: Color) {

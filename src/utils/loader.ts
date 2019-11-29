@@ -1,5 +1,5 @@
 import { TextureFormat } from '../model/rocket-config';
-import { FileLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
+import { FileLoader, ImageLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
 import { TgaRgbaLoader } from './tga-rgba-loader';
 import { TGALoader } from 'three/examples/jsm/loaders/TGALoader';
 import { PNG } from 'pngjs/browser';
@@ -20,6 +20,23 @@ export class PromiseLoader {
         resolve(undefined);
       }
     });
+  }
+}
+
+export class MultiImageLoader {
+  loader: any;
+
+  constructor(private readonly format: TextureFormat, loadingManager?: LoadingManager) {
+    if (this.format === TextureFormat.TGA) {
+      this.loader = new TGALoader(loadingManager);
+    } else {
+      this.loader = new ImageLoader(loadingManager);
+    }
+  }
+
+  load(url: string, onLoad: (buffer: any) => void, onProgress?: (event: ProgressEvent) => void,
+       onError?: (event: ErrorEvent) => void) {
+    this.loader.load(url, onLoad, onProgress, onError);
   }
 }
 

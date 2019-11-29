@@ -1,94 +1,57 @@
 import { BodyModel } from './body-model';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
-import { Color, Texture } from 'three';
+import { Color } from 'three';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageDataLoader, PromiseLoader } from '../../utils/loader';
-import { Layer, LayeredTexture } from '../layered-texture';
-import { getAssetUrl } from '../../utils/network';
-import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../../utils/image';
 import { RocketConfig } from '../../model/rocket-config';
+import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 
-class FelineBodySkin implements BodyTexture {
+// language=GLSL
+const FRAGMENT_SHADER = `
+    precision mediump float;
 
-  private readonly loader: PromiseLoader;
+    uniform sampler2D u_base;
+    uniform sampler2D u_rgba_map;
 
-  private readonly baseUrl: string;
-  private readonly blankSkinUrl: string;
+    uniform vec4 u_primary;
 
-  private primary: Color;
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
 
-  private texture: LayeredTexture;
-
-  private primaryLayer: Layer;
-  private primaryPixels: Set<number>;
-
-  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.baseUrl = getAssetUrl(body.base_skin, rocketConfig);
-    this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
-    this.primary = paints.primary;
-  }
-
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    const rgbaMapTask = this.loader.load(this.blankSkinUrl);
-
-    const baseResult = await baseTask;
-
-    const baseSkinMap = baseResult.data;
-    const blankSkinMap = (await rgbaMapTask).data;
-
-    this.texture = new LayeredTexture(baseSkinMap, baseResult.width, baseResult.height);
-
-    const bodyMask = getChannel(blankSkinMap, ImageChannel.R);
-    for (let i = 0; i < bodyMask.length; i++) {
-      if (bodyMask[i] < 42) {
-        bodyMask[i] = 0;
-      }
+    vec3 blendNormal(vec3 base, vec3 blend) {
+        return blend;
     }
 
-    const primaryMask = getChannel(blankSkinMap, ImageChannel.A);
-    invertChannel(primaryMask);
-    this.primaryLayer = new Layer(primaryMask, this.primary);
-    this.primaryPixels = getMaskPixels(primaryMask);
+    vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
+        return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
+    }
 
-    const backLightMask = getChannel(blankSkinMap, ImageChannel.G);
+    void main() {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        // Look up a color from the texture.
+        vec4 base = texture2D(u_base, v_texCoord);
+        vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
 
-    this.texture.addLayer(new Layer(bodyMask, new Color(0.04943346, 0.04943346, 0.04943346)));
-    this.texture.addLayer(this.primaryLayer);
-    this.texture.addLayer(new Layer(backLightMask, new Color('#7f0000')));
-    this.texture.update();
-  }
+        // base body color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
-  dispose() {
-    this.texture.dispose();
-  }
+        // black base
+        if (rgba_map.r > 0.16470588235) {
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, vec3(0.04943346, 0.04943346, 0.04943346), rgba_map.r);
+        }
 
-  setAccent(color: Color) {
-  }
+        // primary color
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, 1.0 - rgba_map.a);
 
-  setBodyPaint(color: Color) {
-  }
-
-  setPaint(color: Color) {
-  }
-
-  setPrimary(color: Color) {
-    this.primary = color;
-    this.primaryLayer.data = color;
-    this.texture.update(this.primaryPixels);
-  }
-
-  getTexture(): Texture {
-    return this.texture.texture;
-  }
-}
+        // back light
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, vec3(0.5, 0.0, 0.0), rgba_map.g);
+    }
+`;
 
 export class FelineModel extends BodyModel {
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new FelineBodySkin(body, paints, rocketConfig);
+    return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
   }
 
   setPaintColor(color: Color) {

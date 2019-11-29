@@ -5,60 +5,16 @@ import { getAssetUrl } from '../utils/network';
 import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
-import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../utils/loader';
-import { Layer, LayeredTexture } from './layered-texture';
-import { getChannel, getMaskPixels, ImageChannel } from '../utils/image';
+import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { RocketConfig } from '../model/rocket-config';
-
-class TopperSkin {
-
-  private readonly loader: PromiseLoader;
-
-  texture: LayeredTexture;
-  private paintLayer: Layer;
-  private paintPixels: Set<number>;
-
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-  }
-
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-
-    const baseResult = await baseTask;
-
-    if (baseResult != undefined) {
-      const rgbaMap = (await rgbaMapTask).data;
-      this.texture = new LayeredTexture(baseResult.data, baseResult.width, baseResult.height);
-
-      const paintMask = getChannel(rgbaMap, ImageChannel.A);
-
-      this.paintLayer = new Layer(paintMask, this.paint);
-      this.paintPixels = getMaskPixels(paintMask);
-
-      this.texture.addLayer(this.paintLayer);
-      this.texture.update();
-    }
-  }
-
-  dispose() {
-    disposeIfExists(this.texture);
-  }
-
-  setPaint(color: Color) {
-    this.paint = color;
-    this.paintLayer.data = color;
-    this.texture.update(this.paintPixels);
-  }
-}
+import { TopperTexture } from '../webgl/topper-texture';
 
 export class TopperModel extends AbstractObject implements Paintable {
 
   private textureLoader: PromiseLoader;
 
   material: MeshStandardMaterial;
-  skin: TopperSkin;
+  skin: TopperTexture;
 
   normalMapUrl: string;
   baseTextureUrl: string;
@@ -69,7 +25,7 @@ export class TopperModel extends AbstractObject implements Paintable {
     this.normalMapUrl = getAssetUrl(topper.normal_map, rocketConfig);
 
     if (topper.rgba_map) {
-      this.skin = new TopperSkin(
+      this.skin = new TopperTexture(
         getAssetUrl(topper.base_texture, rocketConfig),
         getAssetUrl(topper.rgba_map, rocketConfig),
         paints.topper,
@@ -104,7 +60,7 @@ export class TopperModel extends AbstractObject implements Paintable {
     this.material.normalMap = await normalMapTask;
 
     if (this.skin) {
-      this.material.map = this.skin.texture.texture;
+      this.material.map = this.skin.getTexture();
       this.material.needsUpdate = true;
     } else {
       this.material.map = skin;
