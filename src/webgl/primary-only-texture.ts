@@ -6,7 +6,7 @@ import { getAssetUrl } from '../utils/network';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 
 
-export class PrimaryOnlyTextureWebGL extends WebGLCanvasTexture implements BodyTexture {
+export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTexture {
 
   private readonly blankSkinUrl: string;
 

@@ -49,7 +49,7 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class ChassisTextureWebGL extends WebGLCanvasTexture {
+export class ChassisTexture extends WebGLCanvasTexture {
 
   private rgbaMap: HTMLImageElement;
 

@@ -77,7 +77,7 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class StaticDecalTextureWebGL extends WebGLCanvasTexture implements BodyTexture {
+export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTexture {
 
   protected fragmentShader: string = FRAGMENT_SHADER;
 

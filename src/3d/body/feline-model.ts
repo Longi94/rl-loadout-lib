@@ -5,7 +5,7 @@ import { Color } from 'three';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
 import { RocketConfig } from '../../model/rocket-config';
-import { PrimaryOnlyTextureWebGL } from '../../webgl/primary-only-texture-webgl';
+import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 
 // language=GLSL
 const FRAGMENT_SHADER = `
@@ -51,7 +51,7 @@ const FRAGMENT_SHADER = `
 
 export class FelineModel extends BodyModel {
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new PrimaryOnlyTextureWebGL(body, paints, rocketConfig, FRAGMENT_SHADER);
+    return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
   }
 
   setPaintColor(color: Color) {

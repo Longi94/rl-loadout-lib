@@ -16,8 +16,8 @@ import { WheelsModel } from '../wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { MAX_WHEEL_YAW } from '../constants';
-import { StaticDecalTextureWebGL } from '../../webgl/static-decal-texture-webgl';
-import { ChassisTextureWebGL } from '../../webgl/chassis-texture-webgl';
+import { StaticDecalTexture } from '../../webgl/static-decal-texture';
+import { ChassisTexture } from '../../webgl/chassis-texture';
 
 
 export class BodyModel extends AbstractObject implements Paintable {
@@ -32,7 +32,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   chassisMaterial: MeshStandardMaterial;
 
   bodySkin: BodyTexture;
-  chassisSkin: ChassisTextureWebGL;
+  chassisSkin: ChassisTexture;
 
   chassisNUrl: string;
 
@@ -58,7 +58,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
     this.bodySkin = this.initBodySkin(body, decal, paints, rocketConfig);
 
-    this.chassisSkin = new ChassisTextureWebGL(
+    this.chassisSkin = new ChassisTexture(
       getAssetUrl(body.chassis_base, rocketConfig),
       getAssetUrl(body.chassis_n, rocketConfig),
       body.chassis_paintable,
@@ -68,7 +68,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new StaticDecalTextureWebGL(body, decal, paints, rocketConfig);
+    return new StaticDecalTexture(body, decal, paints, rocketConfig);
   }
 
   dispose() {
@@ -224,7 +224,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     this.bodySkin.dispose();
-    this.bodySkin = new StaticDecalTextureWebGL(this.body, decal, paints, rocketConfig);
+    this.bodySkin = new StaticDecalTexture(this.body, decal, paints, rocketConfig);
     await this.bodySkin.load();
     this.applyDecal();
   }
