@@ -40,9 +40,7 @@ const FRAGMENT_SHADER = `
         // gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
         // primary color
-        if (rgba_map.r > 0.58823529411) { // red 150
-            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, 1.0 - rgba_map.a);
-        }
+        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, 1.0 - rgba_map.a);
     }
 `;
 
