@@ -6,55 +6,10 @@ import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils';
 import { disposeIfExists } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
-import { Layer, LayeredTexture } from './layered-texture';
-import { ImageDataLoader, ImageTextureLoader, PromiseLoader } from '../utils/loader';
-import { getChannel, getMaskPixels, ImageChannel, invertChannel } from '../utils/image';
+import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
-
-class RimSkin {
-
-  private readonly loader: PromiseLoader;
-
-  texture: LayeredTexture;
-  private paintLayer: Layer;
-  private paintPixels: Set<number>;
-
-  constructor(private readonly baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-  }
-
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-
-    const baseResult = await baseTask;
-
-    if (baseResult != undefined) {
-      const rgbaMap = (await rgbaMapTask).data;
-      this.texture = new LayeredTexture(baseResult.data, baseResult.width, baseResult.height);
-
-      const paintMask = getChannel(rgbaMap, ImageChannel.R);
-      invertChannel(paintMask);
-
-      this.paintLayer = new Layer(paintMask, this.paint);
-      this.paintPixels = getMaskPixels(paintMask);
-
-      this.texture.addLayer(this.paintLayer);
-      this.texture.update();
-    }
-  }
-
-  setPaint(color: Color) {
-    this.paint = color;
-    this.paintLayer.data = color;
-    this.texture.update(this.paintPixels);
-  }
-
-  dispose() {
-    disposeIfExists(this.texture);
-  }
-}
+import { RimTexture } from '../webgl/rim-texture';
 
 class WheelModel {
   model: Object3D;
@@ -67,7 +22,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
-  rimSkin: RimSkin;
+  rimSkin: RimTexture;
 
   tireMaterial: MeshStandardMaterial;
 
@@ -79,7 +34,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     if (wheel.rim_base && wheel.rim_rgb_map) {
-      this.rimSkin = new RimSkin(
+      this.rimSkin = new RimTexture(
         getAssetUrl(wheel.rim_base, rocketConfig),
         getAssetUrl(wheel.rim_rgb_map, rocketConfig),
         paints.wheel,
@@ -116,7 +71,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     this.tireMaterial.normalMap = await tireNTask;
 
     if (this.rimSkin) {
-      this.rimMaterial.map = this.rimSkin.texture.texture;
+      this.rimMaterial.map = this.rimSkin.getTexture();
       this.rimMaterial.needsUpdate = true;
     }
   }
