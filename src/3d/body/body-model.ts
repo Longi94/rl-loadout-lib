@@ -10,7 +10,6 @@ import { BodyTexture } from './body-texture';
 import { PaintConfig } from '../../model/paint-config';
 import { AxleSettings, WheelSettings } from '../../model/axle-settings';
 import { HitboxConfig } from '../../model/hitbox-config';
-import { ChassisSkin } from '../chassis-skin';
 import { WheelConfig } from '../../model/wheel';
 import { RocketConfig } from '../../model/rocket-config';
 import { WheelsModel } from '../wheels-model';
@@ -18,6 +17,7 @@ import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { MAX_WHEEL_YAW } from '../constants';
 import { StaticDecalTextureWebGL } from '../../webgl/static-decal-texture-webgl';
+import { ChassisTextureWebGL } from '../../webgl/chassis-texture-webgl';
 
 
 export class BodyModel extends AbstractObject implements Paintable {
@@ -32,10 +32,9 @@ export class BodyModel extends AbstractObject implements Paintable {
   chassisMaterial: MeshStandardMaterial;
 
   bodySkin: BodyTexture;
-  chassisSkin: ChassisSkin;
+  chassisSkin: ChassisTextureWebGL;
 
   chassisNUrl: string;
-  chassisBaseUrl: string;
 
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
@@ -54,20 +53,18 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.textureLoader = new PromiseLoader(new ImageDataLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     this.chassisNUrl = getAssetUrl(body.chassis_n, rocketConfig);
-    this.chassisBaseUrl = getAssetUrl(body.chassis_base, rocketConfig);
 
     this.body = body;
 
     this.bodySkin = this.initBodySkin(body, decal, paints, rocketConfig);
 
-    if (body.chassis_paintable) {
-      this.chassisSkin = new ChassisSkin(
-        getAssetUrl(body.chassis_base, rocketConfig),
-        getAssetUrl(body.chassis_n, rocketConfig),
-        paints,
-        rocketConfig
-      );
-    }
+    this.chassisSkin = new ChassisTextureWebGL(
+      getAssetUrl(body.chassis_base, rocketConfig),
+      getAssetUrl(body.chassis_n, rocketConfig),
+      body.chassis_paintable,
+      paints,
+      rocketConfig
+    );
   }
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
@@ -87,25 +84,17 @@ export class BodyModel extends AbstractObject implements Paintable {
     const superTask = super.load();
     const bodySkinTask = this.bodySkin.load();
     const chassisNTask = this.imageTextureLoader.load(this.chassisNUrl);
-    const chassisBaseTask = this.imageTextureLoader.load(this.chassisBaseUrl);
 
-    if (this.chassisSkin != undefined) {
-      await this.chassisSkin.load();
-    }
+    await this.chassisSkin.load();
 
     await superTask;
     await bodySkinTask;
 
     this.applyDecal();
 
-    if (this.chassisSkin) {
-      this.chassisMaterial.map = this.chassisSkin.texture.texture;
-      this.chassisMaterial.needsUpdate = true;
-    } else {
-      this.chassisMaterial.normalMap = await chassisNTask;
-      this.chassisMaterial.map = await chassisBaseTask;
-      this.chassisMaterial.needsUpdate = true;
-    }
+    this.chassisMaterial.normalMap = await chassisNTask;
+    this.chassisMaterial.map = this.chassisSkin.getTexture();
+    this.chassisMaterial.needsUpdate = true;
   }
 
   handleModel(scene: Scene) {
@@ -223,9 +212,7 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color paint color
    */
   setPaintColor(color: Color) {
-    if (this.chassisSkin != undefined) {
-      this.chassisSkin.setPaint(color);
-    }
+    this.chassisSkin.setPaint(color);
     this.bodySkin.setBodyPaint(color);
   }
 
@@ -248,9 +235,7 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   setAccentColor(color: Color) {
     this.bodySkin.setAccent(color);
-    if (this.chassisSkin != undefined) {
-      this.chassisSkin.setAccent(color);
-    }
+    this.chassisSkin.setAccent(color);
   }
 
   setDecalPaintColor(color: Color) {
