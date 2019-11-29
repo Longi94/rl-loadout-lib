@@ -1,36 +1,9 @@
-import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 'three';
-import { MultiImageLoader, PromiseLoader } from '../utils/loader';
+import { Color } from 'three';
 import { PaintConfig } from '../model/paint-config';
 import { RocketConfig } from '../model/rocket-config';
-import { bindColor, createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
+import { bindColor, createTextureFromImage } from '../utils/webgl';
+import { WebGLCanvasTexture } from './webgl-texture';
 
-
-// language=GLSL
-const VERTEX_SHADER = `
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
-
-    uniform vec2 u_resolution;
-
-    varying vec2 v_texCoord;
-
-    void main() {
-        // convert the rectangle from pixels to 0.0 to 1.0
-        vec2 zeroToOne = a_position / u_resolution;
-
-        // convert from 0->1 to 0->2
-        vec2 zeroToTwo = zeroToOne * 2.0;
-
-        // convert from 0->2 to -1->+1 (clipspace)
-        vec2 clipSpace = zeroToTwo - 1.0;
-
-        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-
-        // pass the texCoord to the fragment shader
-        // The GPU will interpolate this value between points.
-        v_texCoord = a_texCoord;
-    }
-`;
 
 // language=GLSL
 const FRAGMENT_SHADER = `
@@ -76,114 +49,61 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class ChassisTextureWebGL {
+export class ChassisTextureWebGL extends WebGLCanvasTexture {
 
-  private readonly loader: PromiseLoader;
-
-  private base: HTMLImageElement;
   private rgbaMap: HTMLImageElement;
+
+  protected fragmentShader: string = FRAGMENT_SHADER;
 
   private accent: Color;
   private paint: Color;
 
-  private canvas: OffscreenCanvas;
-  private gl: WebGLRenderingContext;
-  private program: WebGLProgram;
-
   private paintLocation: WebGLUniformLocation;
   private accentLocation: WebGLUniformLocation;
+  private rgbaMapLocation: WebGLUniformLocation;
 
-  private baseTexture: WebGLTexture;
   private rgbaMapTexture: WebGLTexture;
 
-  private texCoordBuffer: WebGLBuffer;
-  private positionBuffer: WebGLBuffer;
-
-  private texture: CanvasTexture;
-
-  constructor(private readonly baseUrl: string, private readonly rgbaMapUrl: string, private readonly paintable: boolean,
+  constructor(baseUrl: string, private readonly rgbaMapUrl: string, private readonly paintable: boolean,
               paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new MultiImageLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
+    super(baseUrl, rocketConfig);
     this.accent = paints.accent;
     this.paint = paints.body;
   }
 
   async load() {
-    const baseTask = this.loader.load(this.baseUrl);
+    const superTask = super.load();
     const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-
-    this.base = await baseTask;
     this.rgbaMap = await rgbaMapTask;
-
-    const width = this.base.width;
-    const height = this.base.height;
-
-    this.initWebGL(width, height);
-
-    // @ts-ignore
-    this.texture = new CanvasTexture(this.canvas);
-    this.texture.wrapS = RepeatWrapping;
-    this.texture.wrapT = RepeatWrapping;
-    this.texture.encoding = LinearEncoding;
-    this.texture.flipY = false;
-    this.update();
+    await superTask;
   }
 
-  private initWebGL(width: number, height: number) {
-    this.canvas = new OffscreenCanvas(width, height);
-
-    this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
-    this.program = initShaderProgram(this.gl, VERTEX_SHADER, FRAGMENT_SHADER);
-    this.gl.useProgram(this.program);
-
-    // look up where the vertex data needs to go.
-    const baseLocation = this.gl.getUniformLocation(this.program, 'u_base');
-    const rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
-    const resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+  protected initWebGL(width: number, height: number) {
+    this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
     const hasAlphaLocation = this.gl.getUniformLocation(this.program, 'u_has_alpha');
-    const positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
-    const texCoordLocation = this.gl.getAttribLocation(this.program, 'a_texCoord');
 
     this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
     this.accentLocation = this.gl.getUniformLocation(this.program, 'u_accent');
 
     this.gl.uniform1i(hasAlphaLocation, hasAlpha(this.base) ? 1 : 0);
 
-    // provide texture coordinates for the rectangle.
-    this.texCoordBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
-      0.0, 0.0,
-      1.0, 0.0,
-      0.0, 1.0,
-      0.0, 1.0,
-      1.0, 0.0,
-      1.0, 1.0]), this.gl.STATIC_DRAW);
-    this.gl.enableVertexAttribArray(texCoordLocation);
-    this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
+    super.initWebGL(width, height);
+  }
 
-    this.baseTexture = createTextureFromImage(this.gl, this.base);
+  protected createTextures() {
+    super.createTextures();
     this.rgbaMapTexture = createTextureFromImage(this.gl, this.rgbaMap);
+  }
 
-    this.gl.uniform1i(baseLocation, 0);
-    this.gl.uniform1i(rgbaMapLocation, 1);
+  protected setTextureLocations() {
+    super.setTextureLocations();
+    this.gl.uniform1i(this.rgbaMapLocation, 1);
+  }
 
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.baseTexture);
+  protected bindTextures() {
+    super.bindTextures();
     this.gl.activeTexture(this.gl.TEXTURE1);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaMapTexture);
-
-    // set the resolution
-    this.gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
-
-    // Create a buffer for the position of the rectangle corners.
-    this.positionBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.enableVertexAttribArray(positionLocation);
-    this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
-
-    // Set a rectangle the same size as the image.
-    setRectangle(this.gl, 0, 0, this.base.width, this.base.height);
   }
 
   setPaint(paint: Color) {
@@ -196,34 +116,16 @@ export class ChassisTextureWebGL {
     this.update();
   }
 
-  private update() {
+  protected update() {
     bindColor(this.gl, this.accentLocation, this.accent);
     bindColor(this.gl, this.paintLocation, this.paintable ? this.paint : undefined);
-
-    // Draw the rectangle.
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    this.texture.needsUpdate = true;
+    super.update();
   }
 
   dispose() {
-    this.base = undefined;
+    super.dispose();
     this.rgbaMap = undefined;
-
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-    this.gl.activeTexture(this.gl.TEXTURE1);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-    this.gl.activeTexture(this.gl.TEXTURE2);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    this.gl.deleteTexture(this.baseTexture);
     this.gl.deleteTexture(this.rgbaMapTexture);
-    this.gl.deleteBuffer(this.texCoordBuffer);
-    this.gl.deleteBuffer(this.positionBuffer);
-  }
-
-  getTexture(): Texture {
-    return this.texture;
   }
 }
 
