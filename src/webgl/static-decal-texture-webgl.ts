@@ -39,6 +39,7 @@ const FRAGMENT_SHADER = `
         // Look up a color from the texture.
         vec4 base = texture2D(u_base, v_texCoord);
         vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
+        vec4 decal_map = texture2D(u_decal_map, v_texCoord);
 
         // base body color
         gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
@@ -49,16 +50,21 @@ const FRAGMENT_SHADER = `
         }
 
         // primary color
-        if (rgba_map.r > 0.58823529411) { // red 150
-            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, rgba_map.r);
+        float primary_mask = rgba_map.r;
+
+        if (u_is_blank == 0) {
+            primary_mask = decal_map.r;
+        }
+
+        if (primary_mask > 0.58823529411) { // red 150
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_primary.rgb, primary_mask);
         }
 
         if (u_is_blank == 0) {
-
-            vec4 decal_map = texture2D(u_decal_map, v_texCoord);
-
             // accent color
-            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_accent.rgb, decal_map.a);
+            if (primary_mask > 0.58823529411) {
+                gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_accent.rgb, decal_map.a);
+            }
 
             // decal paint
             if (u_decal_paint.r >= 0.0) {
