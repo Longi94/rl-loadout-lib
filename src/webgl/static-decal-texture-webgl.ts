@@ -100,7 +100,7 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class StaticSkinWebGL implements BodyTexture {
+export class StaticDecalTextureWebGL implements BodyTexture {
 
   private readonly loader: PromiseLoader;
 
