@@ -3,6 +3,7 @@ import { PaintConfig } from '../model/paint-config';
 import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
+import { createOffscreenCanvas } from '../utils/offscreen-canvas';
 
 
 // language=GLSL
@@ -131,7 +132,7 @@ export class ChassisTexture extends WebGLCanvasTexture {
 
 // so hacky
 function hasAlpha(image): boolean {
-  const canvas = new OffscreenCanvas(image.width, image.height);
+  const canvas = createOffscreenCanvas(image.width, image.height);
   const ctx = canvas.getContext('2d');
   ctx.drawImage(image, 0, 0);
 

@@ -2,6 +2,7 @@ import { RocketConfig } from '../model/rocket-config';
 import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
+import { createOffscreenCanvas } from '../utils/offscreen-canvas';
 
 // language=GLSL
 const VERTEX_SHADER = `
@@ -53,7 +54,7 @@ export class WebGLCanvasTexture {
 
   protected base: HTMLImageElement;
 
-  protected canvas: OffscreenCanvas;
+  protected canvas: OffscreenCanvas | HTMLCanvasElement;
   protected gl: WebGLRenderingContext;
   protected program: WebGLProgram;
 
@@ -79,7 +80,7 @@ export class WebGLCanvasTexture {
     const width = this.base.width;
     const height = this.base.height;
 
-    this.canvas = new OffscreenCanvas(width, height);
+    this.canvas = createOffscreenCanvas(width, height);
 
     this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
     this.program = initShaderProgram(this.gl, this.vertexShader, this.fragmentShader);
