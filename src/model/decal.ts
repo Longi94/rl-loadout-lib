@@ -11,6 +11,6 @@ export class Decal extends Item {
 
   base_texture?: string;
   rgba_map?: string;
-  body_id?: string;
+  body_id?: number;
   body_name?: string;
 }
