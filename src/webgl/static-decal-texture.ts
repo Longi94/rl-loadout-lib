@@ -1,6 +1,6 @@
 import { Color } from 'three';
 import { Decal } from '../model/decal';
-import { getAssetUrl } from '../utils/network';
+import { fixTierUrl, getAssetUrl } from '../utils/network';
 import { BodyTexture } from '../3d/body/body-texture';
 import { Body } from '../model/body';
 import { PaintConfig } from '../model/paint-config';
@@ -105,7 +105,7 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(decal.base_texture != undefined ? getAssetUrl(decal.base_texture, rocketConfig) :
       getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
-    this.rgbaMapUrl = getAssetUrl(decal.rgba_map, rocketConfig);
+    this.rgbaMapUrl = fixTierUrl(body.id, getAssetUrl(decal.rgba_map, rocketConfig));
     this.bodyBlankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
 
     this.primary = paints.primary;
