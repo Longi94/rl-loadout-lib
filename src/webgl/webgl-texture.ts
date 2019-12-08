@@ -163,6 +163,7 @@ export class WebGLCanvasTexture {
 
   dispose() {
     this.base = undefined;
+    this.canvas = undefined;
 
     if (this.gl != undefined) {
       const numTextureUnits = this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS);
