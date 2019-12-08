@@ -3,6 +3,7 @@ import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { createOffscreenCanvas } from '../utils/offscreen-canvas';
+import { disposeIfExists } from '../utils/util';
 
 // language=GLSL
 const VERTEX_SHADER = `
@@ -163,17 +164,19 @@ export class WebGLCanvasTexture {
   dispose() {
     this.base = undefined;
 
-    const numTextureUnits = this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS);
-    for (let unit = 0; unit < numTextureUnits; ++unit) {
-      this.gl.activeTexture(this.gl.TEXTURE0 + unit);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-      this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null);
-    }
+    if (this.gl != undefined) {
+      const numTextureUnits = this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS);
+      for (let unit = 0; unit < numTextureUnits; ++unit) {
+        this.gl.activeTexture(this.gl.TEXTURE0 + unit);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null);
+      }
 
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    this.gl.deleteTexture(this.baseTexture);
-    this.gl.deleteBuffer(this.texCoordBuffer);
-    this.gl.deleteBuffer(this.positionBuffer);
-    this.texture.dispose();
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+      this.gl.deleteTexture(this.baseTexture);
+      this.gl.deleteBuffer(this.texCoordBuffer);
+      this.gl.deleteBuffer(this.positionBuffer);
+    }
+    disposeIfExists(this.texture);
   }
 }

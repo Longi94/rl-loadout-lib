@@ -97,6 +97,8 @@ export class RimTexture extends WebGLCanvasTexture {
   dispose() {
     super.dispose();
     this.rgbaMap = undefined;
-    this.gl.deleteTexture(this.rgbaMapTexture);
+    if (this.gl != undefined) {
+      this.gl.deleteTexture(this.rgbaMapTexture);
+    }
   }
 }

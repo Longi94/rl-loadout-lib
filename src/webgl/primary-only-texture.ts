@@ -64,7 +64,9 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
   dispose() {
     super.dispose();
     this.bodyBlankSkin = undefined;
-    this.gl.deleteTexture(this.rgbaMapTexture);
+    if (this.gl != undefined) {
+      this.gl.deleteTexture(this.rgbaMapTexture);
+    }
   }
 
   setAccent(color: Color) {
