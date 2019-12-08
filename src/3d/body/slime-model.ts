@@ -1,5 +1,5 @@
 import { BodyModel } from './body-model';
-import { Color, DataTexture, MeshStandardMaterial, RGBAFormat, Scene } from 'three';
+import { Color, MeshStandardMaterial, Scene, Texture } from 'three';
 import { Decal } from '../../model/decal';
 import { COLOR_MAPLE_ORANGE } from '../../utils/color';
 import { BodyTexture } from './body-texture';
@@ -8,6 +8,7 @@ import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
 import { RocketConfig } from '../../model/rocket-config';
 import { getAssetUrl } from '../../utils/network';
+import { disposeIfExists } from '../../utils/util';
 
 const BODY_ORANGE = 'body/body_slime/Body_Slime1_D.tga';
 const BODY_BLUE = 'body/body_slime/Body_Slime2_D.tga';
@@ -16,13 +17,10 @@ const CHASSIS_BLUE = 'body/body_slime/Chassis_Slime2_D.tga';
 
 export class SlimeModel extends BodyModel {
 
-  private bodyDataOrange: Uint8ClampedArray;
-  private bodyDataBlue: Uint8ClampedArray;
-  private chassisDataOrange: Uint8ClampedArray;
-  private chassisDataBlue: Uint8ClampedArray;
-
-  private bodyTexture: DataTexture;
-  private chassisTexture: DataTexture;
+  private bodyDataOrange: Texture;
+  private bodyDataBlue: Texture;
+  private chassisDataOrange: Texture;
+  private chassisDataBlue: Texture;
 
   private lensMaterial: MeshStandardMaterial;
 
@@ -46,36 +44,29 @@ export class SlimeModel extends BodyModel {
 
   dispose() {
     super.dispose();
-    this.bodyTexture.dispose();
-    this.chassisTexture.dispose();
-    this.bodyDataOrange = undefined;
-    this.bodyDataBlue = undefined;
-    this.chassisDataOrange = undefined;
-    this.chassisDataBlue = undefined;
+    disposeIfExists(this.bodyDataOrange);
+    disposeIfExists(this.bodyDataBlue);
+    disposeIfExists(this.chassisDataOrange);
+    disposeIfExists(this.chassisDataBlue);
   }
 
   async load() {
     const modelTask = this.loader.load(this.url);
-    const bodyOrangeTask = this.textureLoader.load(this.bodyOrangeUrl);
-    const bodyBlueTask = this.textureLoader.load(this.bodyBlueUrl);
-    const chassisOrangeTask = this.textureLoader.load(this.chassisOrangeUrl);
-    const chassisBlueTask = this.textureLoader.load(this.chassisBlueUrl);
+    const bodyOrangeTask = this.imageTextureLoader.load(this.bodyOrangeUrl);
+    const bodyBlueTask = this.imageTextureLoader.load(this.bodyBlueUrl);
+    const chassisOrangeTask = this.imageTextureLoader.load(this.chassisOrangeUrl);
+    const chassisBlueTask = this.imageTextureLoader.load(this.chassisBlueUrl);
 
     const gltf = await modelTask;
     this.handleGltf(gltf);
 
-    const result = await bodyOrangeTask;
+    this.bodyDataOrange = await bodyOrangeTask;
+    this.bodyDataBlue = await bodyBlueTask;
+    this.chassisDataOrange = await chassisOrangeTask;
+    this.chassisDataBlue = await chassisBlueTask;
 
-    this.bodyDataOrange = result.data;
-    this.bodyDataBlue = (await bodyBlueTask).data;
-    this.chassisDataOrange = (await chassisOrangeTask).data;
-    this.chassisDataBlue = (await chassisBlueTask).data;
-
-    this.bodyTexture = new DataTexture(new Uint8ClampedArray(this.bodyDataBlue), result.width, result.height, RGBAFormat);
-    this.chassisTexture = new DataTexture(new Uint8ClampedArray(this.chassisDataBlue), result.width, result.height, RGBAFormat);
-
-    this.bodyMaterial.map = this.bodyTexture;
-    this.chassisMaterial.map = this.chassisTexture;
+    this.bodyMaterial.map = this.bodyDataBlue;
+    this.chassisMaterial.map = this.chassisDataBlue;
 
     this.lensMaterial.color.setRGB(0, 0, 0.8);
 
@@ -93,8 +84,6 @@ export class SlimeModel extends BodyModel {
   }
 
   private applyTextures() {
-    this.bodyTexture.needsUpdate = true;
-    this.chassisTexture.needsUpdate = true;
     this.bodyMaterial.needsUpdate = true;
     this.chassisMaterial.needsUpdate = true;
     this.lensMaterial.needsUpdate = true;
@@ -108,12 +97,12 @@ export class SlimeModel extends BodyModel {
 
   setPrimaryColor(color: Color) {
     if (`#${color.getHexString()}` === COLOR_MAPLE_ORANGE) {
-      this.bodyTexture.image.data.set(this.bodyDataOrange);
-      this.chassisTexture.image.data.set(this.chassisDataOrange);
+      this.bodyMaterial.map = this.bodyDataOrange;
+      this.chassisMaterial.map = this.chassisDataOrange;
       this.lensMaterial.color.setRGB(0.8, 0, 0);
     } else {
-      this.bodyTexture.image.data.set(this.bodyDataBlue);
-      this.chassisTexture.image.data.set(this.chassisDataBlue);
+      this.bodyMaterial.map = this.bodyDataBlue;
+      this.chassisMaterial.map = this.chassisDataBlue;
       this.lensMaterial.color.setRGB(0, 0, 0.8);
     }
     this.applyTextures();

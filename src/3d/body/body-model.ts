@@ -24,7 +24,6 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   private readonly body: Body;
 
-  textureLoader: PromiseLoader;
   imageTextureLoader: PromiseLoader;
 
   skeleton: Bone;
