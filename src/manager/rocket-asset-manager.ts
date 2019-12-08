@@ -14,8 +14,16 @@ export class RocketAssetManager {
     this.rlService = new RocketLoadoutService(config.backendHost);
   }
 
-  async loadBody(id: number, paintConfig: PaintConfig, fallback?: Body): Promise<BodyModel> {
+  async loadBody(id: number, paintConfig: PaintConfig, fallback?: Body, decalId?: number): Promise<BodyModel> {
     let body: Body;
+    let decal = Decal.NONE;
+
+    if (decalId != undefined && decalId > 1) {
+      try {
+        decal = await this.rlService.getDecal(decalId);
+      } catch (e) {
+      }
+    }
 
     try {
       body = await this.rlService.getBody(id);
@@ -27,7 +35,7 @@ export class RocketAssetManager {
       throw new Error('body is undefined');
     }
 
-    const bodyModel = new BodyModel(body, Decal.NONE, paintConfig, this.config);
+    const bodyModel = new BodyModel(body, decal, paintConfig, this.config);
     await bodyModel.load();
 
     return bodyModel;

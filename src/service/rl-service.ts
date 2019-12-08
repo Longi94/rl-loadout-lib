@@ -1,6 +1,7 @@
 import { Body } from '../model/body';
 import { doRequest } from '../utils/network';
 import { Wheel } from '../model/wheel';
+import { Decal } from '../model/decal';
 
 const HOST_PROD = 'https://rocket-loadout.com';
 const PATH_V1 = '/api/v1';
@@ -22,5 +23,9 @@ export class RocketLoadoutService {
 
   getWheel(id: number): Promise<Wheel> {
     return doRequest<Wheel>(`${this.baseUrl}/wheels/${id}`);
+  }
+
+  getDecal(id: number): Promise<Decal> {
+    return doRequest<Wheel>(`${this.baseUrl}/decals/${id}`);
   }
 }
