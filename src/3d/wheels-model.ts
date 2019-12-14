@@ -1,5 +1,5 @@
 import { AbstractObject } from './object';
-import { Color, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from 'three';
+import { Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../model/wheel';
 import { getAssetUrl } from '../utils/network';
 import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils';
@@ -26,6 +26,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   tireMaterial: MeshStandardMaterial;
 
+  rimBaseUrl: string;
   rimNUrl: string;
   tireBaseUrl: string;
   tireNUrl: string;
@@ -33,13 +34,15 @@ export class WheelsModel extends AbstractObject implements Paintable {
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    if (wheel.rim_base && wheel.rim_rgb_map) {
+    if (wheel.rim_rgb_map != undefined) {
       this.rimSkin = new RimTexture(
         getAssetUrl(wheel.rim_base, rocketConfig),
         getAssetUrl(wheel.rim_rgb_map, rocketConfig),
         paints.wheel,
         rocketConfig
       );
+    } else {
+      this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
 
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
@@ -59,9 +62,12 @@ export class WheelsModel extends AbstractObject implements Paintable {
     const rimNTask = this.textureLoader.load(this.rimNUrl);
     const tireBaseTask = this.textureLoader.load(this.tireBaseUrl);
     const tireNTask = this.textureLoader.load(this.tireNUrl);
+    let rimBaseTask: Promise<Texture>;
 
     if (this.rimSkin) {
       await this.rimSkin.load();
+    } else {
+      rimBaseTask = this.textureLoader.load(this.rimBaseUrl);
     }
 
     await superTask;
@@ -73,6 +79,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin) {
       this.rimMaterial.map = this.rimSkin.getTexture();
       this.rimMaterial.needsUpdate = true;
+    } else {
+      this.rimMaterial.map = await rimBaseTask;
     }
   }
 
