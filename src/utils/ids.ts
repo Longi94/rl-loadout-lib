@@ -18,9 +18,9 @@ export const BODY_SLIME_ID = 4155; // Ecto-1
 export const BODY_MELON_TIER1_ID = 4318; // Mudcat
 export const BODY_MELON_TIER2_ID = 4319; // Mudcat G1
 export const BODY_MELON_TIER3_ID = 4320; // Mudcat GXT
-export const BODY_DURIAN_TIER3_ID = 4472; // Chikara GXT
-export const BODY_DURIAN_TIER1_ID = 4473; // Chikara
-export const BODY_DURIAN_TIER2_ID = 4770; // Chikara G1
+export const BODY_DURIAN_TIER3_ID = 4367; // Chikara GXT
+export const BODY_DURIAN_TIER1_ID = 4472; // Chikara
+export const BODY_DURIAN_TIER2_ID = 4473; // Chikara G1
 
 export const TIER_2_BODIES = new Set<number>([
   BODY_RYE_TIER2_ID,
