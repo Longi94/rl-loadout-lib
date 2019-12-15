@@ -10,6 +10,7 @@ import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
 import { RocketConfig } from '../model/rocket-config';
 import { RimTexture } from '../webgl/rim-texture';
+import { TireTexture } from '../webgl/tire-texture';
 
 class WheelModel {
   model: Object3D;
@@ -24,12 +25,12 @@ export class WheelsModel extends AbstractObject implements Paintable {
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
   rimSkin: RimTexture;
+  tireTexture: TireTexture;
 
   tireMaterial: MeshStandardMaterial;
 
   rimBaseUrl: string;
   rimNUrl: string;
-  tireBaseUrl: string;
   tireNUrl: string;
 
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
@@ -46,8 +47,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
 
+    this.tireTexture = new TireTexture(getAssetUrl(wheel.tire_base, rocketConfig), paints.wheel, rocketConfig);
+
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
-    this.tireBaseUrl = getAssetUrl(wheel.tire_base, rocketConfig);
     this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
   }
 
@@ -61,7 +63,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
   async load() {
     const superTask = super.load();
     const rimNTask = this.textureLoader.load(this.rimNUrl);
-    const tireBaseTask = this.textureLoader.load(this.tireBaseUrl);
+    const tireBaseTask = this.tireTexture.load();
     const tireNTask = this.textureLoader.load(this.tireNUrl);
     let rimBaseTask: Promise<Texture>;
 
@@ -72,9 +74,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
 
     await superTask;
+    await tireBaseTask;
 
     this.rimMaterial.normalMap = await rimNTask;
-    this.tireMaterial.map = await tireBaseTask;
+    this.tireMaterial.map = this.tireTexture.getTexture();
     this.tireMaterial.normalMap = await tireNTask;
 
     if (this.rimSkin) {
@@ -153,6 +156,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
     }
+    this.tireTexture.setPaint(paint);
   }
 
   visible(visible: boolean) {
