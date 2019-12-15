@@ -109,7 +109,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
       position.copy(conf.position);
 
       if (!conf.right) {
-        wheel.rotation.set(-Math.PI / 2, 0, 0);
+        wheel.rotation.set(-Math.PI / 2, 0, Math.PI);
         position.add(new Vector3(0, offset, 0));
       } else {
         wheel.rotation.set(Math.PI / 2, 0, 0);
@@ -156,7 +156,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
       if (wheel.config.right) {
         wheel.model.rotation.z = -angle;
       } else {
-        wheel.model.rotation.z = angle;
+        wheel.model.rotation.z = Math.PI + angle;
       }
     }
   }
