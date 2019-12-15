@@ -47,7 +47,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
 
-    this.tireTexture = new TireTexture(getAssetUrl(wheel.tire_base, rocketConfig), paints.wheel, rocketConfig);
+    if (wheel.tire_base != undefined) {
+      this.tireTexture = new TireTexture(getAssetUrl(wheel.tire_base, rocketConfig), paints.wheel, rocketConfig);
+    }
 
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
     this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
@@ -63,23 +65,32 @@ export class WheelsModel extends AbstractObject implements Paintable {
   async load() {
     const superTask = super.load();
     const rimNTask = this.textureLoader.load(this.rimNUrl);
-    const tireBaseTask = this.tireTexture.load();
     const tireNTask = this.textureLoader.load(this.tireNUrl);
+
+    let tireBaseTask: Promise<void>;
     let rimBaseTask: Promise<Texture>;
 
-    if (this.rimSkin) {
+    if (this.tireTexture != undefined) {
+      tireBaseTask = this.tireTexture.load();
+    }
+
+    if (this.rimSkin != undefined) {
       await this.rimSkin.load();
     } else {
       rimBaseTask = this.textureLoader.load(this.rimBaseUrl);
     }
 
     await superTask;
-    await tireBaseTask;
+    if (tireBaseTask != undefined) {
+      await tireBaseTask;
+    }
+
+    if (this.tireTexture != undefined) {
+      this.tireMaterial.map = this.tireTexture.getTexture();
+      this.tireMaterial.normalMap = await tireNTask;
+    }
 
     this.rimMaterial.normalMap = await rimNTask;
-    this.tireMaterial.map = this.tireTexture.getTexture();
-    this.tireMaterial.normalMap = await tireNTask;
-
     if (this.rimSkin) {
       this.rimMaterial.map = this.rimSkin.getTexture();
       this.rimMaterial.needsUpdate = true;
@@ -156,7 +167,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
     }
-    this.tireTexture.setPaint(paint);
+    if (this.tireTexture != undefined) {
+      this.tireTexture.setPaint(paint);
+    }
   }
 
   visible(visible: boolean) {
