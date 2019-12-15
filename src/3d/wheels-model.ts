@@ -1,5 +1,5 @@
 import { AbstractObject } from './object';
-import { Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../model/wheel';
 import { getAssetUrl } from '../utils/network';
 import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils';
@@ -14,6 +14,7 @@ import { RimTexture } from '../webgl/rim-texture';
 class WheelModel {
   model: Object3D;
   config: WheelConfig;
+  spinnerJoint: Bone;
 }
 
 export class WheelsModel extends AbstractObject implements Paintable {
@@ -119,9 +120,19 @@ export class WheelsModel extends AbstractObject implements Paintable {
       wheel.scale.set(radiusScale, radiusScale, widthScale);
       wheel.position.copy(position);
 
+      let spinnerJoint: Bone = undefined;
+      wheel.traverse(object => {
+        if (object['isBone']) {
+          if (object.name == 'spinner_jnt') {
+            spinnerJoint = object as Bone;
+          }
+        }
+      });
+
       this.wheels.push({
         model: wheel,
-        config: conf
+        config: conf,
+        spinnerJoint
       });
     }
   }
@@ -157,6 +168,14 @@ export class WheelsModel extends AbstractObject implements Paintable {
         wheel.model.rotation.z = -angle;
       } else {
         wheel.model.rotation.z = Math.PI + angle;
+      }
+
+      if (wheel.spinnerJoint != undefined) {
+        if (wheel.config.right) {
+          wheel.spinnerJoint.rotation.y = angle;
+        } else {
+          wheel.spinnerJoint.rotation.y = -angle;
+        }
       }
     }
   }
