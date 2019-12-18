@@ -6,3 +6,7 @@ tsconfig.json
 tslint.json
 README.md
 *.map
+dist/bundle.js
+test/
+test.html
+webpack.config.js
