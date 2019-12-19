@@ -23,3 +23,4 @@ export * from './3d/constants';
 export * from './utils/loader';
 export * from './utils/color';
 export * from './utils/ids';
+export * from './utils/bakkes';
