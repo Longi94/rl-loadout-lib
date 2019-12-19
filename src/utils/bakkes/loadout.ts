@@ -4,6 +4,19 @@ import { Color } from 'three';
 
 export const CURRENT_LOADOUT_VERSION = 2;
 
+export const SLOT_BODY = 0; //Body won't be applied when loading in BakkesMod, user must have it equipped
+export const SLOT_SKIN = 1;
+export const SLOT_WHEELS = 2;
+export const SLOT_BOOST = 3;
+export const SLOT_ANTENNA = 4;
+export const SLOT_HAT = 5;
+
+export const SLOT_PAINTFINISH = 7;
+export const SLOT_PAINTFINISH_SECONDARY = 12;
+
+export const SLOT_ENGINE_AUDIO = 13;
+export const SLOT_SUPERSONIC_TRAIL = 14;
+export const SLOT_GOALEXPLOSION = 15;
 
 export function encodeLoadout(loadout: BMLoadout): string {
   // Allocate buffer that's big enough
