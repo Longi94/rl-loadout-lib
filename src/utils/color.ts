@@ -299,14 +299,6 @@ export const COLOR_MAPLE_ORANGE = '#800000';
 export const COLOR_BERRY_ORANGE = '#B3915F';
 export const COLOR_BERRY_BLUE = '#656336';
 
-export function overBlendColors(foreground: Color, background: Color, foregroundAlpha: number, holder: Color) {
-  foregroundAlpha = foregroundAlpha / 255;
-  const r = (foreground.r * foregroundAlpha) + (background.r * (1.0 - foregroundAlpha));
-  const g = (foreground.g * foregroundAlpha) + (background.g * (1.0 - foregroundAlpha));
-  const b = (foreground.b * foregroundAlpha) + (background.b * (1.0 - foregroundAlpha));
-  holder.setRGB(r, g, b);
-}
-
 export function getColorsForBody(body: Body): { [team: string]: string[] } {
   switch (body.id) {
     case BODY_MAPLE_ID:
