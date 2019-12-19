@@ -1,6 +1,5 @@
 import { BitBinaryReader, BitBinaryWriter } from './binary';
-import { BMItem, BMItems, BMLoadout } from './model';
-import { Color } from 'three';
+import { BMItem, BMItems, BMLoadout, BMRGB } from './model';
 
 export const CURRENT_LOADOUT_VERSION = 2;
 
@@ -152,18 +151,18 @@ function writeLoadout(writer: BitBinaryWriter, loadout: BMItems) {
   writer.currentBit = amountStorePos2; // Set back reader to original position
 }
 
-function writeColor(writer: BitBinaryWriter, color: Color) {
-  writer.writeNumber(Math.round(color.r * 255), 8);
-  writer.writeNumber(Math.round(color.g * 255), 8);
-  writer.writeNumber(Math.round(color.b * 255), 8);
+function writeColor(writer: BitBinaryWriter, color: BMRGB) {
+  writer.writeNumber(color.r, 8);
+  writer.writeNumber(color.g, 8);
+  writer.writeNumber(color.b, 8);
 }
 
-function readColorsFromBuffer(reader: BitBinaryReader): Color {
-  return new Color(
-    reader.readNumber(8) / 255,
-    reader.readNumber(8) / 255,
-    reader.readNumber(8) / 255
-  );
+function readColorsFromBuffer(reader: BitBinaryReader): BMRGB {
+  return {
+    r: reader.readNumber(8),
+    g: reader.readNumber(8),
+    b: reader.readNumber(8)
+  };
 }
 
 function readItemsFromBuffer(reader: BitBinaryReader): BMItems {
