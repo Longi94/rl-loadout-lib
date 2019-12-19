@@ -19,13 +19,19 @@ import * as btoa from 'btoa';
 import * as atob from 'atob';
 import { BMItem, BMLoadout } from '../../../src/utils/bakkes/model';
 import {
-  PAINT_BLACK, PAINT_BURNT_SIENNA,
-  PAINT_COBALT, PAINT_CRIMSON,
-  PAINT_FOREST_GREEN, PAINT_LIME, PAINT_NONE, PAINT_ORANGE,
+  PAINT_BLACK,
+  PAINT_BURNT_SIENNA,
+  PAINT_COBALT,
+  PAINT_CRIMSON,
+  PAINT_FOREST_GREEN,
+  PAINT_LIME,
+  PAINT_NONE,
+  PAINT_ORANGE,
   PAINT_PINK,
   PAINT_PURPLE,
   PAINT_SAFFRON,
-  PAINT_SKY_BLUE, PAINT_TITANIUM_WHITE
+  PAINT_SKY_BLUE,
+  PAINT_TITANIUM_WHITE
 } from '../../../src/utils/color';
 
 describe('Bakkes loadout', () => {
@@ -63,7 +69,7 @@ describe('Bakkes loadout', () => {
     expect(loadout.body.orangeColor.secondaryColors).to.be.undefined;
   });
 
-  it('should encode default loadout', function () {
+  it('should encode default loadout', () => {
     const loadout = new BMLoadout();
 
     const defaultItem: BMItem = {
@@ -80,7 +86,7 @@ describe('Bakkes loadout', () => {
     expect(result).to.equal('ggL/AlwAAlwAAA==');
   });
 
-  it('should decode complex loadout code', function () {
+  it('should decode complex loadout code', () => {
     const loadout = decodeLoadout('ggpXF0yGRThlByH5HsPTRMj9iZTzODmrBjuJGl/jMFniFbfNfwAAAAAA');
 
     expect(loadout.header.version).to.equal(2);
@@ -140,7 +146,7 @@ describe('Bakkes loadout', () => {
     expect(blueColor.secondaryColors.b).to.equal(0);
   });
 
-  it('should encode complex loadout', function () {
+  it('should encode complex loadout', () => {
     const loadout = new BMLoadout();
 
     loadout.body.blueIsOrange = true;
