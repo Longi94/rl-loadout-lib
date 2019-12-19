@@ -3,7 +3,7 @@ import { BMItem, BMItems, BMLoadout, BMRGB } from './model';
 
 export const CURRENT_LOADOUT_VERSION = 2;
 
-export const SLOT_BODY = 0; //Body won't be applied when loading in BakkesMod, user must have it equipped
+export const SLOT_BODY = 0; // Body won't be applied when loading in BakkesMod, user must have it equipped
 export const SLOT_SKIN = 1;
 export const SLOT_WHEELS = 2;
 export const SLOT_BOOST = 3;
@@ -49,8 +49,8 @@ export function encodeLoadout(loadout: BMLoadout): string {
 
   const currentBit = writer.currentBit; // Save current location of writer
 
-  //Calculate how many bytes are used
-  const sizeInBytes: number = Math.floor(currentBit / 8) + (currentBit % 8 == 0 ? 0 : 1);
+  // Calculate how many bytes are used
+  const sizeInBytes: number = Math.floor(currentBit / 8) + (currentBit % 8 === 0 ? 0 : 1);
   writer.currentBit = 6; // Set writer to header (bit 6)
   writer.writeNumber(sizeInBytes, 10); // Write size
   writer.writeNumber(writer.calculateCrc(3, sizeInBytes), 8); // Write calculated CRC
@@ -75,7 +75,7 @@ export function decodeLoadout(loadoutString: string, verify: boolean = true): BM
 
   // Verification (can be skipped if you already know the code is correct)
   if (verify) {
-    const stringSizeCalc = (Math.ceil((4 * loadout.header.codeSize / 3)) + 3) & ~3;
+    const stringSizeCalc = (Math.ceil(4 * loadout.header.codeSize / 3) + 3) & ~3;
 
     // Diff may be at most 4 (?) because of base64 padding, but we check > 6 because IDK
     if (Math.abs(stringSizeCalc - loadoutString.length) > 6) {
@@ -129,8 +129,8 @@ function writeLoadout(writer: BitBinaryWriter, loadout: BMItems) {
   for (const entry of loadout) {
     const opt = entry[1];
 
-    //In bakkesmod, when unequipping the productID gets set to 0 but doesn't
-    //get removed, so we do this check here.
+    // In bakkesmod, when unequipping the productID gets set to 0 but doesn't
+    // get removed, so we do this check here.
     if (opt.productId === 0) {
       continue;
     }
@@ -146,7 +146,7 @@ function writeLoadout(writer: BitBinaryWriter, loadout: BMItems) {
   // Save current position of writer
   const amountStorePos2 = writer.currentBit;
   writer.currentBit = amountStorePos;
-  //Write the size of the loadout to the spot we allocated earlier
+  // Write the size of the loadout to the spot we allocated earlier
   writer.writeNumber(loadoutSize, 4); // Gives us a max of 15 customizable slots per team
   writer.currentBit = amountStorePos2; // Set back reader to original position
 }

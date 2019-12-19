@@ -29,10 +29,10 @@ class BMBody {
   blueLoadout: BMItems = new Map<number, BMItem>();
   blueColor = new BMOverrideColor();
   orangeLoadout?: BMItems = new Map<number, BMItem>();
-  orangeColor? = new BMOverrideColor();
+  orangeColor ? = new BMOverrideColor();
 }
 
 export class BMLoadout {
-  header? = new BMHeader();
+  header ? = new BMHeader();
   body = new BMBody();
 }

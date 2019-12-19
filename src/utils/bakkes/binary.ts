@@ -32,7 +32,7 @@ export class BitBinaryWriter {
   }
 
   toHex(): string {
-    const sizeInBytes: number = Math.floor(this.currentBit / 8) + (this.currentBit % 8 == 0 ? 0 : 1);
+    const sizeInBytes: number = Math.floor(this.currentBit / 8) + (this.currentBit % 8 === 0 ? 0 : 1);
     // @ts-ignore
     return btoa(String.fromCharCode.apply(null, this.buffer.slice(0, sizeInBytes)));
   }
