@@ -124,3 +124,4 @@ crashlytics-build.properties
 fabric.properties
 
 dist/
+test-results/
