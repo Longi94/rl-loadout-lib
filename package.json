@@ -7,8 +7,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "test:junitReporter": "mocha -r ts-node/register test/**/*.spec.ts --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/mocha/results.xml",
+    "test": "mocha -r ts-node/register 'test/**/*.spec.ts'",
+    "test:junitReporter": "mocha -r ts-node/register 'test/**/*.spec.ts' --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/mocha/results.xml",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
