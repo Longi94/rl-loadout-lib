@@ -37,6 +37,24 @@ jobs:
       - persist_to_workspace:
           root: ~/rl-loadout-lib
           paths: .
+  test:
+    working_directory: ~/rl-loadout-lib
+    docker:
+      - image: circleci/node:10.16
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-dependencies and build
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: run mocha tests
+          command: npm run test
   deploy:
     working_directory: ~/rl-loadout-lib
     docker:
@@ -62,9 +80,14 @@ workflows:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
+      - test:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - deploy:
           requires:
             - build
+            - test
           filters:
             branches:
               ignore: /.*/
