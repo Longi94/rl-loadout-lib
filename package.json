@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf dist",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
@@ -30,8 +31,9 @@
     "three": "^0.110.0"
   },
   "devDependencies": {
+    "rimraf": "^3.0.0",
+    "three": "^0.110.0",
     "tslint": "^5.20.0",
-    "typescript": "~3.7.2",
-    "three": "^0.110.0"
+    "typescript": "~3.7.2"
   }
 }
