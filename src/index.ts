@@ -15,7 +15,8 @@ export * from './model/rocket-config';
 
 export * from './3d/body/factory';
 export * from './3d/body/body-model';
-export * from './3d/wheels-model';
+export * from './3d/wheel/factory';
+export * from './3d/wheel/wheels-model';
 export * from './3d/topper-model';
 export * from './3d/antenna-model';
 export * from './3d/constants';

@@ -37,3 +37,5 @@ export const TIER_3_BODIES = new Set<number>([
   BODY_ENSPIER_TIER3_ID,
   BODY_DURIAN_TIER3_ID
 ]);
+
+export const WHEEL_SPINNER_ID = 388;

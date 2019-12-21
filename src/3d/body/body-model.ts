@@ -12,7 +12,7 @@ import { AxleSettings, WheelSettings } from '../../model/axle-settings';
 import { HitboxConfig } from '../../model/hitbox-config';
 import { WheelConfig } from '../../model/wheel';
 import { RocketConfig } from '../../model/rocket-config';
-import { WheelsModel } from '../wheels-model';
+import { WheelsModel } from '../wheel/wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { MAX_WHEEL_YAW } from '../constants';

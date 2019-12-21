@@ -2,10 +2,12 @@ import { RocketLoadoutService } from '../service/rl-service';
 import { BodyModel } from '../3d/body/body-model';
 import { Decal } from '../model/decal';
 import { PaintConfig } from '../model/paint-config';
-import { WheelsModel } from '../3d/wheels-model';
+import { WheelsModel } from '../3d/wheel/wheels-model';
 import { RocketConfig } from '../model/rocket-config';
 import { Body } from '../model/body';
 import { Wheel } from '../model/wheel';
+import { createBodyModel } from '../3d/body/factory';
+import { createWheelsModel } from '../3d/wheel/factory';
 
 export class RocketAssetManager {
   private readonly rlService: RocketLoadoutService;
@@ -35,7 +37,7 @@ export class RocketAssetManager {
       throw new Error('body is undefined');
     }
 
-    const bodyModel = new BodyModel(body, decal, paintConfig, this.config);
+    const bodyModel = createBodyModel(body, decal, paintConfig, this.config);
     await bodyModel.load();
 
     return bodyModel;
@@ -54,7 +56,7 @@ export class RocketAssetManager {
       throw new Error('wheel is undefined');
     }
 
-    const wheelsModel = new WheelsModel(wheel, paintConfig, this.config);
+    const wheelsModel = createWheelsModel(wheel, paintConfig, this.config);
     await wheelsModel.load();
 
     return wheelsModel;

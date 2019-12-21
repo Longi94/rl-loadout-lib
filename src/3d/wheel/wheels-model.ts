@@ -1,16 +1,16 @@
-import { AbstractObject } from './object';
+import { AbstractObject } from '../object';
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
-import { Wheel, WheelConfig } from '../model/wheel';
-import { getAssetUrl } from '../utils/network';
+import { Wheel, WheelConfig } from '../../model/wheel';
+import { getAssetUrl } from '../../utils/network';
 import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils';
-import { disposeIfExists } from '../utils/util';
-import { Paintable } from './paintable';
-import { PaintConfig } from '../model/paint-config';
-import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
-import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from './constants';
-import { RocketConfig } from '../model/rocket-config';
-import { RimTexture } from '../webgl/rim-texture';
-import { TireTexture } from '../webgl/tire-texture';
+import { disposeIfExists } from '../../utils/util';
+import { Paintable } from '../paintable';
+import { PaintConfig } from '../../model/paint-config';
+import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
+import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../constants';
+import { RocketConfig } from '../../model/rocket-config';
+import { RimTexture } from '../../webgl/rim-texture';
+import { TireTexture } from '../../webgl/tire-texture';
 
 class WheelModel {
   model: Object3D;
@@ -32,6 +32,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
   rimBaseUrl: string;
   rimNUrl: string;
   tireNUrl: string;
+
+  protected roll = 0;
 
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
@@ -180,6 +182,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
   }
 
   setRoll(angle: number) {
+    this.roll = angle;
     for (const wheel of this.wheels) {
       if (wheel.config.right) {
         wheel.model.rotation.z = -angle;
@@ -195,5 +198,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
         }
       }
     }
+  }
+
+  animate(t: number) {
   }
 }
