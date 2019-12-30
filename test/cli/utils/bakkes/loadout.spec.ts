@@ -14,10 +14,10 @@ import {
   SLOT_SKIN,
   SLOT_SUPERSONIC_TRAIL,
   SLOT_WHEELS
-} from '../../../src/utils/bakkes';
+} from '../../../../src/utils/bakkes';
 import * as btoa from 'btoa';
 import * as atob from 'atob';
-import { BMItem, BMLoadout } from '../../../src/utils/bakkes/model';
+import { BMItem, BMLoadout } from '../../../../src/utils/bakkes/model';
 import {
   PAINT_BLACK,
   PAINT_BURNT_SIENNA,
@@ -32,7 +32,7 @@ import {
   PAINT_SAFFRON,
   PAINT_SKY_BLUE,
   PAINT_TITANIUM_WHITE
-} from '../../../src/utils/color';
+} from '../../../../src/utils/color';
 
 describe('Bakkes loadout', () => {
   before(() => {

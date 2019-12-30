@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha';
-import { getAssetUrl } from '../../src/utils/network';
-import { RocketConfig, TextureFormat, TextureQuality } from '../../src/model/rocket-config';
+import { getAssetUrl } from '../../../src/utils/network';
+import { RocketConfig, TextureFormat, TextureQuality } from '../../../src/model/rocket-config';
 
 
 describe('Network', () => {
