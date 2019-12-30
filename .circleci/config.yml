@@ -30,6 +30,9 @@ jobs:
       - run:
           name: install-dependencies and build
           command: npm install
+      - run:
+          name: build web
+          command: npm run build-web
       - save_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
