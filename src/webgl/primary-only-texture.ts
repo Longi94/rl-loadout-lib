@@ -1,7 +1,9 @@
 import { WebGLCanvasTexture } from './webgl-texture';
 import { BodyTexture } from '../3d/body/body-texture';
 import { Color } from 'three';
-import { Body, PaintConfig, RocketConfig } from '..';
+import { Body } from '../model/body';
+import { PaintConfig } from '../model/paint-config';
+import { RocketConfig } from '../model/rocket-config';
 import { getAssetUrl } from '../utils/network';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 
