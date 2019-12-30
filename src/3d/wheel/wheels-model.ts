@@ -2,7 +2,7 @@ import { AbstractObject } from '../object';
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../../model/wheel';
 import { getAssetUrl } from '../../utils/network';
-import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils';
+import { SkeletonUtils } from '../../utils/three/skeleton';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { PaintConfig } from '../../model/paint-config';
