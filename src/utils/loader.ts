@@ -1,6 +1,6 @@
 import { TextureFormat } from '../model/rocket-config';
 import { ImageLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
-import { TGALoader } from 'three/examples/jsm/loaders/TGALoader';
+import { TGALoader } from '../utils/three/tga-loader';
 
 export class PromiseLoader {
 
