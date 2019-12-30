@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tests</title>
+  <link href="node_modules/mocha/mocha.css" rel="stylesheet" />
+  <script src="node_modules/mocha/mocha.js"></script>
+  <script src="node_modules/chai/chai.js"></script>
+</head>
+<body>
+
+<!-- A container element for the visual Mocha results -->
+<div id="mocha"></div>
+
+<!-- Mocha setup and initiation code -->
+<script>
+  const expect = chai.expect;
+  mocha.setup('bdd');
+  window.onload = function() {
+    mocha.run();
+  };
+</script>
+
+<!-- The script under test -->
+<script src="test/web/three.min.js"></script>
+<script src="build/rl-loadout-lib.js"></script>
+<script src="test/web/utils/network.spec.js"></script>
+<script src="test/web/utils/bakkes/loadout.spec.js"></script>
+
+</body>
+</html>

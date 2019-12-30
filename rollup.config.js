@@ -8,7 +8,7 @@ export default {
     {
       file: 'build/rl-loadout-lib.min.js',
       format: 'umd',
-      name: 'RocketLoadout', // the global which can be used in a browser,
+      name: 'RL', // the global which can be used in a browser,
       globals: {
         three: 'three'
       }
@@ -16,9 +16,9 @@ export default {
     {
       file: 'build/rl-loadout-lib.js',
       format: 'umd',
-      name: 'RocketLoadout', // the global which can be used in a browser,
+      name: 'RL', // the global which can be used in a browser,
       globals: {
-        three: 'three'
+        three: 'THREE'
       }
     }
   ],

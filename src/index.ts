@@ -25,3 +25,4 @@ export * from './utils/loader';
 export * from './utils/color';
 export * from './utils/ids';
 export * from './utils/bakkes';
+export * from './utils/network';
