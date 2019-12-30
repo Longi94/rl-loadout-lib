@@ -1,6 +1,6 @@
 export const SkeletonUtils = {
 
-  clone: function(source) {
+  clone: source => {
 
     const sourceLookup = new Map();
     const cloneLookup = new Map();

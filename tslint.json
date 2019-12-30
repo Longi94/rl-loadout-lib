@@ -1,7 +1,7 @@
 {
   "extends": "tslint:recommended",
   "linterOptions": {
-    "exclude": []
+    "exclude": ["src/utils/three/tga-loader.js"]
   },
   "rules": {
     "array-type": false,
