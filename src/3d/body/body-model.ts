@@ -166,6 +166,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   addWheelsModel(wheelsModel: WheelsModel) {
+    this.clearWheelsModel();
     this.wheelsModel = wheelsModel;
     this.wheelsModel.applyWheelConfig(this.wheelConfig);
     this.wheelsModel.addToJoints();
@@ -179,6 +180,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   addTopperModel(topperModel: TopperModel) {
+    this.clearTopperModel();
     this.topperModel = topperModel;
     this.topperModel.applyAnchor(this.hatSocket);
     this.topperModel.addToScene(this.scene);
@@ -192,6 +194,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   addAntennaModel(antennaModel: AntennaModel) {
+    this.clearAntennaModel();
     this.antennaModel = antennaModel;
     this.antennaModel.applyAnchor(this.antennaSocket);
     this.antennaModel.addToScene(this.scene);
