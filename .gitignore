@@ -126,3 +126,4 @@ fabric.properties
 dist/
 test-results/
 build/
+doc/

@@ -1,6 +1,8 @@
 src/
 test/
 test-results/
+build/
+doc/
 *.iml
 .*
 node_modules/
