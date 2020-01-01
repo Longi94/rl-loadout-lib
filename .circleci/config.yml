@@ -73,6 +73,35 @@ jobs:
       - run:
           name: Publish package
           command: npm publish
+  doc-deploy:
+    working_directory: ~/rl-loadout-lib
+    docker:
+      - image: circleci/node:10.16
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-dependencies and build
+          command: npm install
+      - run:
+          name: generate documentation
+          command: npm run docgen
+      - run:
+          name: Remove old files
+          command: ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "echo $SSH_PASS | sudo -S rm -rf $DOCS_DIR/*"
+      - run:
+          name: Create dir for files in home
+          command: ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "mkdir -p ~/rl-loadout-docs"
+      - run:
+          name: Copy artifacts to host
+          command: scp -rP $SSH_PORT docs/* "$SSH_USER@$SSH_HOST:/home/$SSH_USER/rl-loadout-docs/"
+      - run:
+          name: Copy artifacts to deploy folder
+          command: ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "echo $SSH_PASS | sudo -S cp -r ~/rl-loadout-docs/* $DOCS_DIR/"
+      - run:
+          name: Remove dir in home
+          command: ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "rm -rf ~/rl-loadout-docs/"
 workflows:
   version: 2
   build-and-deploy:
@@ -98,3 +127,6 @@ workflows:
               ignore: /.*/
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+/
+      - doc-deploy:
+          requires:
+            - deploy
