@@ -109,7 +109,7 @@ export abstract class AbstractObject {
 
   /**
    * Set the visibility of the object.
-   * @param visible
+   * @param visible visibility of the object
    */
   visible(visible: boolean) {
     this.scene.visible = visible;

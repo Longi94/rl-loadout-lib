@@ -19,7 +19,7 @@ export const SLOT_GOALEXPLOSION = 15;
 
 /**
  * Encode a loadout into a string that can be loaded into bakkesmod's item mod.
- * @param loadout
+ * @param loadout loadout to encode
  */
 export function encodeLoadout(loadout: BMLoadout): string {
   // Allocate buffer that's big enough

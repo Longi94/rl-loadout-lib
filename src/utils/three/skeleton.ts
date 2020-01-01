@@ -8,7 +8,7 @@ export const SkeletonUtils = {
    * Clones the given object and its descendants, ensuring that any SkinnedMesh instances are correctly associated with their bones. Bones
    * are also cloned, and must be descendants of the object passed to this method. Other data, like geometries and materials, are reused by
    * reference.
-   * @param source
+   * @param source the object that will be cloned
    */
   clone: source => {
 

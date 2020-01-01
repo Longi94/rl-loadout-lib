@@ -7,25 +7,25 @@ export interface BodyTexture {
 
   /**
    * Set the primary color.
-   * @param color
+   * @param color THREE Color object
    */
   setPrimary(color: Color);
 
   /**
    * Set the accent color.
-   * @param color
+   * @param color THREE Color object
    */
   setAccent(color: Color);
 
   /**
    * Set the paint color of the decal.
-   * @param color
+   * @param color THREE Color object
    */
   setPaint(color: Color);
 
   /**
    * Set the paint color of the body.
-   * @param color
+   * @param color THREE Color object
    */
   setBodyPaint(color: Color);
 
