@@ -11,6 +11,9 @@ import { RyeTier1Model } from './rye-tier1-model';
 const KIT_DIFFUSE = 'body/Body_Rye_Tier2/Body_Rye_BodyKit_D.tga';
 const KIT_NORMAL = 'body/Body_Rye_Tier2/Body_Rye_BodyKit_N.tga';
 
+/**
+ * Class for the 3D model of Maverick GXT. Needed because of custom textures.
+ */
 export class RyeTier2Model extends RyeTier1Model {
 
   kitDiffuseUrl: string;

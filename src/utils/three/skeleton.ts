@@ -1,5 +1,15 @@
+/**
+ * Utility functions for Skeleton, SkinnedMesh, and Bone manipulation.
+ * @see https://github.com/mrdoob/three.js/blob/dev/examples/jsm/utils/SkeletonUtils.js
+ */
 export const SkeletonUtils = {
 
+  /**
+   * Clones the given object and its descendants, ensuring that any SkinnedMesh instances are correctly associated with their bones. Bones
+   * are also cloned, and must be descendants of the object passed to this method. Other data, like geometries and materials, are reused by
+   * reference.
+   * @param source
+   */
   clone: source => {
 
     const sourceLookup = new Map();

@@ -14,6 +14,9 @@ const DECALS_NORMAL = 'body/body_ron/Body_Ron_Decals_N.tga';
 const HEX_DIFFUSE = 'body/body_ron/hex.tga';
 const HEX_NORMAL = 'body/body_ron/Detail_HexPattern9000_N.tga';
 
+/**
+ * Class for the 3D model of McLaren 570S. Needed because of custom textures.
+ */
 export class RonModel extends BodyModel {
 
   protected imageLoader: PromiseLoader;

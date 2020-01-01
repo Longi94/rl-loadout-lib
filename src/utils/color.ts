@@ -1,8 +1,10 @@
-import { Color } from 'three';
 import { Body } from '../model/body';
 import { BODY_BERRY_ID, BODY_MAPLE_ID, BODY_SLIME_ID } from './ids';
 
-// https://www.reddit.com/r/RLFashionAdvice/comments/9l1swx/rocket_league_color_palette_with_hex_and_rgb/
+/**
+ * An array of primary colors for the blue team. The array index corresponds to the colors in-game ID.
+ * Taken from https://www.reddit.com/r/RLFashionAdvice/comments/9l1swx/rocket_league_color_palette_with_hex_and_rgb/
+ */
 export const BLUE_PRIMARY_COLORS = [
   '#507F39',
   '#397F3F',
@@ -76,6 +78,10 @@ export const BLUE_PRIMARY_COLORS = [
   '#30067F'
 ];
 
+/**
+ * An array of primary colors for the orange team. The array index corresponds to the colors in-game ID.
+ * Taken from https://www.reddit.com/r/RLFashionAdvice/comments/9l1swx/rocket_league_color_palette_with_hex_and_rgb/
+ */
 export const ORANGE_PRIMARY_COLORS = [
   '#7F7F39',
   '#7F7039',
@@ -149,6 +155,10 @@ export const ORANGE_PRIMARY_COLORS = [
   '#7F0642'
 ];
 
+/**
+ * An array of accent colors. The array index corresponds to the colors in-game ID.
+ * Taken from https://www.reddit.com/r/RLFashionAdvice/comments/9l1swx/rocket_league_color_palette_with_hex_and_rgb/
+ */
 export const ACCENT_COLORS = [
   '#E5E5E5',
   '#FF7F7F',
@@ -257,8 +267,17 @@ export const ACCENT_COLORS = [
   '#330008'
 ];
 
+/**
+ * The default blue primary color, that's set when creating a new loadout.
+ */
 export const DEFAULT_BLUE_TEAM = BLUE_PRIMARY_COLORS[35];
+/**
+ * The default orange primary color, that's set when creating a new loadout.
+ */
 export const DEFAULT_ORANGE_TEAM = ORANGE_PRIMARY_COLORS[33];
+/**
+ * The default accent color, that's set when creating a new loadout.
+ */
 export const DEFAULT_ACCENT = ACCENT_COLORS[0];
 
 export const PAINT_NONE = 0; // is this actually used?
@@ -290,8 +309,6 @@ PAINT_COLORS[PAINT_COBALT] = '#0048ed';
 PAINT_COLORS[PAINT_PINK] = '#ff38f8';
 PAINT_COLORS[PAINT_PURPLE] = '#8800cc';
 PAINT_COLORS[PAINT_BURNT_SIENNA] = '#843d00';
-
-export const BLACK = new Color(0, 0, 0);
 
 export const COLOR_MAPLE_BLUE = '#0000F3';
 export const COLOR_MAPLE_ORANGE = '#800000';

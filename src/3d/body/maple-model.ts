@@ -14,6 +14,9 @@ const BODY_BLUE = 'body/body_maple/Body_Maple2_D.tga';
 const CHASSIS_ORANGE = 'body/body_maple/Chassis_Maple1_D.tga';
 const CHASSIS_BLUE = 'body/body_maple/Chassis_Maple2_D.tga';
 
+/**
+ * Class for the 3D model of Jurassic Jeep® Wrangler. Needed because paints cannot be applied to this body.
+ */
 export class MapleModel extends BodyModel {
 
   private bodyDataOrange: Texture;
@@ -76,7 +79,7 @@ export class MapleModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {

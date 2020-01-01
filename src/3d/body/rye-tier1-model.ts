@@ -12,6 +12,9 @@ const LIGHTS_DIFFUSE = 'body/Body_Rye_Tier1/Chassis_Rye_Lights_D.tga';
 const LIGHTS_NORMAL = 'body/Body_Rye_Tier1/Chassis_Rye_Lights_N.tga';
 const GRILL_NORMAL = 'body/Body_Rye_Tier1/Car_Grille_Hexy_N.tga';
 
+/**
+ * Class for the 3D model of Maverick G1. Needed because of custom textures.
+ */
 export class RyeTier1Model extends BodyModel {
 
   protected imageLoader: PromiseLoader;

@@ -25,6 +25,14 @@ import { RyeTier2Model } from './rye-tier2-model';
 import { RyeTier1Model } from './rye-tier1-model';
 import { RonModel } from './ron-model';
 
+/**
+ * Create a body model object. This handles unique models that need a custom class to handle it.
+ * @param body car body
+ * @param decal car decal
+ * @param paints paints to be applied to the body
+ * @param rocketConfig configuration used for loading assets
+ * @return body model
+ */
 export function createBodyModel(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyModel {
   switch (body.id) {
     case BODY_MAPLE_ID:

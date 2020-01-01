@@ -17,6 +17,10 @@ export const SLOT_ENGINE_AUDIO = 13;
 export const SLOT_SUPERSONIC_TRAIL = 14;
 export const SLOT_GOALEXPLOSION = 15;
 
+/**
+ * Encode a loadout into a string that can be loaded into bakkesmod's item mod.
+ * @param loadout
+ */
 export function encodeLoadout(loadout: BMLoadout): string {
   // Allocate buffer that's big enough
   const writer = new BitBinaryWriter(10000);
@@ -59,6 +63,12 @@ export function encodeLoadout(loadout: BMLoadout): string {
   return writer.toHex();
 }
 
+/**
+ * Decode a bakkesmod item mod string.
+ * @param loadoutString bakkes item mod string
+ * @param verify if true, the string is verified and an error is thrown if the verification fails
+ * @throws Error verification failed
+ */
 export function decodeLoadout(loadoutString: string, verify: boolean = true): BMLoadout {
   const reader = new BitBinaryReader(loadoutString);
   const loadout = new BMLoadout();

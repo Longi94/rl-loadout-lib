@@ -20,11 +20,14 @@ import { StaticDecalTexture } from '../../webgl/static-decal-texture';
 import { ChassisTexture } from '../../webgl/chassis-texture';
 
 
+/**
+ * Class that handles loading the 3D model of the car body.
+ */
 export class BodyModel extends AbstractObject implements Paintable {
 
   private readonly body: Body;
 
-  imageTextureLoader: PromiseLoader;
+  protected readonly imageTextureLoader: PromiseLoader;
 
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
@@ -33,7 +36,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   bodySkin: BodyTexture;
   chassisSkin: ChassisTexture;
 
-  chassisNUrl: string;
+  private readonly chassisNUrl: string;
 
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
@@ -47,6 +50,13 @@ export class BodyModel extends AbstractObject implements Paintable {
   topperModel: TopperModel;
   antennaModel: AntennaModel;
 
+  /**
+   * Create a body model object. You should **not** use this unless you know what you are doing. Use {@link createBodyModel} instead.
+   * @param body car body to load the model of
+   * @param decal car decal to load the textures of
+   * @param paints paints to be applied to the body
+   * @param rocketConfig configuration used for loading assets
+   */
   constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
     this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
@@ -65,7 +75,7 @@ export class BodyModel extends AbstractObject implements Paintable {
     );
   }
 
-  initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
+  protected initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
     return new StaticDecalTexture(body, decal, paints, rocketConfig);
   }
 
@@ -78,6 +88,9 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.wheelsModel = undefined;
   }
 
+  /**
+   * Load the body model and all textures needed for it.
+   */
   async load() {
     const superTask = super.load();
     const bodySkinTask = this.bodySkin.load();
@@ -95,14 +108,14 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.chassisMaterial.needsUpdate = true;
   }
 
-  handleModel(scene: Scene) {
+  protected handleModel(scene: Scene) {
     if ('hitbox' in scene.userData) {
       this.hitboxConfig = scene.userData.hitbox;
     }
     if ('wheelSettings' in scene.userData) {
       this.wheelSettings = {
         frontAxle: AxleSettings.fromObject(scene.userData.wheelSettings.frontAxle),
-        backAxle: AxleSettings.fromObject(scene.userData.wheelSettings.backAxle),
+        backAxle: AxleSettings.fromObject(scene.userData.wheelSettings.backAxle)
       };
     }
 
@@ -165,6 +178,10 @@ export class BodyModel extends AbstractObject implements Paintable {
     });
   }
 
+  /**
+   * Add wheels to the body. This creates 4 copies of the wheel model and attaches them to the wheel joints. Replaces existing wheels.
+   * @param wheelsModel the wheels
+   */
   addWheelsModel(wheelsModel: WheelsModel) {
     this.clearWheelsModel();
     this.wheelsModel = wheelsModel;
@@ -172,6 +189,9 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.wheelsModel.addToJoints();
   }
 
+  /**
+   * Remove the wheels from the body.
+   */
   clearWheelsModel() {
     if (this.wheelsModel != undefined) {
       this.wheelsModel.removeFromJoints();
@@ -179,6 +199,10 @@ export class BodyModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Add a topper to the body and attach it to the topper socket. It replaces existing toppers.
+   * @param topperModel the topper
+   */
   addTopperModel(topperModel: TopperModel) {
     this.clearTopperModel();
     this.topperModel = topperModel;
@@ -186,6 +210,9 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.topperModel.addToScene(this.scene);
   }
 
+  /**
+   * Remove the topper from the body.
+   */
   clearTopperModel() {
     if (this.topperModel != undefined) {
       this.topperModel.removeFromScene(this.scene);
@@ -193,6 +220,10 @@ export class BodyModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Add an antenna to the body and attach it to the antenna anchor. It replaces existing antennas.
+   * @param antennaModel the antenna
+   */
   addAntennaModel(antennaModel: AntennaModel) {
     this.clearAntennaModel();
     this.antennaModel = antennaModel;
@@ -200,6 +231,9 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.antennaModel.addToScene(this.scene);
   }
 
+  /**
+   * Remove the antenna from the body.
+   */
   clearAntennaModel() {
     if (this.antennaModel != undefined) {
       this.antennaModel.removeFromScene(this.scene);
@@ -208,8 +242,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   /**
-   * Set the paint color of this body. This only applies to the chassis, the paint of the body is set by the skin.
-   *
+   * Set the paint color of this body.
    * @param color paint color
    */
   setPaintColor(color: Color) {
@@ -223,6 +256,12 @@ export class BodyModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Replace the current decal with a new one.
+   * @param decal new decal
+   * @param paints paint config needed for decal colors
+   * @param rocketConfig rocket config needed for loading assets
+   */
   async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
     this.bodySkin.dispose();
     this.bodySkin = new StaticDecalTexture(this.body, decal, paints, rocketConfig);
@@ -230,19 +269,36 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.applyDecal();
   }
 
+  /**
+   * Set the primary color.
+   * @param color THREE Color object
+   */
   setPrimaryColor(color: Color) {
     this.bodySkin.setPrimary(color);
   }
 
+  /**
+   * Set the accent color.
+   * @param color THREE Color object
+   */
   setAccentColor(color: Color) {
     this.bodySkin.setAccent(color);
     this.chassisSkin.setAccent(color);
   }
 
+  /**
+   * Set the paint color of the decal.
+   * @param color THREE Color object
+   */
   setDecalPaintColor(color: Color) {
     this.bodySkin.setPaint(color);
   }
 
+  /**
+   * Set the yaw rotation (turn) of the front wheels.
+   * @param angle yaw in radians
+   * @param clamped if true, the angle will be clamped and the absolute value will not be higher than {@link MAX_WHEEL_YAW}
+   */
   setFrontWheelYaw(angle: number, clamped: boolean = true) {
     if (clamped) {
       angle = Math.max(Math.min(angle, MAX_WHEEL_YAW), -MAX_WHEEL_YAW);

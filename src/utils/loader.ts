@@ -2,6 +2,9 @@ import { TextureFormat } from '../model/rocket-config';
 import { ImageLoader, LinearEncoding, LoadingManager, RepeatWrapping, TextureLoader } from 'three';
 import { TGALoader } from '../utils/three/tga-loader';
 
+/**
+ * Wrapper around THREE.js loaders to work with Promises.
+ */
 export class PromiseLoader {
 
   private loader: any;
@@ -21,6 +24,9 @@ export class PromiseLoader {
   }
 }
 
+/**
+ * Image loader that handles multiple texture formats using ImageLoader and TGALoader.
+ */
 export class MultiImageLoader {
   loader: any;
 
@@ -38,6 +44,9 @@ export class MultiImageLoader {
   }
 }
 
+/**
+ * Texture loader that handles multiple texture formats using ImageLoader and TGALoader.
+ */
 export class ImageTextureLoader {
 
   loader: any;

@@ -2,16 +2,30 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LinearEncoding, Mesh, MeshStandardMaterial, Object3D, Scene, Texture } from 'three';
 import { PromiseLoader } from '../utils/loader';
 
+/**
+ * Abstract 3D model object, that loads gltf models.
+ */
 export abstract class AbstractObject {
 
+  protected loader: PromiseLoader = new PromiseLoader(this.gltfLoader);
+
+  /**
+   * URL of the gltf file.
+   */
   url: string;
-  loader: PromiseLoader = new PromiseLoader(this.gltfLoader);
+
+  /**
+   * THREE scene that contains this object.
+   */
   scene: Scene;
 
   protected constructor(modelUrl: string, private gltfLoader: GLTFLoader) {
     this.url = modelUrl;
   }
 
+  /**
+   * Load the model asynchronously.
+   */
   async load() {
     const gltf = await this.loader.load(this.url);
     this.handleGltf(gltf);
@@ -41,20 +55,27 @@ export abstract class AbstractObject {
     }
   }
 
-  abstract handleModel(scene: Scene);
+  protected abstract handleModel(scene: Scene);
 
+  /**
+   * Add the model to a scene.
+   * @param scene THREE scene
+   */
   addToScene(scene: Scene) {
     scene.add(this.scene);
   }
 
+  /**
+   * Remove the model from a scene.
+   * @param scene THREE scene
+   */
   removeFromScene(scene: Scene) {
     scene.remove(this.scene);
   }
 
   /**
    * Set the environment map to all objects in this scene
-   *
-   * @param envMap environment map
+   * @param envMap environment map texture
    */
   setEnvMap(envMap: Texture) {
     this.scene.traverse(object => {
@@ -68,7 +89,6 @@ export abstract class AbstractObject {
 
   /**
    * Set the position and rotation of the anchor to this object.
-   *
    * @param anchor the anchor object
    */
   applyAnchor(anchor: Object3D) {
@@ -81,17 +101,26 @@ export abstract class AbstractObject {
   }
 
   /**
-   * Dispose of the object
+   * Dispose of the object.
    */
   dispose() {
     this.scene.dispose();
   }
 
+  /**
+   * Set the visibility of the object.
+   * @param visible
+   */
   visible(visible: boolean) {
     this.scene.visible = visible;
   }
 }
 
+/**
+ * Executes the callback on this object's material and all descendants' materials.
+ * @param object Object3D object to traverse through
+ * @param callback this will be called on all the materials
+ */
 export function traverseMaterials(object, callback: (mat) => void) {
   object.traverse((node) => {
     if (!node.isMesh) {

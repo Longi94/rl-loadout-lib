@@ -2,6 +2,9 @@ import { WheelsModel } from './wheels-model';
 
 const ANIM_INTERVAL = 1000;
 
+/**
+ * Animated model for the Spinner wheels.
+ */
 export class SpinnerModel extends WheelsModel {
 
   animate(t: number) {

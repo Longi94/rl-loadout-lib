@@ -41,7 +41,9 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-
+/**
+ * Class for the 3D model of 89' Batmobile. Needed because of custom coloring.
+ */
 export class EggplantModel extends BodyModel {
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
@@ -51,7 +53,7 @@ export class EggplantModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {

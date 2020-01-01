@@ -46,6 +46,9 @@ const FRAGMENT_SHADER = `
     }
 `;
 
+/**
+ * Class for the 3D model of DeLorean Time Machine. Needed because of custom coloring.
+ */
 export class GreyCarModel extends BodyModel {
 
   async load(): Promise<void> {
@@ -60,7 +63,7 @@ export class GreyCarModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {

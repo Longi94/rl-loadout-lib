@@ -18,9 +18,12 @@ class WheelModel {
   spinnerJoint: Bone;
 }
 
+/**
+ * Class that handles loading the 3D model of the car wheels.
+ */
 export class WheelsModel extends AbstractObject implements Paintable {
 
-  private textureLoader: PromiseLoader;
+  private readonly textureLoader: PromiseLoader;
 
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
@@ -29,12 +32,18 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   tireMaterial: MeshStandardMaterial;
 
-  rimBaseUrl: string;
-  rimNUrl: string;
-  tireNUrl: string;
+  private readonly rimBaseUrl: string;
+  private readonly rimNUrl: string;
+  private readonly tireNUrl: string;
 
   protected roll = 0;
 
+  /**
+   * Create a wheels model object. You should **not** use this unless you know what you are doing. Use {@link createWheelsModel} instead.
+   * @param wheel the wheel
+   * @param paints the paint config to apply the wheel paint
+   * @param rocketConfig configuration used for loading assets
+   */
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
@@ -114,6 +123,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
     });
   }
 
+  /**
+   * This is used internally by {@link BodyModel} to apply the wheel positions and scale based on the car body.
+   * @param config wheel configuration of the car body
+   */
   applyWheelConfig(config: WheelConfig[]) {
     this.wheels = [];
     for (const conf of config) {
@@ -153,12 +166,18 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * This is used internally by {@link BodyModel} to attach the wheels to the joints of the car body skeleton.
+   */
   addToJoints() {
     for (const wheel of this.wheels) {
       wheel.config.joint.add(wheel.model);
     }
   }
 
+  /**
+   * This is used internally by {@link BodyModel} to detach the wheels from the joints of the car body skeleton.
+   */
   removeFromJoints() {
     for (const wheel of this.wheels) {
       wheel.config.joint.remove(wheel.model);
@@ -181,6 +200,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Set roll rotation of the wheels.
+   * @param angle roll angle in radians
+   */
   setRoll(angle: number) {
     this.roll = angle;
     for (const wheel of this.wheels) {
@@ -200,6 +223,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Animate the wheels. This is a safe no-op if the wheels are not animated.
+   * @param t time in milliseconds
+   */
   animate(t: number) {
   }
 }

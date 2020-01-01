@@ -42,7 +42,9 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-
+/**
+ * Class for the 3D model of The Dark Knight Rises Tumbler. Needed because of the double back wheels and custom coloring.
+ */
 export class BerryModel extends BodyModel {
 
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
@@ -52,7 +54,7 @@ export class BerryModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {

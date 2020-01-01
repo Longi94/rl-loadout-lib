@@ -6,17 +6,26 @@ import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { PaintConfig } from '../model/paint-config';
 import { RocketConfig } from '../model/rocket-config';
 
+/**
+ * Class that handles loading the 3D model of the car antenna.
+ */
 export class AntennaModel extends AbstractObject {
 
-  private antennaLoader: PromiseLoader;
-  private textureLoader: PromiseLoader;
+  private readonly antennaLoader: PromiseLoader;
+  private readonly textureLoader: PromiseLoader;
 
-  antennaUrl: string;
-  baseTextureUrl: string;
-  normalMap: string;
+  private readonly antennaUrl: string;
+  private readonly baseTextureUrl: string;
+  private readonly normalMap: string;
 
   socket: Object3D;
 
+  /**
+   * Create an antenna object.
+   * @param antenna the antenna
+   * @param paints the paint config to apply the antenna paint
+   * @param rocketConfig configuration used for loading assets
+   */
   constructor(antenna: Antenna, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(antenna.stick, rocketConfig), rocketConfig.gltfLoader);
     this.antennaLoader = new PromiseLoader(rocketConfig.gltfLoader);

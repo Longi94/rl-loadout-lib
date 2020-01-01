@@ -8,16 +8,52 @@ import {
   ORANGE_PRIMARY_COLORS, PAINT_COLORS
 } from '../utils/color';
 
+/**
+ * Color configuration of a loadout.
+ */
 export class PaintConfig {
+  /**
+   * Primary color.
+   */
   primary: Color = new Color(DEFAULT_BLUE_TEAM);
+  /**
+   * Accent color.
+   */
   accent: Color = new Color(DEFAULT_ACCENT);
+  /**
+   * Paint color of the car body. Undefined if unpainted.
+   */
   body?: Color;
+  /**
+   * Paint color of the car decal. Undefined if unpainted.
+   */
   decal?: Color;
+  /**
+   * Paint color of the car wheels. Undefined if unpainted.
+   */
   wheel?: Color;
+  /**
+   * Paint color of the car topper. Undefined if unpainted.
+   */
   topper?: Color;
+  /**
+   * Paint color of the car antenna. Undefined if unpainted.
+   */
   antenna?: Color;
 }
 
+/**
+ * Create a color configuration object based on in-game color IDs, converting the IDs to THREE Color objects with RGB values.
+ * @param isOrange Whether the loadout is orange or not
+ * @param primaryColorId in-game ID of the primary color
+ * @param accentColorId in-game ID of the accent color
+ * @param bodyPaintId in-game ID of the body paint
+ * @param decalPaintId in-game ID of the decal paint
+ * @param wheelPaintId in-game ID of the wheel paint
+ * @param topperPaintId in-game ID of the topper paint
+ * @param antennaPaintId in-game ID of the antenna paint
+ * @return color configuration with RGB values
+ */
 export function createPaintConfig(
   isOrange?: boolean,
   primaryColorId?: number,

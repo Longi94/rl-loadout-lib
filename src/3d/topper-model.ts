@@ -9,16 +9,25 @@ import { ImageTextureLoader, PromiseLoader } from '../utils/loader';
 import { RocketConfig } from '../model/rocket-config';
 import { TopperTexture } from '../webgl/topper-texture';
 
+/**
+ * Class that handles loading the 3D model of the car topper.
+ */
 export class TopperModel extends AbstractObject implements Paintable {
 
-  private textureLoader: PromiseLoader;
+  private readonly textureLoader: PromiseLoader;
 
   material: MeshStandardMaterial;
   skin: TopperTexture;
 
-  normalMapUrl: string;
-  baseTextureUrl: string;
+  private readonly normalMapUrl: string;
+  private readonly baseTextureUrl: string;
 
+  /**
+   * Create an topper object.
+   * @param topper the topper
+   * @param paints the paint config to apply the topper paint
+   * @param rocketConfig configuration used for loading assets
+   */
   constructor(topper: Topper, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(topper.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));

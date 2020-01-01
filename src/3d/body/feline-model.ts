@@ -49,6 +49,9 @@ const FRAGMENT_SHADER = `
     }
 `;
 
+/**
+ * Class for the 3D model of K.I.T.T. Needed because of custom coloring.
+ */
 export class FelineModel extends BodyModel {
   initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
     return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
@@ -57,7 +60,7 @@ export class FelineModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {

@@ -15,6 +15,9 @@ const BODY_BLUE = 'body/body_slime/Body_Slime2_D.tga';
 const CHASSIS_ORANGE = 'body/body_slime/Chassis_Slime_D.tga';
 const CHASSIS_BLUE = 'body/body_slime/Chassis_Slime2_D.tga';
 
+/**
+ * Class for the 3D model of Ecto-1. Needed because paints cannot be applied to this body.
+ */
 export class SlimeModel extends BodyModel {
 
   private bodyDataOrange: Texture;
@@ -92,7 +95,7 @@ export class SlimeModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig) {
+  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
   }
 
   setPrimaryColor(color: Color) {
