@@ -19,13 +19,17 @@
 
 Load Rocket League assets into three.js. This library is closely tied with [Rocket Loadout](https://github.com/Longi94/rl-loadout) as the code was originally part of it. It uses GLTF models and TGA textures created and stored for the website.
 
+[Documentation](https://rocket-loadout.com/docs/)
+
 ## Quick start
+
+The library currently works with Three.js r110. You should use that since there are usually a lot of breaking changes between Three.js releases. Models are DRACO compressed, you must provide the [decoder](https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco).
+
+### NPM
 
 ```bash
 npm install rl-loadout-lib
 ```
-
-Models are DRACO compressed, you must provide the [decoder](https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco).
 
 ```typescript
 import { Scene } from 'three';
@@ -62,4 +66,29 @@ async function load() {
   // Now you can add the car to the three.js scene
   scene.add(body.scene);
 }
+```
+
+### Pure JS
+
+Download [Three.js r110](https://raw.githubusercontent.com/mrdoob/three.js/r110/build/three.min.js) and the javascript bundle from the [releases](https://github.com/Longi94/rl-loadout-lib/releases).
+
+```html
+<script src="js/three.js"></script>
+<script src="js/rl-loadout-lib.js"></script>
+```
+
+You can use the `RL` global.
+
+```javascript
+const gltfLoader = new THREE.GLTFLoader();
+const dracoLoader = new THREE.DRACOLoader();
+dracoLoader.setDecoderPath('/draco/');
+gltfLoader.setDRACOLoader(dracoLoader);
+const config = new RL.RocketConfig({
+  gltfLoader
+});
+
+const manager = new RL.RocketAssetManager(config);
+
+...
 ```
