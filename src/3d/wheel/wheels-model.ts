@@ -48,12 +48,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
     if (wheel.rim_rgb_map != undefined) {
-      this.rimSkin = new RimTexture(
-        getAssetUrl(wheel.rim_base, rocketConfig),
-        getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-        paints.wheel,
-        rocketConfig
-      );
+      this.initRimSkin(wheel, paints, rocketConfig);
     } else {
       this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
@@ -64,6 +59,15 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
     this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
+  }
+
+  protected initRimSkin(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
+    this.rimSkin = new RimTexture(
+      getAssetUrl(wheel.rim_base, rocketConfig),
+      getAssetUrl(wheel.rim_rgb_map, rocketConfig),
+      paints.wheel,
+      rocketConfig
+    );
   }
 
   dispose() {

@@ -39,3 +39,4 @@ export const TIER_3_BODIES = new Set<number>([
 ]);
 
 export const WHEEL_SPINNER_ID = 388;
+export const WHEEL_LIGHT_WHEEL_ID = 517;
