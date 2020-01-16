@@ -45,7 +45,7 @@ const FRAGMENT_SHADER = `
     gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
 
     // light
-    gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, vec3(0, 1, 1), rgba_map.r * lights.g * lights.b);
+    gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, rgba_map.r * lights.g * lights.b);
   }
 `;
 
@@ -53,6 +53,13 @@ class LightWheelRimTexture extends RimTexture {
   fragmentShader = FRAGMENT_SHADER;
 
   private animOffsetLocation: WebGLUniformLocation;
+
+  constructor(baseUrl, rgbaMapUrl, paint: Color, rocketConfig: RocketConfig) {
+    super(baseUrl, rgbaMapUrl, paint, rocketConfig);
+    if (this.paint == undefined) {
+      this.paint = new Color(0, 1, 1);
+    }
+  }
 
   protected initWebGL(width: number, height: number) {
     this.animOffsetLocation = this.gl.getUniformLocation(this.program, 'u_anim_offset');
@@ -65,6 +72,13 @@ class LightWheelRimTexture extends RimTexture {
       this.update();
     }
   }
+
+  setPaint(color: Color) {
+    if (color == undefined) {
+      color = new Color(0, 1, 1);
+    }
+    super.setPaint(color);
+  }
 }
 
 /**
@@ -73,7 +87,6 @@ class LightWheelRimTexture extends RimTexture {
 export class LightWheelModel extends WheelsModel {
   animate(t: number) {
     (this.rimSkin as LightWheelRimTexture).animate((t % ANIM_INTERVAL) / ANIM_INTERVAL);
-    this.rimMaterial.needsUpdate = true;
   }
 
   protected initRimSkin(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
@@ -81,6 +94,6 @@ export class LightWheelModel extends WheelsModel {
       getAssetUrl(wheel.rim_base, rocketConfig),
       getAssetUrl(wheel.rim_rgb_map, rocketConfig),
       paints.wheel,
-      rocketConfig)
+      rocketConfig);
   }
 }

@@ -50,7 +50,7 @@ export class RimTexture extends WebGLCanvasTexture {
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
+  constructor(baseUrl, private readonly rgbaMapUrl, protected paint: Color, rocketConfig: RocketConfig) {
     super(baseUrl, rocketConfig);
   }
 
