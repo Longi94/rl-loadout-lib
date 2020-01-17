@@ -21,7 +21,7 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig, fragmentShader: string) {
+  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig, fragmentShader: () => string) {
     super(getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
     this.fragmentShader = fragmentShader;
     this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);

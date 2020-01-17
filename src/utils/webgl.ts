@@ -1,6 +1,6 @@
 import { Color } from 'three';
 
-export function initShaderProgram(gl, vsSource, fsSource): WebGLProgram {
+export function initShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string): WebGLProgram {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
@@ -19,7 +19,7 @@ export function initShaderProgram(gl, vsSource, fsSource): WebGLProgram {
   return shaderProgram;
 }
 
-function loadShader(gl, type, source): WebGLShader {
+function loadShader(gl: WebGLRenderingContext, type: GLenum, source: string): WebGLShader {
   const shader = gl.createShader(type);
 
   // Send the source to the shader object
@@ -38,7 +38,7 @@ function loadShader(gl, type, source): WebGLShader {
   return shader;
 }
 
-export function setRectangle(gl, x, y, width, height) {
+export function setRectangle(gl: WebGLRenderingContext, x: number, y: number, width: number, height: number) {
   const x1 = x;
   const x2 = x + width;
   const y1 = y;

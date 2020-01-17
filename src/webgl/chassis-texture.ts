@@ -8,7 +8,7 @@ import { COLOR_INCLUDE } from './include/color';
 
 
 // language=GLSL
-const FRAGMENT_SHADER = `
+const FRAGMENT_SHADER = () => `
     precision mediump float;
   ` + COLOR_INCLUDE + `
 
@@ -48,7 +48,7 @@ export class ChassisTexture extends WebGLCanvasTexture {
 
   private rgbaMap: HTMLImageElement;
 
-  protected fragmentShader: string = FRAGMENT_SHADER;
+  protected fragmentShader = FRAGMENT_SHADER;
 
   private accent: Color;
   private paint: Color;

@@ -10,7 +10,7 @@ import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
 
 // language=GLSL
-const FRAGMENT_SHADER = `
+const FRAGMENT_SHADER = () => `
     precision mediump float;
     ` + COLOR_INCLUDE + `
 

@@ -5,7 +5,7 @@ import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
 
 // language=GLSL
-const FRAGMENT_SHADER = `
+const FRAGMENT_SHADER = () => `
     precision mediump float;
   ` + COLOR_INCLUDE + `
 
@@ -33,7 +33,7 @@ const FRAGMENT_SHADER = `
 
 export class TireTexture extends WebGLCanvasTexture {
 
-  protected fragmentShader: string = FRAGMENT_SHADER;
+  protected fragmentShader = FRAGMENT_SHADER;
 
   private paintLocation: WebGLUniformLocation;
 

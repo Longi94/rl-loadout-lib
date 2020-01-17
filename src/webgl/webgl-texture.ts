@@ -6,7 +6,7 @@ import { createOffscreenCanvas } from '../utils/offscreen-canvas';
 import { disposeIfExists } from '../utils/util';
 
 // language=GLSL
-const VERTEX_SHADER = `
+const VERTEX_SHADER = () => `
     attribute vec2 a_position;
     attribute vec2 a_texCoord;
 
@@ -33,7 +33,7 @@ const VERTEX_SHADER = `
 `;
 
 // language=GLSL
-const FRAGMENT_SHADER = `
+const FRAGMENT_SHADER = () => `
     precision mediump float;
 
     uniform sampler2D u_base;
@@ -50,8 +50,8 @@ export class WebGLCanvasTexture {
 
   protected readonly loader: PromiseLoader;
 
-  protected vertexShader: string = VERTEX_SHADER;
-  protected fragmentShader: string = FRAGMENT_SHADER;
+  protected vertexShader: () => string = VERTEX_SHADER;
+  protected fragmentShader: () => string = FRAGMENT_SHADER;
 
   protected base: HTMLImageElement;
 
@@ -84,7 +84,7 @@ export class WebGLCanvasTexture {
     this.canvas = createOffscreenCanvas(width, height);
 
     this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
-    this.program = initShaderProgram(this.gl, this.vertexShader, this.fragmentShader);
+    this.program = initShaderProgram(this.gl, this.vertexShader(), this.fragmentShader());
     this.gl.useProgram(this.program);
 
     this.initWebGL(width, height);

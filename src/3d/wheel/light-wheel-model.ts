@@ -10,7 +10,7 @@ import { COLOR_INCLUDE } from '../../webgl/include/color';
 const ANIM_INTERVAL = 1000.0;
 
 // language=GLSL
-const FRAGMENT_SHADER = `
+const FRAGMENT_SHADER = () => `
   precision mediump float;
   ` + COLOR_INCLUDE + `
 
