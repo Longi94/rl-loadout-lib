@@ -5,12 +5,14 @@ import { getAssetUrl } from '../../utils/network';
 import { PaintConfig } from '../../model/paint-config';
 import { RocketConfig } from '../../model/rocket-config';
 import { Wheel } from '../../model/wheel';
+import { COLOR_INCLUDE } from '../../webgl/include/color';
 
 const ANIM_INTERVAL = 1000.0;
 
 // language=GLSL
 const FRAGMENT_SHADER = `
   precision mediump float;
+  ` + COLOR_INCLUDE + `
 
   uniform sampler2D u_base;
   uniform sampler2D u_rgba_map;
@@ -20,14 +22,6 @@ const FRAGMENT_SHADER = `
 
   // the texCoords passed in from the vertex shader.
   varying vec2 v_texCoord;
-
-  vec3 blendNormal(vec3 base, vec3 blend) {
-    return blend;
-  }
-
-  vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
-    return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
-  }
 
   void main() {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
