@@ -7,3 +7,7 @@ export function disposeIfExists(object: any) {
     object.dispose();
   }
 }
+
+export const StringUtil = {
+  nullOrEmpty: (s: string) => s == undefined || s === ''
+};

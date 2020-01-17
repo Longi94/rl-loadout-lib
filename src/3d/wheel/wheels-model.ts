@@ -11,6 +11,7 @@ import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../constants';
 import { RocketConfig } from '../../model/rocket-config';
 import { RimTexture } from '../../webgl/rim-texture';
 import { TireTexture } from '../../webgl/tire-texture';
+import { getRimTexture } from './texture-factory';
 
 class WheelModel {
   model: Object3D;
@@ -47,9 +48,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
   constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
     super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
     this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    if (wheel.rim_rgb_map != undefined) {
-      this.initRimSkin(wheel, paints, rocketConfig);
-    } else {
+    this.rimSkin = getRimTexture(wheel, paints, rocketConfig);
+    if (this.rimSkin == undefined) {
       this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
 
@@ -59,15 +59,6 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
     this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
-  }
-
-  protected initRimSkin(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.rimSkin = new RimTexture(
-      getAssetUrl(wheel.rim_base, rocketConfig),
-      getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-      paints.wheel,
-      rocketConfig
-    );
   }
 
   dispose() {
@@ -232,5 +223,8 @@ export class WheelsModel extends AbstractObject implements Paintable {
    * @param t time in milliseconds
    */
   animate(t: number) {
+    if (this.rimSkin != undefined) {
+      this.rimSkin.animate(t);
+    }
   }
 }

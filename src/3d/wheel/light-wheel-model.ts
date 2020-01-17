@@ -1,10 +1,6 @@
-import { WheelsModel } from './wheels-model';
 import { RimTexture } from '../../webgl/rim-texture';
 import { Color } from 'three';
-import { getAssetUrl } from '../../utils/network';
-import { PaintConfig } from '../../model/paint-config';
 import { RocketConfig } from '../../model/rocket-config';
-import { Wheel } from '../../model/wheel';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
 
 const ANIM_INTERVAL = 1000.0;
@@ -43,7 +39,10 @@ const FRAGMENT_SHADER = () => `
   }
 `;
 
-class LightWheelRimTexture extends RimTexture {
+/**
+ * Animated rim texture for Photon wheels.
+ */
+export class LightWheelRimTexture extends RimTexture {
   fragmentShader = FRAGMENT_SHADER;
 
   private animOffsetLocation: WebGLUniformLocation;
@@ -62,7 +61,7 @@ class LightWheelRimTexture extends RimTexture {
 
   animate(t: number) {
     if (this.gl != undefined) {
-      this.gl.uniform1f(this.animOffsetLocation, t);
+      this.gl.uniform1f(this.animOffsetLocation, (t % ANIM_INTERVAL) / ANIM_INTERVAL);
       this.update();
     }
   }
@@ -72,22 +71,5 @@ class LightWheelRimTexture extends RimTexture {
       color = new Color(0, 1, 1);
     }
     super.setPaint(color);
-  }
-}
-
-/**
- * Animated model for Photon wheels.
- */
-export class LightWheelModel extends WheelsModel {
-  animate(t: number) {
-    (this.rimSkin as LightWheelRimTexture).animate((t % ANIM_INTERVAL) / ANIM_INTERVAL);
-  }
-
-  protected initRimSkin(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
-    this.rimSkin = new LightWheelRimTexture(
-      getAssetUrl(wheel.rim_base, rocketConfig),
-      getAssetUrl(wheel.rim_rgb_map, rocketConfig),
-      paints.wheel,
-      rocketConfig);
   }
 }

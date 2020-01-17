@@ -88,6 +88,13 @@ export class RimTexture extends WebGLCanvasTexture {
     super.update();
   }
 
+  /**
+   * Animate the rim texture. This is a no-op function unless overridden.
+   * @param t time in milliseconds
+   */
+  animate(t: number) {
+  }
+
   dispose() {
     super.dispose();
     this.rgbaMap = undefined;
