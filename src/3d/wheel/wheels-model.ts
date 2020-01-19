@@ -11,7 +11,7 @@ import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../constants';
 import { RocketConfig } from '../../model/rocket-config';
 import { RimTexture } from '../../webgl/rim-texture';
 import { TireTexture } from '../../webgl/tire-texture';
-import { getRimTexture } from './texture-factory';
+import { getRimTexture, getTireTexture } from './texture-factory';
 
 class WheelModel {
   model: Object3D;
@@ -29,7 +29,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
   wheels: WheelModel[] = [];
   rimMaterial: MeshStandardMaterial;
   rimSkin: RimTexture;
-  tireTexture: TireTexture;
+  tireTexture: TireTexture | Color;
 
   tireMaterial: MeshStandardMaterial;
 
@@ -53,9 +53,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
     }
 
-    if (wheel.tire_base != undefined) {
-      this.tireTexture = new TireTexture(getAssetUrl(wheel.tire_base, rocketConfig), paints.wheel, rocketConfig);
-    }
+    this.tireTexture = getTireTexture(wheel, paints, rocketConfig);
 
     this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
     this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
@@ -76,7 +74,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     let tireBaseTask: Promise<void>;
     let rimBaseTask: Promise<Texture>;
 
-    if (this.tireTexture != undefined) {
+    if (this.tireTexture != undefined && this.tireTexture instanceof TireTexture) {
       tireBaseTask = this.tireTexture.load();
     }
 
@@ -92,9 +90,13 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
 
     if (this.tireTexture != undefined) {
-      this.tireMaterial.map = this.tireTexture.getTexture();
-      this.tireMaterial.normalMap = await tireNTask;
+      if (this.tireTexture instanceof TireTexture) {
+        this.tireMaterial.map = this.tireTexture.getTexture();
+      } else if (this.tireTexture instanceof Color) {
+        this.tireMaterial.color = this.tireTexture;
+      }
     }
+    this.tireMaterial.normalMap = await tireNTask;
 
     this.rimMaterial.normalMap = await rimNTask;
     if (this.rimSkin) {
@@ -183,7 +185,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
     }
-    if (this.tireTexture != undefined) {
+    if (this.tireTexture != undefined && this.tireTexture instanceof TireTexture) {
       this.tireTexture.setPaint(paint);
     }
   }

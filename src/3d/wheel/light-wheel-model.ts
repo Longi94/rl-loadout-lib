@@ -48,7 +48,7 @@ export class LightWheelRimTexture extends RimTexture {
   private animOffsetLocation: WebGLUniformLocation;
 
   constructor(baseUrl, rgbaMapUrl, paint: Color, rocketConfig: RocketConfig) {
-    super(baseUrl, rgbaMapUrl, paint, rocketConfig);
+    super(baseUrl, rgbaMapUrl, paint, rocketConfig, undefined);
     if (this.paint == undefined) {
       this.paint = new Color(0, 1, 1);
     }

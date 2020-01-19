@@ -5,7 +5,7 @@ import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
 
 // language=GLSL
-const FRAGMENT_SHADER = () => `
+const FRAGMENT_SHADER = `
     precision mediump float;
   ` + COLOR_INCLUDE + `
 
@@ -28,23 +28,23 @@ const FRAGMENT_SHADER = () => `
 
         // paint
         if (u_paint.r >= 0.0) {
-            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, 1.0 - rgba_map.r);
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, mask);
         }
     }
 `;
 
 export class RimTexture extends WebGLCanvasTexture {
 
-  protected fragmentShader = FRAGMENT_SHADER;
-
   private rgbaMap: HTMLImageElement;
+
+  protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}rgba_map.${this.maskChannel}`);
 
   private paintLocation: WebGLUniformLocation;
   private rgbaMapLocation: WebGLUniformLocation;
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(baseUrl, private readonly rgbaMapUrl, protected paint: Color, rocketConfig: RocketConfig) {
+  constructor(baseUrl, private readonly rgbaMapUrl, protected paint: Color, rocketConfig: RocketConfig, private maskChannel: string, private invertMask: boolean = false) {
     super(baseUrl, rocketConfig);
   }
 
