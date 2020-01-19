@@ -1,5 +1,5 @@
 import { Body } from '../model/body';
-import { BODY_BERRY_ID, BODY_MAPLE_ID, BODY_SLIME_ID } from './ids';
+import { ProductID } from './ids';
 
 /**
  * An array of primary colors for the blue team. The array index corresponds to the colors in-game ID.
@@ -318,10 +318,10 @@ export const COLOR_BERRY_BLUE = '#656336';
 
 export function getColorsForBody(body: Body): { [team: string]: string[] } {
   switch (body.id) {
-    case BODY_MAPLE_ID:
-    case BODY_SLIME_ID:
+    case ProductID.BODY_MAPLE:
+    case ProductID.BODY_SLIME:
       return {blue: [COLOR_MAPLE_BLUE], orange: [COLOR_MAPLE_ORANGE]};
-    case BODY_BERRY_ID:
+    case ProductID.BODY_BERRY:
       return {blue: [COLOR_BERRY_BLUE], orange: [COLOR_BERRY_ORANGE]};
     default:
       return {blue: BLUE_PRIMARY_COLORS, orange: ORANGE_PRIMARY_COLORS};
