@@ -43,4 +43,9 @@ export const WHEEL_LIGHT_WHEEL_ID = 517;
 export const WHEEL_LONE_WOLF_ID = 818;
 export const WHEEL_EXOTIC_ID = 1502;
 export const WHEEL_SEASTAR_ID = 1506;
-
+export const WHEEL_7SPOKE_ID = 1656;
+export const WHEEL_GLASSY_ID = 1784;
+export const WHEEL_PUMPERNICKEL_ID = 1929;
+export const WHEEL_GETSI_ID = 2005;
+export const WHEEL_DONUT_ID = 2060;
+export const WHEEL_PEPPERMINT_ID = 2441;
