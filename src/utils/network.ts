@@ -1,5 +1,6 @@
 import { RocketConfig, TextureFormat, TextureQuality } from '../model/rocket-config';
 import { TIER_2_BODIES, TIER_3_BODIES } from './ids';
+import { StringUtil } from './util';
 
 /**
  * Make a json fetch request.
@@ -27,7 +28,7 @@ export async function doRequest<T>(request: RequestInfo | string): Promise<T> {
  * @param rocketConfig configuration
  */
 export function getAssetUrl(path: string, rocketConfig: RocketConfig): string {
-  if (path == undefined || path.length === 0) {
+  if (StringUtil.nullOrEmpty(path)) {
     return undefined;
   }
   if (path.endsWith('.tga')) {

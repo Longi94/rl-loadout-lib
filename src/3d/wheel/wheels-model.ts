@@ -96,7 +96,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
         this.tireMaterial.color = this.tireTexture;
       }
     }
-    this.tireMaterial.normalMap = await tireNTask;
+    if (this.tireMaterial != undefined) {
+      this.tireMaterial.normalMap = await tireNTask;
+    }
 
     this.rimMaterial.normalMap = await rimNTask;
     if (this.rimSkin) {
