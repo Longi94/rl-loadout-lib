@@ -21,8 +21,15 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_7SPOKE:
     case ProductID.WHEEL_GLASSY:
     case ProductID.WHEEL_PUMPERNICKEL:
+    case ProductID.WHEEL_DAISUKE:
       return new RimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r');
     case ProductID.WHEEL_GETSI:
+    case ProductID.WHEEL_RAZZLEMADOO:
+    case ProductID.WHEEL_FOLLIN:
+    case ProductID.WHEEL_REAPER:
+    case ProductID.WHEEL_LEAN:
+    case ProductID.WHEEL_TREBLE_MEGA:
+    case ProductID.WHEEL_OBSCURE:
       return new RimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
     case ProductID.WHEEL_DONUT:
       return new ShadedPaintableTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig);
@@ -42,10 +49,17 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_7SPOKE:
     case ProductID.WHEEL_GLASSY:
     case ProductID.WHEEL_GETSI:
+    case ProductID.WHEEL_RAZZLEMADOO:
+    case ProductID.WHEEL_FOLLIN:
+    case ProductID.WHEEL_REAPER:
+    case ProductID.WHEEL_ZTEIGHTEEN:
       return new TireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, true);
     case ProductID.WHEEL_SEASTAR:
+    case ProductID.WHEEL_OBSCURE:
       return new Color('#141414');
     case ProductID.WHEEL_PEPPERMINT:
+    case ProductID.WHEEL_LEAN:
+    case ProductID.WHEEL_TREBLE_MEGA:
       return new TireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
