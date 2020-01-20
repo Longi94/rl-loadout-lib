@@ -1,7 +1,8 @@
 import { TireTexture } from '../../webgl/tire-texture';
 import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { BASIC_VERT_SHADER } from '../../webgl/include/vertex';
-import { MultiImageLoader, PromiseLoader, RocketConfig } from '../..';
+import { MultiImageLoader, PromiseLoader } from '../../utils/loader';
+import { RocketConfig } from '../../model/rocket-config';
 import { createOffscreenCanvas } from '../../utils/offscreen-canvas';
 import { bindColor, createTextureFromImage, initShaderProgram, setRectangle } from '../../utils/webgl';
 import { disposeIfExists } from '../../utils/util';
