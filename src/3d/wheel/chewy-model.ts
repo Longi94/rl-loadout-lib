@@ -27,7 +27,7 @@ const FRAGMENT_SHADER = () => `
 
         // paint
         if (u_paint.r >= 0.0) {
-            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, 1.0 - normal.r);
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, normal.r);
         }
     }
 `;
@@ -52,7 +52,7 @@ export class ChewyTireTexture implements TireTexture {
   private paintLocation: WebGLUniformLocation;
   private normalLocation: WebGLUniformLocation;
 
-  constructor(private readonly normalUrl: string, private paint: Color, rocketConfig: RocketConfig) {
+  constructor(private readonly normalUrl: string, private paint: Color, rocketConfig: RocketConfig, private invertMask: boolean = false) {
     this.loader = new PromiseLoader(new MultiImageLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
@@ -68,7 +68,12 @@ export class ChewyTireTexture implements TireTexture {
     this.canvas = createOffscreenCanvas(width, height);
 
     this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
-    this.program = initShaderProgram(this.gl, BASIC_VERT_SHADER, FRAGMENT_SHADER());
+    let fragmentShader = FRAGMENT_SHADER();
+
+    if (this.invertMask) {
+      fragmentShader = fragmentShader.replace('normal.r', '1.0-normal.r');
+    }
+    this.program = initShaderProgram(this.gl, BASIC_VERT_SHADER, fragmentShader);
     this.gl.useProgram(this.program);
 
     this.initWebGL();

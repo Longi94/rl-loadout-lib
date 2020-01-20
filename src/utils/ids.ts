@@ -44,6 +44,11 @@ export enum ProductID {
   WHEEL_TREBLE_MEGA = 2956,
   WHEEL_OBSCURE = 2986,
   WHEEL_CHEWY = 3001,
+  WHEEL_INN = 3072,
+  WHEEL_FORK = 3313,
+  WHEEL_CHIEF = 3317,
+  WHEEL_ENSPIER = 3585,
+  WHEEL_SPECTRAL = 3696,
 }
 
 export const TIER_2_BODIES = new Set<ProductID>([

@@ -32,6 +32,11 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_TREBLE_MEGA:
     case ProductID.WHEEL_OBSCURE:
     case ProductID.WHEEL_CHEWY:
+    case ProductID.WHEEL_INN:
+    case ProductID.WHEEL_FORK:
+    case ProductID.WHEEL_CHIEF:
+    case ProductID.WHEEL_ENSPIER:
+    case ProductID.WHEEL_SPECTRAL:
       return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
     case ProductID.WHEEL_DONUT:
       return new ShadedPaintableTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig);
@@ -55,6 +60,7 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_FOLLIN:
     case ProductID.WHEEL_REAPER:
     case ProductID.WHEEL_ZTEIGHTEEN:
+    case ProductID.WHEEL_INN:
       return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, true);
     case ProductID.WHEEL_SEASTAR:
     case ProductID.WHEEL_OBSCURE:
@@ -62,9 +68,12 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_PEPPERMINT:
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
+    case ProductID.WHEEL_SPECTRAL:
       return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
     case ProductID.WHEEL_CHEWY:
-      return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig);
+      return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig, true);
+    case ProductID.WHEEL_ENSPIER:
+      return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig, false);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
         return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'a', false, true);
