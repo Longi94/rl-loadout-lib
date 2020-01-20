@@ -9,6 +9,7 @@ import { TireTexture, WebGLTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
 import { ShadedPaintableTexture } from '../../webgl/shaded-paintable-texture';
+import { ChewyTireTexture } from './chewy-model';
 
 export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig): RimTexture {
   const rimBase = getAssetUrl(wheel.rim_base, rocketConfig);
@@ -30,6 +31,7 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
     case ProductID.WHEEL_OBSCURE:
+    case ProductID.WHEEL_CHEWY:
       return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
     case ProductID.WHEEL_DONUT:
       return new ShadedPaintableTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig);
@@ -61,6 +63,8 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
       return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
+    case ProductID.WHEEL_CHEWY:
+      return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
         return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'a', false, true);

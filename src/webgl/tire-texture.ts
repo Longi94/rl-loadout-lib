@@ -65,10 +65,10 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
     await superTask;
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.normalLocation = this.gl.getUniformLocation(this.program, 'u_normal');
     this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   protected createTextures() {

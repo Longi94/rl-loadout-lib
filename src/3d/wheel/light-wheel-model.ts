@@ -54,9 +54,9 @@ export class LightWheelRimTexture extends WebGLRimTexture {
     }
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.animOffsetLocation = this.gl.getUniformLocation(this.program, 'u_anim_offset');
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   animate(t: number) {

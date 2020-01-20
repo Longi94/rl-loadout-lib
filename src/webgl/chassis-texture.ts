@@ -73,7 +73,7 @@ export class ChassisTexture extends WebGLCanvasTexture {
     await superTask;
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
     const hasAlphaLocation = this.gl.getUniformLocation(this.program, 'u_has_alpha');
 
@@ -82,7 +82,7 @@ export class ChassisTexture extends WebGLCanvasTexture {
 
     this.gl.uniform1i(hasAlphaLocation, hasAlpha(this.base) ? 1 : 0);
 
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   protected createTextures() {

@@ -1,67 +1,73 @@
-import { RocketConfig } from '../model/rocket-config';
-import { MultiImageLoader, PromiseLoader } from '../utils/loader';
-import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
-import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
-import { createOffscreenCanvas } from '../utils/offscreen-canvas';
-import { disposeIfExists } from '../utils/util';
-import { BASIC_VERT_SHADER } from './include/vertex';
-
-// language=GLSL
-const VERTEX_SHADER = () => BASIC_VERT_SHADER;
+import { TireTexture } from '../../webgl/tire-texture';
+import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 'three';
+import { BASIC_VERT_SHADER } from '../../webgl/include/vertex';
+import { MultiImageLoader, PromiseLoader, RocketConfig } from '../..';
+import { createOffscreenCanvas } from '../../utils/offscreen-canvas';
+import { bindColor, createTextureFromImage, initShaderProgram, setRectangle } from '../../utils/webgl';
+import { disposeIfExists } from '../../utils/util';
+import { COLOR_INCLUDE } from '../../webgl/include/color';
 
 // language=GLSL
 const FRAGMENT_SHADER = () => `
-  precision mediump float;
+    precision mediump float;
+  ` + COLOR_INCLUDE + `
 
-  uniform sampler2D u_base;
+    uniform sampler2D u_normal;
 
-  // the texCoords passed in from the vertex shader.
-  varying vec2 v_texCoord;
+    uniform vec4 u_paint;
 
-  void main() {
-    gl_FragColor = texture2D(u_base, v_texCoord);
-  }
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
+
+    void main() {
+        gl_FragColor = vec4(0.078431, 0.078431, 0.078431, 1.0);
+        // Look up a color from the texture.
+        vec4 normal = texture2D(u_normal, v_texCoord);
+
+        // paint
+        if (u_paint.r >= 0.0) {
+            gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, u_paint.rgb, 1.0 - normal.r);
+        }
+    }
 `;
 
-export class WebGLCanvasTexture {
+export class ChewyTireTexture implements TireTexture {
 
   protected readonly loader: PromiseLoader;
 
-  protected vertexShader: () => string = VERTEX_SHADER;
-  protected fragmentShader: () => string = FRAGMENT_SHADER;
-
-  protected base: HTMLImageElement;
+  protected normal: HTMLImageElement;
 
   protected canvas: OffscreenCanvas | HTMLCanvasElement;
   protected gl: WebGLRenderingContext;
   protected program: WebGLProgram;
 
-  private baseTexture: WebGLTexture;
+  private normalTexture: WebGLTexture;
 
   private texCoordBuffer: WebGLBuffer;
   private positionBuffer: WebGLBuffer;
 
   private texture: CanvasTexture;
 
-  private baseLocation: WebGLUniformLocation;
+  private paintLocation: WebGLUniformLocation;
+  private normalLocation: WebGLUniformLocation;
 
-  constructor(private readonly baseUrl: string, rocketConfig: RocketConfig) {
+  constructor(private readonly normalUrl: string, private paint: Color, rocketConfig: RocketConfig) {
     this.loader = new PromiseLoader(new MultiImageLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
   }
 
   async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    this.base = await baseTask;
+    const normalTask = this.loader.load(this.normalUrl);
+    this.normal = await normalTask;
   }
 
   private init() {
-    const width = this.base.width;
-    const height = this.base.height;
+    const width = this.normal.width;
+    const height = this.normal.height;
 
     this.canvas = createOffscreenCanvas(width, height);
 
     this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
-    this.program = initShaderProgram(this.gl, this.vertexShader(), this.fragmentShader());
+    this.program = initShaderProgram(this.gl, BASIC_VERT_SHADER, FRAGMENT_SHADER());
     this.gl.useProgram(this.program);
 
     this.initWebGL();
@@ -77,7 +83,8 @@ export class WebGLCanvasTexture {
 
   protected initWebGL() {
     // look up where the vertex data needs to go.
-    this.baseLocation = this.gl.getUniformLocation(this.program, 'u_base');
+    this.normalLocation = this.gl.getUniformLocation(this.program, 'u_normal');
+    this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
     const resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
     const positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
     const texCoordLocation = this.gl.getAttribLocation(this.program, 'a_texCoord');
@@ -95,9 +102,10 @@ export class WebGLCanvasTexture {
     this.gl.enableVertexAttribArray(texCoordLocation);
     this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
 
-    this.createTextures();
-    this.setTextureLocations();
-    this.bindTextures();
+    this.normalTexture = createTextureFromImage(this.gl, this.normal);
+    this.gl.uniform1i(this.normalLocation, 0);
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
 
     // set the resolution
     this.gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
@@ -109,20 +117,7 @@ export class WebGLCanvasTexture {
     this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
 
     // Set a rectangle the same size as the image.
-    setRectangle(this.gl, 0, 0, this.base.width, this.base.height);
-  }
-
-  protected createTextures() {
-    this.baseTexture = createTextureFromImage(this.gl, this.base);
-  }
-
-  protected setTextureLocations() {
-    this.gl.uniform1i(this.baseLocation, 0);
-  }
-
-  protected bindTextures() {
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.baseTexture);
+    setRectangle(this.gl, 0, 0, this.normal.width, this.normal.height);
   }
 
   getTexture(): Texture {
@@ -132,14 +127,20 @@ export class WebGLCanvasTexture {
     return this.texture;
   }
 
+  setPaint(color: Color) {
+    this.paint = color;
+    this.update();
+  }
+
   protected update() {
+    bindColor(this.gl, this.paintLocation, this.paint);
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     this.texture.needsUpdate = true;
   }
 
   dispose() {
-    this.base = undefined;
+    this.normal = undefined;
     this.canvas = undefined;
 
     if (this.gl != undefined) {
@@ -151,7 +152,7 @@ export class WebGLCanvasTexture {
       }
 
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-      this.gl.deleteTexture(this.baseTexture);
+      this.gl.deleteTexture(this.normalTexture);
       this.gl.deleteBuffer(this.texCoordBuffer);
       this.gl.deleteBuffer(this.positionBuffer);
     }

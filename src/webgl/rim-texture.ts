@@ -68,10 +68,10 @@ export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
     await superTask;
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
     this.paintLocation = this.gl.getUniformLocation(this.program, 'u_paint');
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   protected createTextures() {

@@ -36,10 +36,10 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
     await superTask;
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
     this.primaryLocation = this.gl.getUniformLocation(this.program, 'u_primary');
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   protected createTextures() {

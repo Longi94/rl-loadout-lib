@@ -123,7 +123,7 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
     await superTask;
   }
 
-  protected initWebGL(width: number, height: number) {
+  protected initWebGL() {
     this.rgbaMapLocation = this.gl.getUniformLocation(this.program, 'u_rgba_map');
     this.decalMapLocation = this.gl.getUniformLocation(this.program, 'u_decal_map');
     const isBlankLocation = this.gl.getUniformLocation(this.program, 'u_is_blank');
@@ -135,7 +135,7 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
 
     this.gl.uniform1i(isBlankLocation, this.decalRgbaMap != undefined ? 0 : 1);
 
-    super.initWebGL(width, height);
+    super.initWebGL();
   }
 
   protected createTextures() {
