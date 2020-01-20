@@ -74,7 +74,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     let tireBaseTask: Promise<void>;
     let rimBaseTask: Promise<Texture>;
 
-    if (this.tireTexture != undefined && this.tireTexture instanceof TireTexture) {
+    if (this.tireTexture != undefined && !(this.tireTexture instanceof Color)) {
       tireBaseTask = this.tireTexture.load();
     }
 
@@ -90,7 +90,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
 
     if (this.tireTexture != undefined) {
-      if (this.tireTexture instanceof TireTexture) {
+      if (!(this.tireTexture instanceof Color)) {
         this.tireMaterial.map = this.tireTexture.getTexture();
       } else if (this.tireTexture instanceof Color) {
         this.tireMaterial.color = this.tireTexture;
@@ -187,7 +187,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
     }
-    if (this.tireTexture != undefined && this.tireTexture instanceof TireTexture) {
+    if (this.tireTexture != undefined && !(this.tireTexture instanceof Color)) {
       this.tireTexture.setPaint(paint);
     }
   }

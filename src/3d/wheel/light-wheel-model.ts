@@ -1,4 +1,4 @@
-import { RimTexture } from '../../webgl/rim-texture';
+import { WebGLRimTexture } from '../../webgl/rim-texture';
 import { Color } from 'three';
 import { RocketConfig } from '../../model/rocket-config';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
@@ -42,7 +42,7 @@ const FRAGMENT_SHADER = () => `
 /**
  * Animated rim texture for Photon wheels.
  */
-export class LightWheelRimTexture extends RimTexture {
+export class LightWheelRimTexture extends WebGLRimTexture {
   fragmentShader = FRAGMENT_SHADER;
 
   private animOffsetLocation: WebGLUniformLocation;

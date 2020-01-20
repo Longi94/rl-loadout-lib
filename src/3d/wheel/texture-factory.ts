@@ -1,11 +1,11 @@
-import { RimTexture } from '../../webgl/rim-texture';
+import { RimTexture, WebGLRimTexture } from '../../webgl/rim-texture';
 import { getAssetUrl } from '../../utils/network';
 import { PaintConfig } from '../../model/paint-config';
 import { RocketConfig } from '../../model/rocket-config';
 import { Wheel } from '../../model/wheel';
 import { StringUtil } from '../../utils/util';
 import { LightWheelRimTexture } from './light-wheel-model';
-import { TireTexture } from '../../webgl/tire-texture';
+import { TireTexture, WebGLTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
 import { ShadedPaintableTexture } from '../../webgl/shaded-paintable-texture';
@@ -22,7 +22,7 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_GLASSY:
     case ProductID.WHEEL_PUMPERNICKEL:
     case ProductID.WHEEL_DAISUKE:
-      return new RimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r');
+      return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r');
     case ProductID.WHEEL_GETSI:
     case ProductID.WHEEL_RAZZLEMADOO:
     case ProductID.WHEEL_FOLLIN:
@@ -30,12 +30,12 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
     case ProductID.WHEEL_OBSCURE:
-      return new RimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
+      return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
     case ProductID.WHEEL_DONUT:
       return new ShadedPaintableTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig);
     default:
       if (!StringUtil.nullOrEmpty(wheel.rim_rgb_map)) {
-        return new RimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r', true);
+        return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r', true);
       }
       return undefined;
   }
@@ -53,17 +53,17 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_FOLLIN:
     case ProductID.WHEEL_REAPER:
     case ProductID.WHEEL_ZTEIGHTEEN:
-      return new TireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, true);
+      return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, true);
     case ProductID.WHEEL_SEASTAR:
     case ProductID.WHEEL_OBSCURE:
       return new Color('#141414');
     case ProductID.WHEEL_PEPPERMINT:
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
-      return new TireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
+      return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
-        return new TireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'a', false, true);
+        return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'a', false, true);
       }
       return undefined;
   }

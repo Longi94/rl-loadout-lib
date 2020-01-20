@@ -1,8 +1,20 @@
-import { Color } from 'three';
+import { Color, Texture } from 'three';
 import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
+
+export interface RimTexture {
+  load();
+  setPaint(color: Color);
+  /**
+   * Animate the rim texture. This is a no-op function unless overridden.
+   * @param t time in milliseconds
+   */
+  animate(t: number);
+  dispose();
+  getTexture(): Texture;
+}
 
 // language=GLSL
 const FRAGMENT_SHADER = `
@@ -33,7 +45,7 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class RimTexture extends WebGLCanvasTexture {
+export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
 
   private rgbaMap: HTMLImageElement;
 
@@ -88,10 +100,6 @@ export class RimTexture extends WebGLCanvasTexture {
     super.update();
   }
 
-  /**
-   * Animate the rim texture. This is a no-op function unless overridden.
-   * @param t time in milliseconds
-   */
   animate(t: number) {
   }
 

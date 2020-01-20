@@ -1,7 +1,7 @@
 import { Color } from 'three';
 import { RocketConfig } from '..';
 import { COLOR_INCLUDE } from './include/color';
-import { RimTexture } from './rim-texture';
+import { WebGLRimTexture } from './rim-texture';
 
 // language=GLSL
 const FRAGMENT_SHADER = () => `
@@ -34,7 +34,7 @@ const FRAGMENT_SHADER = () => `
     }
 `;
 
-export class ShadedPaintableTexture extends RimTexture {
+export class ShadedPaintableTexture extends WebGLRimTexture {
   fragmentShader = FRAGMENT_SHADER;
 
   constructor(baseUrl, rgbaMapUrl, paint: Color, rocketConfig: RocketConfig) {

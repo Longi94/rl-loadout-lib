@@ -1,8 +1,15 @@
-import { Color } from 'three';
+import { Color, Texture } from 'three';
 import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
+
+export interface TireTexture {
+  load();
+  setPaint(color: Color);
+  dispose();
+  getTexture(): Texture;
+}
 
 // language=GLSL
 const FRAGMENT_SHADER = `
@@ -33,7 +40,7 @@ const FRAGMENT_SHADER = `
     }
 `;
 
-export class TireTexture extends WebGLCanvasTexture {
+export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture {
 
   private normal: HTMLImageElement;
 
