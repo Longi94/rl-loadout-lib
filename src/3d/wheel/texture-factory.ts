@@ -37,9 +37,13 @@ export function getRimTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: R
     case ProductID.WHEEL_CHIEF:
     case ProductID.WHEEL_ENSPIER:
     case ProductID.WHEEL_SPECTRAL:
+    case ProductID.WHEEL_IGTYJR:
       return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', true);
     case ProductID.WHEEL_DONUT:
       return new ShadedPaintableTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig);
+    case ProductID.WHEEL_STORMDRAIN:
+    case ProductID.WHEEL_ALLSPARK:
+      return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'a', false);
     default:
       if (!StringUtil.nullOrEmpty(wheel.rim_rgb_map)) {
         return new WebGLRimTexture(rimBase, rimRgbMap, paints.wheel, rocketConfig, 'r', true);

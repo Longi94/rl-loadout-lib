@@ -36,7 +36,7 @@ const FRAGMENT_SHADER = `
         vec4 rgba_map = texture2D(u_rgba_map, v_texCoord);
 
         // base body color
-        gl_FragColor.rgb = blendNormal(gl_FragColor.rgb, base.rgb, base.a);
+        gl_FragColor.rgb = base.rgb;
 
         // paint
         if (u_paint.r >= 0.0) {
