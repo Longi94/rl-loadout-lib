@@ -5,7 +5,7 @@ import { RocketConfig } from '../../model/rocket-config';
 import { Wheel } from '../../model/wheel';
 import { StringUtil } from '../../utils/util';
 import { LightWheelRimTexture } from './light-wheel-model';
-import { TireTexture, WebGLTireTexture } from '../../webgl/tire-texture';
+import { TireTexture, WebGLTireTexture, WebGLUnpaintableTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
 import { ShadedPaintableTexture } from '../../webgl/shaded-paintable-texture';
@@ -69,11 +69,16 @@ export function getTireTexture(wheel: Wheel, paints: PaintConfig, rocketConfig: 
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
     case ProductID.WHEEL_SPECTRAL:
+    case ProductID.WHEEL_BLENDER:
+    case ProductID.WHEEL_GS:
+    case ProductID.WHEEL_FR01:
       return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'r', true, false);
     case ProductID.WHEEL_CHEWY:
       return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig, true);
     case ProductID.WHEEL_ENSPIER:
       return new ChewyTireTexture(tireNormal, paints.wheel, rocketConfig, false);
+    case ProductID.WHEEL_SHURIKEN:
+      return new WebGLUnpaintableTireTexture(tireBase, tireNormal, rocketConfig);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
         return new WebGLTireTexture(tireBase, tireNormal, paints.wheel, rocketConfig, 'a', false, true);

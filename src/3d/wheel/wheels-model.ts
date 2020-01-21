@@ -100,12 +100,14 @@ export class WheelsModel extends AbstractObject implements Paintable {
       this.tireMaterial.normalMap = await tireNTask;
     }
 
-    this.rimMaterial.normalMap = await rimNTask;
-    if (this.rimSkin) {
-      this.rimMaterial.map = this.rimSkin.getTexture();
-      this.rimMaterial.needsUpdate = true;
-    } else {
-      this.rimMaterial.map = await rimBaseTask;
+    if (this.rimMaterial != undefined) {
+      this.rimMaterial.normalMap = await rimNTask;
+      if (this.rimSkin) {
+        this.rimMaterial.map = this.rimSkin.getTexture();
+        this.rimMaterial.needsUpdate = true;
+      } else {
+        this.rimMaterial.map = await rimBaseTask;
+      }
     }
   }
 

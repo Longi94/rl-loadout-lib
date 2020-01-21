@@ -6,8 +6,11 @@ import { COLOR_INCLUDE } from './include/color';
 
 export interface TireTexture {
   load();
+
   setPaint(color: Color);
+
   dispose();
+
   getTexture(): Texture;
 }
 
@@ -52,7 +55,7 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
   protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}${this.useN ? 'normal' :
     'base'}.${this.maskChannel}`);
 
-  constructor(baseUrl, private normalUrl: string, private paint: Color, rocketConfig: RocketConfig, private maskChannel: string,
+  constructor(baseUrl: string, private normalUrl: string, private paint: Color, rocketConfig: RocketConfig, private maskChannel: string,
               private useN: boolean = false, private invertMask: boolean = false) {
     super(baseUrl, rocketConfig);
   }
@@ -86,6 +89,7 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
     this.gl.activeTexture(this.gl.TEXTURE1);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
   }
+
   setPaint(color: Color) {
     this.paint = color;
     this.update();
@@ -102,5 +106,15 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.normalTexture);
     }
+  }
+}
+
+export class WebGLUnpaintableTireTexture extends WebGLTireTexture {
+  constructor(baseUrl: string, normalUrl: string, rocketConfig: RocketConfig) {
+    super(baseUrl, normalUrl, undefined, rocketConfig, 'a');
+  }
+
+  setPaint(color: Color) {
+    super.setPaint(undefined);
   }
 }
