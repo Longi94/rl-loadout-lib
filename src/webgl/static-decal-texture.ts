@@ -1,10 +1,6 @@
 import { Color } from 'three';
-import { Decal } from '../model/decal';
-import { fixTierUrl, getAssetUrl } from '../utils/network';
 import { BodyTexture } from '../3d/body/body-texture';
-import { Body } from '../model/body';
 import { PaintConfig } from '../model/paint-config';
-import { RocketConfig } from '../model/rocket-config';
 import { bindColor, bindEmptyTexture, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
@@ -75,12 +71,6 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
 
   protected fragmentShader = FRAGMENT_SHADER;
 
-  private readonly rgbaMapUrl: string;
-  private readonly bodyBlankSkinUrl: string;
-
-  private decalRgbaMap: HTMLImageElement;
-  private bodyBlankSkin: HTMLImageElement;
-
   private primary: Color;
   private accent: Color;
   private paint: Color;
@@ -96,31 +86,14 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
   private rgbaMapTexture: WebGLTexture;
   private decalMapTexture: WebGLTexture;
 
-  constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(decal.base_texture != undefined && decal.base_texture.length > 0 ? getAssetUrl(decal.base_texture, rocketConfig) :
-      getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
-    this.rgbaMapUrl = fixTierUrl(body.id, getAssetUrl(decal.rgba_map, rocketConfig));
-    this.bodyBlankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
+  constructor(base?: HTMLImageElement, private decalRgbaMap?: HTMLImageElement, private bodyBlankSkin?: HTMLImageElement,
+              paints?: PaintConfig) {
+    super(base);
 
     this.primary = paints.primary;
     this.accent = paints.accent;
     this.paint = paints.decal;
     this.bodyPaint = paints.body;
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-    const bodyBlankSkinTask = this.loader.load(this.bodyBlankSkinUrl);
-
-    const rgbaMapResult = await rgbaMapTask;
-    if (rgbaMapResult != undefined) {
-      this.decalRgbaMap = rgbaMapResult;
-    }
-
-    this.bodyBlankSkin = await bodyBlankSkinTask;
-
-    await superTask;
   }
 
   protected initWebGL() {
@@ -199,5 +172,23 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
       this.gl.deleteTexture(this.rgbaMapTexture);
       this.gl.deleteTexture(this.decalMapTexture);
     }
+  }
+
+  protected copy(other: StaticDecalTexture) {
+    super.copy(other);
+    this.primary = other.primary.clone();
+    this.accent = other.accent.clone();
+    this.paint = other.paint.clone();
+    this.bodyPaint = other.bodyPaint.clone();
+    this.bodyBlankSkin = other.bodyBlankSkin.cloneNode(true) as HTMLImageElement;
+    if (other.decalRgbaMap) {
+      this.decalRgbaMap = other.decalRgbaMap.cloneNode(true) as HTMLImageElement;
+    }
+  }
+
+  clone(): StaticDecalTexture {
+    const t = new StaticDecalTexture();
+    t.copy(this);
+    return t;
   }
 }

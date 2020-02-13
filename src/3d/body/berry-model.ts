@@ -2,12 +2,12 @@ import { BodyModel } from './body-model';
 import { Color } from 'three';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
-import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
 import { WheelConfig } from '../../model/wheel';
-import { RocketConfig } from '../../model/rocket-config';
 import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
+import { BodyAssets } from '../../loader/body/body-assets';
+import { DecalAssets } from '../../loader/decal/decal-assets';
 
 // language=GLSL
 const FRAGMENT_SHADER = () => `
@@ -41,14 +41,14 @@ const FRAGMENT_SHADER = () => `
  */
 export class BerryModel extends BodyModel {
 
-  initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new PrimaryOnlyTexture(body, paints, rocketConfig, FRAGMENT_SHADER);
+  protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
+    return new PrimaryOnlyTexture(bodyAssets.baseSkin, bodyAssets.blankSkin, paints, FRAGMENT_SHADER);
   }
 
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
   }
 
   setPrimaryColor(color: Color) {

@@ -6,14 +6,10 @@ import { BodyTexture } from './body-texture';
 import { traverseMaterials } from '../object';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
-import { RocketConfig } from '../../model/rocket-config';
-import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
+import { DecalAssets } from '../../loader/decal/decal-assets';
+import { SlimeAssets } from '../../loader/body/slime-loader';
 
-const BODY_ORANGE = 'body/body_slime/Body_Slime1_D.tga';
-const BODY_BLUE = 'body/body_slime/Body_Slime2_D.tga';
-const CHASSIS_ORANGE = 'body/body_slime/Chassis_Slime_D.tga';
-const CHASSIS_BLUE = 'body/body_slime/Chassis_Slime2_D.tga';
 
 /**
  * Class for the 3D model of Ecto-1. Needed because paints cannot be applied to this body.
@@ -27,21 +23,19 @@ export class SlimeModel extends BodyModel {
 
   private lensMaterial: MeshStandardMaterial;
 
-  private readonly bodyOrangeUrl: string;
-  private readonly bodyBlueUrl: string;
-  private readonly chassisOrangeUrl: string;
-  private readonly chassisBlueUrl: string;
+  constructor(body?: Body, decal?: Decal, bodyAssets?: SlimeAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
+    this.bodyDataOrange = new Texture(bodyAssets.bodyOrange);
+    this.bodyDataBlue = new Texture(bodyAssets.bodyBlue);
+    this.chassisDataOrange = new Texture(bodyAssets.chassisOrange);
+    this.chassisDataBlue = new Texture(bodyAssets.chassisBlue);
 
-  constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(body, decal, paints, rocketConfig);
-
-    this.bodyOrangeUrl = getAssetUrl(BODY_ORANGE, rocketConfig);
-    this.bodyBlueUrl = getAssetUrl(BODY_BLUE, rocketConfig);
-    this.chassisOrangeUrl = getAssetUrl(CHASSIS_ORANGE, rocketConfig);
-    this.chassisBlueUrl = getAssetUrl(CHASSIS_BLUE, rocketConfig);
+    this.bodyMaterial.map = this.bodyDataBlue;
+    this.chassisMaterial.map = this.chassisDataBlue;
+    this.applyTextures();
   }
 
-  initBodySkin(body: Body, decal: Decal, paints: PaintConfig): BodyTexture {
+  protected initBodySkin(bodyAssets: SlimeAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
     return undefined;
   }
 
@@ -51,29 +45,6 @@ export class SlimeModel extends BodyModel {
     disposeIfExists(this.bodyDataBlue);
     disposeIfExists(this.chassisDataOrange);
     disposeIfExists(this.chassisDataBlue);
-  }
-
-  async load() {
-    const modelTask = this.loader.load(this.url);
-    const bodyOrangeTask = this.imageTextureLoader.load(this.bodyOrangeUrl);
-    const bodyBlueTask = this.imageTextureLoader.load(this.bodyBlueUrl);
-    const chassisOrangeTask = this.imageTextureLoader.load(this.chassisOrangeUrl);
-    const chassisBlueTask = this.imageTextureLoader.load(this.chassisBlueUrl);
-
-    const gltf = await modelTask;
-    this.handleGltf(gltf);
-
-    this.bodyDataOrange = await bodyOrangeTask;
-    this.bodyDataBlue = await bodyBlueTask;
-    this.chassisDataOrange = await chassisOrangeTask;
-    this.chassisDataBlue = await chassisBlueTask;
-
-    this.bodyMaterial.map = this.bodyDataBlue;
-    this.chassisMaterial.map = this.chassisDataBlue;
-
-    this.lensMaterial.color.setRGB(0, 0, 0.8);
-
-    this.applyTextures();
   }
 
   handleModel(scene: Scene) {
@@ -95,7 +66,7 @@ export class SlimeModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
   }
 
   setPrimaryColor(color: Color) {
@@ -115,5 +86,19 @@ export class SlimeModel extends BodyModel {
   }
 
   setDecalPaintColor(color: Color) {
+  }
+
+  protected copy(other: SlimeModel) {
+    super.copy(other);
+    this.bodyDataBlue = other.bodyDataBlue.clone();
+    this.bodyDataOrange = other.bodyDataOrange.clone();
+    this.chassisDataOrange = other.chassisDataOrange.clone();
+    this.chassisDataBlue = other.chassisDataBlue.clone();
+  }
+
+  clone(): SlimeModel {
+    const m = new SlimeModel();
+    m.copy(this);
+    return m;
   }
 }

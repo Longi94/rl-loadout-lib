@@ -1,34 +1,31 @@
 import { Body } from '../../model/body';
 import { Decal } from '../../model/decal';
 import { PaintConfig } from '../../model/paint-config';
-import { RocketConfig } from '../../model/rocket-config';
-import { getAssetUrl } from '../../utils/network';
-import { MeshStandardMaterial, Scene } from 'three';
+import { MeshStandardMaterial, Scene, Texture } from 'three';
 import { traverseMaterials } from '../object';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { RyeTier1Model } from './rye-tier1-model';
-
-const KIT_DIFFUSE = 'body/Body_Rye_Tier2/Body_Rye_BodyKit_D.tga';
-const KIT_NORMAL = 'body/Body_Rye_Tier2/Body_Rye_BodyKit_N.tga';
+import { DecalAssets } from '../../loader/decal/decal-assets';
+import { RyeTier1Assets, RyeTier2Assets } from '../../loader/body/rye-loader';
 
 /**
  * Class for the 3D model of Maverick GXT. Needed because of custom textures.
  */
 export class RyeTier2Model extends RyeTier1Model {
 
-  kitDiffuseUrl: string;
-  kitNormalUrl: string;
-
   kitMaterial: MeshStandardMaterial;
 
-  constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(body, decal, paints, rocketConfig);
-
-    this.imageLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-
-    this.kitDiffuseUrl = getAssetUrl(KIT_DIFFUSE, rocketConfig);
-    this.kitNormalUrl = getAssetUrl(KIT_NORMAL, rocketConfig);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: RyeTier2Assets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
+    this.init();
   }
+
+  init() {
+    super.init();
+    const bodyAssets = this.bodyAssets as RyeTier2Assets;
+    this.kitMaterial.map = new Texture(bodyAssets.kitD);
+    this.kitMaterial.normalMap = new Texture(bodyAssets.kitN);
+  }
+
 
   handleModel(scene: Scene) {
     super.handleModel(scene);
@@ -39,13 +36,14 @@ export class RyeTier2Model extends RyeTier1Model {
     });
   }
 
-  async load(): Promise<void> {
-    const kitDTask = this.imageLoader.load(this.kitDiffuseUrl);
-    const kitNTask = this.imageLoader.load(this.kitNormalUrl);
+  protected copy(other: RyeTier2Model) {
+    super.copy(other);
+    this.init();
+  }
 
-    await super.load();
-
-    this.kitMaterial.map = await kitDTask;
-    this.kitMaterial.normalMap = await kitNTask;
+  clone(): RyeTier2Model {
+    const m = new RyeTier2Model();
+    m.copy(this);
+    return m;
   }
 }

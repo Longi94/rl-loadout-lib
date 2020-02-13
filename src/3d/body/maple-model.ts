@@ -5,14 +5,9 @@ import { COLOR_MAPLE_ORANGE } from '../../utils/color';
 import { BodyTexture } from './body-texture';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
-import { RocketConfig } from '../../model/rocket-config';
-import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
-
-const BODY_ORANGE = 'body/body_maple/Body_Maple1_D.tga';
-const BODY_BLUE = 'body/body_maple/Body_Maple2_D.tga';
-const CHASSIS_ORANGE = 'body/body_maple/Chassis_Maple1_D.tga';
-const CHASSIS_BLUE = 'body/body_maple/Chassis_Maple2_D.tga';
+import { DecalAssets } from '../../loader/decal/decal-assets';
+import { MapleAssets } from '../../loader/body/maple-loader';
 
 /**
  * Class for the 3D model of Jurassic Jeep® Wrangler. Needed because paints cannot be applied to this body.
@@ -24,21 +19,19 @@ export class MapleModel extends BodyModel {
   private chassisDataOrange: Texture;
   private chassisDataBlue: Texture;
 
-  private readonly bodyOrangeUrl: string;
-  private readonly bodyBlueUrl: string;
-  private readonly chassisOrangeUrl: string;
-  private readonly chassisBlueUrl: string;
+  constructor(body?: Body, decal?: Decal, bodyAssets?: MapleAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
+    this.bodyDataOrange = new Texture(bodyAssets.bodyOrange);
+    this.bodyDataBlue = new Texture(bodyAssets.bodyBlue);
+    this.chassisDataOrange = new Texture(bodyAssets.chassisOrange);
+    this.chassisDataBlue = new Texture(bodyAssets.chassisBlue);
 
-  constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(body, decal, paints, rocketConfig);
-
-    this.bodyOrangeUrl = getAssetUrl(BODY_ORANGE, rocketConfig);
-    this.bodyBlueUrl = getAssetUrl(BODY_BLUE, rocketConfig);
-    this.chassisOrangeUrl = getAssetUrl(CHASSIS_ORANGE, rocketConfig);
-    this.chassisBlueUrl = getAssetUrl(CHASSIS_BLUE, rocketConfig);
+    this.bodyMaterial.map = this.bodyDataBlue;
+    this.chassisMaterial.map = this.chassisDataBlue;
+    this.applyTextures();
   }
 
-  initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
+  protected initBodySkin(bodyAssets: MapleAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
     return undefined;
   }
 
@@ -50,27 +43,6 @@ export class MapleModel extends BodyModel {
     disposeIfExists(this.chassisDataBlue);
   }
 
-  async load() {
-    const modelTask = this.loader.load(this.url);
-    const bodyOrangeTask = this.imageTextureLoader.load(this.bodyOrangeUrl);
-    const bodyBlueTask = this.imageTextureLoader.load(this.bodyBlueUrl);
-    const chassisOrangeTask = this.imageTextureLoader.load(this.chassisOrangeUrl);
-    const chassisBlueTask = this.imageTextureLoader.load(this.chassisBlueUrl);
-
-    const gltf = await modelTask;
-    this.handleGltf(gltf);
-
-    this.bodyDataOrange = await bodyOrangeTask;
-    this.bodyDataBlue = await bodyBlueTask;
-    this.chassisDataOrange = await chassisOrangeTask;
-    this.chassisDataBlue = await chassisBlueTask;
-
-    this.bodyMaterial.map = this.bodyDataBlue;
-    this.chassisMaterial.map = this.chassisDataBlue;
-
-    this.applyTextures();
-  }
-
   private applyTextures() {
     this.bodyMaterial.needsUpdate = true;
     this.chassisMaterial.needsUpdate = true;
@@ -79,7 +51,7 @@ export class MapleModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
   }
 
   setPrimaryColor(color: Color) {
@@ -97,5 +69,19 @@ export class MapleModel extends BodyModel {
   }
 
   setDecalPaintColor(color: Color) {
+  }
+
+  protected copy(other: MapleModel) {
+    super.copy(other);
+    this.bodyDataBlue = other.bodyDataBlue.clone();
+    this.bodyDataOrange = other.bodyDataOrange.clone();
+    this.chassisDataOrange = other.chassisDataOrange.clone();
+    this.chassisDataBlue = other.chassisDataBlue.clone();
+  }
+
+  clone(): MapleModel {
+    const m = new MapleModel();
+    m.copy(this);
+    return m;
   }
 }

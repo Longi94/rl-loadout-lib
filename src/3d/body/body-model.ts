@@ -1,8 +1,6 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Texture } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
-import { getAssetUrl } from '../../utils/network';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { Decal } from '../../model/decal';
@@ -11,13 +9,14 @@ import { PaintConfig } from '../../model/paint-config';
 import { AxleSettings, WheelSettings } from '../../model/axle-settings';
 import { HitboxConfig } from '../../model/hitbox-config';
 import { WheelConfig } from '../../model/wheel';
-import { RocketConfig } from '../../model/rocket-config';
 import { WheelsModel } from '../wheel/wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { MAX_WHEEL_YAW } from '../constants';
 import { StaticDecalTexture } from '../../webgl/static-decal-texture';
 import { ChassisTexture } from '../../webgl/chassis-texture';
+import { BodyAssets } from '../../loader/body/body-assets';
+import { DecalAssets } from '../../loader/decal/decal-assets';
 
 
 /**
@@ -25,18 +24,12 @@ import { ChassisTexture } from '../../webgl/chassis-texture';
  */
 export class BodyModel extends AbstractObject implements Paintable {
 
-  private readonly body: Body;
-
-  protected readonly imageTextureLoader: PromiseLoader;
-
   skeleton: Bone;
   bodyMaterial: MeshStandardMaterial;
   chassisMaterial: MeshStandardMaterial;
 
   bodySkin: BodyTexture;
   chassisSkin: ChassisTexture;
-
-  private readonly chassisNUrl: string;
 
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
@@ -54,29 +47,40 @@ export class BodyModel extends AbstractObject implements Paintable {
    * Create a body model object. You should **not** use this unless you know what you are doing. Use {@link createBodyModel} instead.
    * @param body car body to load the model of
    * @param decal car decal to load the textures of
+   * @param bodyAssets
+   * @param decalAssets
    * @param paints paints to be applied to the body
-   * @param rocketConfig configuration used for loading assets
    */
-  constructor(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(getAssetUrl(body.model, rocketConfig), rocketConfig.gltfLoader);
-    this.imageTextureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.chassisNUrl = getAssetUrl(body.chassis_n, rocketConfig);
+  constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(bodyAssets);
 
-    this.body = body;
+    if (bodyAssets != undefined) {
+      this.bodySkin = this.initBodySkin(bodyAssets, decalAssets, paints);
 
-    this.bodySkin = this.initBodySkin(body, decal, paints, rocketConfig);
-
-    this.chassisSkin = new ChassisTexture(
-      getAssetUrl(body.chassis_base, rocketConfig),
-      getAssetUrl(body.chassis_n, rocketConfig),
-      body.chassis_paintable,
-      paints,
-      rocketConfig
-    );
+      this.chassisSkin = new ChassisTexture(
+        bodyAssets.chassisD,
+        bodyAssets.chassisN,
+        body.chassis_paintable,
+        paints
+      );
+      this.applyAssets();
+    }
   }
 
-  protected initBodySkin(body: Body, decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig): BodyTexture {
-    return new StaticDecalTexture(body, decal, paints, rocketConfig);
+  private applyAssets() {
+    this.applyDecal();
+
+    this.chassisMaterial.normalMap = new Texture(this.bodyAssets.chassisN);
+    this.chassisMaterial.map = this.chassisSkin.getTexture();
+    this.chassisMaterial.needsUpdate = true;
+  }
+
+  protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
+    if (decalAssets.baseTexture != undefined) {
+      return new StaticDecalTexture(decalAssets.baseTexture, decalAssets.rgbaMap, bodyAssets.blankSkin, paints);
+    } else {
+      return new StaticDecalTexture(bodyAssets.baseSkin, decalAssets.rgbaMap, bodyAssets.blankSkin, paints);
+    }
   }
 
   dispose() {
@@ -86,26 +90,6 @@ export class BodyModel extends AbstractObject implements Paintable {
     disposeIfExists(this.chassisSkin);
     disposeIfExists(this.bodySkin);
     this.wheelsModel = undefined;
-  }
-
-  /**
-   * Load the body model and all textures needed for it.
-   */
-  async load() {
-    const superTask = super.load();
-    const bodySkinTask = this.bodySkin.load();
-    const chassisNTask = this.imageTextureLoader.load(this.chassisNUrl);
-
-    await this.chassisSkin.load();
-
-    await superTask;
-    await bodySkinTask;
-
-    this.applyDecal();
-
-    this.chassisMaterial.normalMap = await chassisNTask;
-    this.chassisMaterial.map = this.chassisSkin.getTexture();
-    this.chassisMaterial.needsUpdate = true;
   }
 
   protected handleModel(scene: Scene) {
@@ -259,13 +243,12 @@ export class BodyModel extends AbstractObject implements Paintable {
   /**
    * Replace the current decal with a new one.
    * @param decal new decal
+   * @param decalAssets
    * @param paints paint config needed for decal colors
-   * @param rocketConfig rocket config needed for loading assets
    */
-  async changeDecal(decal: Decal, paints: PaintConfig, rocketConfig: RocketConfig) {
+  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
     this.bodySkin.dispose();
-    this.bodySkin = new StaticDecalTexture(this.body, decal, paints, rocketConfig);
-    await this.bodySkin.load();
+    this.initBodySkin(this.bodyAssets, decalAssets, paints);
     this.applyDecal();
   }
 
@@ -307,5 +290,25 @@ export class BodyModel extends AbstractObject implements Paintable {
     for (const pivot of this.frontPivots) {
       pivot.rotation.z = angle;
     }
+  }
+
+  protected copy(other: BodyModel) {
+    super.copy(other);
+    if (other.wheelsModel != undefined) {
+      this.wheelsModel = other.wheelsModel.clone();
+    }
+    if (other.bodySkin != undefined) {
+      this.bodySkin = other.bodySkin.clone();
+    }
+    if (other.chassisSkin != undefined) {
+      this.chassisSkin = other.chassisSkin.clone();
+    }
+    this.applyAssets();
+  }
+
+  clone(): BodyModel {
+    const m = new BodyModel();
+    m.copy(this);
+    return m;
   }
 }

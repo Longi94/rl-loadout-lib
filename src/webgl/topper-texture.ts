@@ -1,5 +1,4 @@
 import { Color } from 'three';
-import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
@@ -37,23 +36,13 @@ export class TopperTexture extends WebGLCanvasTexture {
 
   protected fragmentShader = FRAGMENT_SHADER;
 
-  private rgbaMap: HTMLImageElement;
-
   private paintLocation: WebGLUniformLocation;
   private rgbaMapLocation: WebGLUniformLocation;
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(baseUrl, private readonly rgbaMapUrl, private paint: Color, rocketConfig: RocketConfig) {
-    super(baseUrl, rocketConfig);
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-
-    this.rgbaMap = await rgbaMapTask;
-    await superTask;
+  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, private paint?: Color) {
+    super(base);
   }
 
   protected initWebGL() {
@@ -94,5 +83,17 @@ export class TopperTexture extends WebGLCanvasTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
+  }
+
+  protected copy(other: TopperTexture) {
+    super.copy(other);
+    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
+    this.paint = other.paint.clone();
+  }
+
+  clone(): TopperTexture {
+    const t = new TopperTexture();
+    t.copy(this);
+    return t;
   }
 }

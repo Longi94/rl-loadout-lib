@@ -1,6 +1,5 @@
 import { Color } from 'three';
 import { PaintConfig } from '../model/paint-config';
-import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { createOffscreenCanvas } from '../utils/offscreen-canvas';
@@ -46,8 +45,6 @@ const FRAGMENT_SHADER = () => `
 
 export class ChassisTexture extends WebGLCanvasTexture {
 
-  private rgbaMap: HTMLImageElement;
-
   protected fragmentShader = FRAGMENT_SHADER;
 
   private accent: Color;
@@ -59,18 +56,10 @@ export class ChassisTexture extends WebGLCanvasTexture {
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(baseUrl: string, private readonly rgbaMapUrl: string, private readonly paintable: boolean,
-              paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(baseUrl, rocketConfig);
+  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, private readonly paintable?: boolean, paints?: PaintConfig) {
+    super(base);
     this.accent = paints.accent;
     this.paint = paints.body;
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-    this.rgbaMap = await rgbaMapTask;
-    await superTask;
   }
 
   protected initWebGL() {
@@ -123,6 +112,19 @@ export class ChassisTexture extends WebGLCanvasTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
+  }
+
+  protected copy(other: ChassisTexture) {
+    super.copy(other);
+    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
+    this.accent = other.accent.clone();
+    this.paint = other.paint.clone();
+  }
+
+  clone(): ChassisTexture {
+    const t = new ChassisTexture();
+    t.copy(this);
+    return t;
   }
 }
 

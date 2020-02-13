@@ -1,18 +1,11 @@
 import { WebGLCanvasTexture } from './webgl-texture';
 import { BodyTexture } from '../3d/body/body-texture';
 import { Color } from 'three';
-import { Body } from '../model/body';
 import { PaintConfig } from '../model/paint-config';
-import { RocketConfig } from '../model/rocket-config';
-import { getAssetUrl } from '../utils/network';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 
 
 export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTexture {
-
-  private readonly blankSkinUrl: string;
-
-  private bodyBlankSkin: HTMLImageElement;
 
   primary: Color;
 
@@ -21,19 +14,10 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(body: Body, paints: PaintConfig, rocketConfig: RocketConfig, fragmentShader: () => string) {
-    super(getAssetUrl(body.base_skin, rocketConfig), rocketConfig);
+  constructor(base?: HTMLImageElement, private bodyBlankSkin?: HTMLImageElement, paints?: PaintConfig, fragmentShader?: () => string) {
+    super(base);
     this.fragmentShader = fragmentShader;
-    this.blankSkinUrl = getAssetUrl(body.blank_skin, rocketConfig);
     this.primary = paints.primary;
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rgbaMapTask = this.loader.load(this.blankSkinUrl);
-
-    this.bodyBlankSkin = await rgbaMapTask;
-    await superTask;
   }
 
   protected initWebGL() {
@@ -83,5 +67,18 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
   setPrimary(color: Color) {
     this.primary = color;
     this.update();
+  }
+
+  protected copy(other: PrimaryOnlyTexture) {
+    super.copy(other);
+    this.primary = other.primary.clone();
+    this.bodyBlankSkin = other.bodyBlankSkin.cloneNode(true) as HTMLImageElement;
+    this.fragmentShader = other.fragmentShader;
+  }
+
+  clone(): PrimaryOnlyTexture {
+    const t = new PrimaryOnlyTexture();
+    t.copy(this);
+    return t;
   }
 }

@@ -35,12 +35,9 @@ export interface BodyTexture {
   dispose();
 
   /**
-   * Load files needed for the texture.
-   */
-  load(): Promise<any>;
-
-  /**
    * Get the texture object that can be applied to THREE materials.
    */
   getTexture(): Texture;
+
+  clone();
 }
