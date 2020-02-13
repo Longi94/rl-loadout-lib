@@ -8,6 +8,10 @@ import { Body } from '../model/body';
 import { Wheel } from '../model/wheel';
 import { createBodyModel } from '../3d/body/factory';
 import { createWheelsModel } from '../3d/wheel/factory';
+import { getBodyLoader } from '../loader/body/mapping';
+import { MultiImageLoader, PromiseLoader } from '..';
+import { StaticDecalLoader } from '../loader/decal/decal-loader';
+import { getWheelLoader } from '../loader/wheel/mapping';
 
 /**
  * Helper class to load items by their in game item ID.
@@ -15,8 +19,13 @@ import { createWheelsModel } from '../3d/wheel/factory';
 export class RocketAssetManager {
   private readonly rlService: RocketLoadoutService;
 
+  private readonly textureLoader: PromiseLoader;
+  private readonly modelLoader: PromiseLoader;
+
   constructor(public readonly config: RocketConfig) {
     this.rlService = new RocketLoadoutService(config.backendHost);
+    this.textureLoader = new PromiseLoader(new MultiImageLoader(config.textureFormat, config.loadingManager));
+    this.modelLoader = new PromiseLoader(config.gltfLoader);
   }
 
   /**
@@ -49,10 +58,15 @@ export class RocketAssetManager {
       throw new Error('body is undefined');
     }
 
-    const bodyModel = createBodyModel(body, decal, paintConfig, this.config);
-    await bodyModel.load();
+    const loader = getBodyLoader(body.id);
 
-    return bodyModel;
+    const bodyAssetsTask = loader.load(body, this.modelLoader, this.textureLoader, this.config);
+    const decalAssetsTask = StaticDecalLoader.load(body, decal, this.textureLoader, this.config);
+
+    const bodyAssets = await bodyAssetsTask;
+    const decalAssets = await decalAssetsTask;
+
+    return createBodyModel(body, decal, bodyAssets, decalAssets, paintConfig);
   }
 
   /**
@@ -75,9 +89,10 @@ export class RocketAssetManager {
       throw new Error('wheel is undefined');
     }
 
-    const wheelsModel = createWheelsModel(wheel, paintConfig, this.config);
-    await wheelsModel.load();
+    const loader = getWheelLoader(wheel.id);
 
-    return wheelsModel;
+    const wheelAssets = await loader.load(wheel, this.modelLoader, this.textureLoader, this.config);
+
+    return createWheelsModel(wheel, wheelAssets, paintConfig);
   }
 }

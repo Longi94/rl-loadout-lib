@@ -18,6 +18,7 @@ import { BodyAssets } from '../../loader/body/body-assets';
 import { MapleAssets } from '../../loader/body/maple-loader';
 import { SlimeAssets } from '../../loader/body/slime-loader';
 import { RyeTier1Assets, RyeTier2Assets } from '../../loader/body/rye-loader';
+import { RonAssets } from '../../loader/body/ron-loader';
 
 /**
  * Create a body model object. This handles unique models that need a custom class to handle it.
@@ -49,7 +50,7 @@ export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets
     case ProductID.BODY_RYE_TIER2:
       return new RyeTier2Model(body, decal, bodyAssets as RyeTier2Assets, decalAssets, paints);
     case ProductID.BODY_RON:
-      return new RonModel(body, decal, bodyAssets, decalAssets, paints);
+      return new RonModel(body, decal, bodyAssets as RonAssets, decalAssets, paints);
     default:
       return new BodyModel(body, decal, bodyAssets, decalAssets, paints);
   }
