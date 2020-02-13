@@ -61,6 +61,7 @@
       true,
       "single"
     ],
+    "semicolon": [true, "ignore-bound-class-methods"],
     "trailing-comma": false,
     "triple-equals": [
       true,

@@ -109,7 +109,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
       wheel.scale.set(radiusScale, radiusScale, widthScale);
       wheel.position.copy(position);
 
-      let spinnerJoint: Bone = undefined;
+      let spinnerJoint: Bone;
       wheel.traverse(object => {
         if (object['isBone']) {
           if (object.name === 'spinner_jnt') {

@@ -47,11 +47,12 @@ export class BodyModel extends AbstractObject implements Paintable {
    * Create a body model object. You should **not** use this unless you know what you are doing. Use {@link createBodyModel} instead.
    * @param body car body to load the model of
    * @param decal car decal to load the textures of
-   * @param bodyAssets
-   * @param decalAssets
+   * @param bodyAssets body assets
+   * @param decalAssets decal assets
    * @param paints paints to be applied to the body
    */
-  constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+  constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets,
+              paints?: PaintConfig) {
     super(bodyAssets);
 
     if (bodyAssets != undefined) {
@@ -243,7 +244,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   /**
    * Replace the current decal with a new one.
    * @param decal new decal
-   * @param decalAssets
+   * @param decalAssets decal assets
    * @param paints paint config needed for decal colors
    */
   changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {

@@ -24,12 +24,13 @@ import { RonAssets } from '../../loader/body/ron-loader';
  * Create a body model object. This handles unique models that need a custom class to handle it.
  * @param body car body
  * @param decal car decal
- * @param bodyAssets
- * @param decalAssets
+ * @param bodyAssets body assets
+ * @param decalAssets decal assets
  * @param paints paints to be applied to the body
  * @return body model
  */
-export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyModel {
+export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets, decalAssets: DecalAssets,
+                                paints: PaintConfig): BodyModel {
   switch (body.id) {
     case ProductID.BODY_MAPLE:
       return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints);

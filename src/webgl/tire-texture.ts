@@ -49,8 +49,8 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
 
   private normalTexture: WebGLTexture;
 
-  protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}${this.useN ? 'normal' :
-    'base'}.${this.maskChannel}`);
+  protected fragmentShader = () =>
+    FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}${this.useN ? 'normal' : 'base'}.${this.maskChannel}`);
 
   constructor(base?: HTMLImageElement, private normal?: HTMLImageElement, private paint?: Color, private maskChannel?: string,
               private useN: boolean = false, private invertMask: boolean = false) {

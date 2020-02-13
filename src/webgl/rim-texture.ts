@@ -50,12 +50,12 @@ const FRAGMENT_SHADER = `
 
 export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
 
-  protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}rgba_map.${this.maskChannel}`);
-
   private paintLocation: WebGLUniformLocation;
   private rgbaMapLocation: WebGLUniformLocation;
 
   private rgbaMapTexture: WebGLTexture;
+
+  protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}rgba_map.${this.maskChannel}`);
 
   constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, protected paint?: Color, private maskChannel?: string,
               private invertMask = false) {

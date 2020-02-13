@@ -18,7 +18,7 @@ export class TopperModel extends AbstractObject implements Paintable {
   /**
    * Create an topper object.
    * @param topper the topper
-   * @param topperAssets
+   * @param topperAssets topper assets
    * @param paints the paint config to apply the topper paint
    */
   constructor(topper?: Topper, topperAssets?: TopperAssets, paints?: PaintConfig) {

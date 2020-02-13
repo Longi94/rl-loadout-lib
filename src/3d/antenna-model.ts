@@ -14,7 +14,7 @@ export class AntennaModel extends AbstractObject {
   /**
    * Create an antenna object.
    * @param antenna the antenna
-   * @param antennaAssets
+   * @param antennaAssets antenna assets
    * @param paints the paint config to apply the antenna paint
    */
   constructor(antenna?: Antenna, protected antennaAssets?: AntennaAssets, paints?: PaintConfig) {
