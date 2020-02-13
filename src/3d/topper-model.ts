@@ -1,7 +1,7 @@
 import { AbstractObject } from './object';
 import { Color, Mesh, MeshStandardMaterial, Scene, Texture } from 'three';
 import { Topper } from '../model/topper';
-import { disposeIfExists } from '../utils/util';
+import { disposeIfExists, htmlImageToTexture } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
 import { TopperTexture } from '../webgl/topper-texture';
@@ -33,9 +33,9 @@ export class TopperModel extends AbstractObject implements Paintable {
         this.material.map = this.skin.getTexture();
         this.material.needsUpdate = true;
       } else {
-        this.material.map = new Texture(topperAssets.diffuse);
+        this.material.map = htmlImageToTexture(topperAssets.diffuse);
       }
-      this.material.normalMap = new Texture(topperAssets.normalMap);
+      this.material.normalMap = htmlImageToTexture(topperAssets.normalMap);
     }
   }
 

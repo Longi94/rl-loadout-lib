@@ -23,8 +23,8 @@ export const DefaultWheelLoader: WheelLoader = {
       rimD: await rimD,
       rimN: await rimN,
       rimRgba: await rimRgba,
-      tireN: await tireD,
-      tireD: await tireN
+      tireN: await tireN,
+      tireD: await tireD
     };
   }
 };

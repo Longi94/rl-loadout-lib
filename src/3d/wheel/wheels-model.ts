@@ -2,7 +2,7 @@ import { AbstractObject } from '../object';
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../../model/wheel';
 import { SkeletonUtils } from '../../utils/three/skeleton';
-import { disposeIfExists } from '../../utils/util';
+import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { PaintConfig } from '../../model/paint-config';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../constants';
@@ -33,12 +33,17 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   protected roll = 0;
 
-  constructor(assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig) {
+  constructor(protected assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig) {
     super(assets);
     if (assets != undefined) {
       this.rimSkin = getRimTexture(wheel, assets, paints);
       this.tireTexture = getTireTexture(wheel, assets, paints);
+    }
+    this.init();
+  }
 
+  init() {
+    if (this.assets != undefined) {
       if (this.tireTexture != undefined) {
         if (!(this.tireTexture instanceof Color)) {
           this.tireMaterial.map = this.tireTexture.getTexture();
@@ -47,17 +52,19 @@ export class WheelsModel extends AbstractObject implements Paintable {
         }
       }
       if (this.tireMaterial != undefined) {
-        this.tireMaterial.normalMap = new Texture(assets.tireN);
+        this.tireMaterial.normalMap = htmlImageToTexture(this.assets.tireN);
       }
+      this.tireMaterial.needsUpdate = true;
 
       if (this.rimMaterial != undefined) {
-        this.rimMaterial.normalMap = new Texture(assets.rimN);
+        this.rimMaterial.normalMap = htmlImageToTexture(this.assets.rimN);
         if (this.rimSkin) {
           this.rimMaterial.map = this.rimSkin.getTexture();
           this.rimMaterial.needsUpdate = true;
         } else {
-          this.rimMaterial.map = new Texture(assets.rimD);
+          this.rimMaterial.map = htmlImageToTexture(this.assets.rimD);
         }
+        this.rimMaterial.needsUpdate = true;
       }
     }
   }
@@ -203,6 +210,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
     }
     this.applyWheelConfig(other.config);
     this.roll = other.roll;
+    this.init();
   }
 
   clone(): WheelsModel {

@@ -1,7 +1,7 @@
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Texture } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
-import { disposeIfExists } from '../../utils/util';
+import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { Decal } from '../../model/decal';
 import { BodyTexture } from './body-texture';
@@ -64,14 +64,15 @@ export class BodyModel extends AbstractObject implements Paintable {
         body.chassis_paintable,
         paints
       );
-      this.applyAssets();
     }
+
+    this.applyAssets();
   }
 
-  private applyAssets() {
+  protected applyAssets() {
     this.applyDecal();
 
-    this.chassisMaterial.normalMap = new Texture(this.bodyAssets.chassisN);
+    this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
     this.chassisMaterial.map = this.chassisSkin.getTexture();
     this.chassisMaterial.needsUpdate = true;
   }
@@ -106,6 +107,10 @@ export class BodyModel extends AbstractObject implements Paintable {
 
     this.hatSocket = scene.getObjectByName('HatSocket');
     this.antennaSocket = scene.getObjectByName('AntennaSocket');
+
+    if (this.frontPivots == undefined) {
+      this.frontPivots = [];
+    }
 
     scene.traverse(object => {
       if (object['isBone'] && this.skeleton == undefined) {
@@ -249,7 +254,7 @@ export class BodyModel extends AbstractObject implements Paintable {
    */
   changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
     this.bodySkin.dispose();
-    this.initBodySkin(this.bodyAssets, decalAssets, paints);
+    this.bodySkin = this.initBodySkin(this.bodyAssets, decalAssets, paints);
     this.applyDecal();
   }
 

@@ -6,6 +6,7 @@ import { MeshStandardMaterial, Scene, Texture } from 'three';
 import { traverseMaterials } from '../object';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { RyeTier1Assets } from '../../loader/body/rye-loader';
+import { htmlImageToTexture } from '../../utils/util';
 
 /**
  * Class for the 3D model of Maverick G1. Needed because of custom textures.
@@ -22,9 +23,9 @@ export class RyeTier1Model extends BodyModel {
 
   init() {
     const bodyAssets = this.bodyAssets as RyeTier1Assets;
-    this.lightsMaterial.map = new Texture(bodyAssets.lightsD);
-    this.lightsMaterial.normalMap = new Texture(bodyAssets.lightsN);
-    this.grillMaterial.normalMap = new Texture(bodyAssets.grillN);
+    this.lightsMaterial.map = htmlImageToTexture(bodyAssets.lightsD);
+    this.lightsMaterial.normalMap = htmlImageToTexture(bodyAssets.lightsN);
+    this.grillMaterial.normalMap = htmlImageToTexture(bodyAssets.grillN);
   }
 
   handleModel(scene: Scene) {

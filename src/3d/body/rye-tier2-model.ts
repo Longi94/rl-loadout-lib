@@ -6,6 +6,7 @@ import { traverseMaterials } from '../object';
 import { RyeTier1Model } from './rye-tier1-model';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { RyeTier1Assets, RyeTier2Assets } from '../../loader/body/rye-loader';
+import { htmlImageToTexture } from '../../utils/util';
 
 /**
  * Class for the 3D model of Maverick GXT. Needed because of custom textures.
@@ -22,8 +23,8 @@ export class RyeTier2Model extends RyeTier1Model {
   init() {
     super.init();
     const bodyAssets = this.bodyAssets as RyeTier2Assets;
-    this.kitMaterial.map = new Texture(bodyAssets.kitD);
-    this.kitMaterial.normalMap = new Texture(bodyAssets.kitN);
+    this.kitMaterial.map = htmlImageToTexture(bodyAssets.kitD);
+    this.kitMaterial.normalMap = htmlImageToTexture(bodyAssets.kitN);
   }
 
 

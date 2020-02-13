@@ -3,6 +3,7 @@ import { AbstractObject } from './object';
 import { Mesh, MeshStandardMaterial, Object3D, Scene, Texture } from 'three';
 import { PaintConfig } from '../model/paint-config';
 import { AntennaAssets } from '../loader/antenna/antenna-assets';
+import { htmlImageToTexture } from '../utils/util';
 
 /**
  * Class that handles loading the 3D model of the car antenna.
@@ -27,8 +28,8 @@ export class AntennaModel extends AbstractObject {
     const antennaModel: Mesh = antennaScene.children[0] as Mesh;
     const material: MeshStandardMaterial = antennaModel.material as MeshStandardMaterial;
 
-    material.map = new Texture(this.antennaAssets.baseTexture);
-    material.normalMap = new Texture(this.antennaAssets.normalMap);
+    material.map = htmlImageToTexture(this.antennaAssets.baseTexture);
+    material.normalMap = htmlImageToTexture(this.antennaAssets.normalMap);
 
     if (this.socket) {
       antennaModel.position.copy(this.socket.position);

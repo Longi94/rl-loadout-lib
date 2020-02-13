@@ -12,8 +12,8 @@ export interface DecalLoader {
 export const StaticDecalLoader: DecalLoader = {
   load: async (body, decal, textureLoader, rocketConfig) => {
 
-    const baseTexture = textureLoader.load(getAssetUrl(body.chassis_base, rocketConfig));
-    const rgbaMap = textureLoader.load(fixTierUrl(body.id, getAssetUrl(body.chassis_n, rocketConfig)));
+    const baseTexture = textureLoader.load(getAssetUrl(decal.base_texture, rocketConfig));
+    const rgbaMap = textureLoader.load(fixTierUrl(body.id, getAssetUrl(decal.rgba_map, rocketConfig)));
 
     return {
       baseTexture: await baseTexture,

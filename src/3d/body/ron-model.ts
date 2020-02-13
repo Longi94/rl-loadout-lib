@@ -6,6 +6,7 @@ import { MeshStandardMaterial, Scene, Texture } from 'three';
 import { traverseMaterials } from '../object';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { RonAssets } from '../../loader/body/ron-loader';
+import { htmlImageToTexture } from '../../utils/util';
 
 /**
  * Class for the 3D model of McLaren 570S. Needed because of custom textures.
@@ -23,11 +24,11 @@ export class RonModel extends BodyModel {
 
   init() {
     const bodyAssets = this.bodyAssets as RonAssets;
-    this.carbonFibreMaterial.normalMap = new Texture(bodyAssets.carbonFibre);
-    this.decalsMaterial.map = new Texture(bodyAssets.decalsD);
-    this.decalsMaterial.normalMap = new Texture(bodyAssets.decalsN);
-    this.tilingMaterial.map = new Texture(bodyAssets.hexD);
-    this.tilingMaterial.normalMap = new Texture(bodyAssets.hexN);
+    this.carbonFibreMaterial.normalMap = htmlImageToTexture(bodyAssets.carbonFibre);
+    this.decalsMaterial.map = htmlImageToTexture(bodyAssets.decalsD);
+    this.decalsMaterial.normalMap = htmlImageToTexture(bodyAssets.decalsN);
+    this.tilingMaterial.map = htmlImageToTexture(bodyAssets.hexD);
+    this.tilingMaterial.normalMap = htmlImageToTexture(bodyAssets.hexN);
 
     this.carbonFibreMaterial.normalMap.offset.y = -20;
     this.carbonFibreMaterial.normalMap.repeat.x = 20;

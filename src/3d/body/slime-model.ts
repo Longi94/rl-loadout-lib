@@ -6,7 +6,7 @@ import { BodyTexture } from './body-texture';
 import { traverseMaterials } from '../object';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
-import { disposeIfExists } from '../../utils/util';
+import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { SlimeAssets } from '../../loader/body/slime-loader';
 
@@ -25,14 +25,20 @@ export class SlimeModel extends BodyModel {
 
   constructor(body?: Body, decal?: Decal, bodyAssets?: SlimeAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
     super(body, decal, bodyAssets, decalAssets, paints);
-    this.bodyDataOrange = new Texture(bodyAssets.bodyOrange);
-    this.bodyDataBlue = new Texture(bodyAssets.bodyBlue);
-    this.chassisDataOrange = new Texture(bodyAssets.chassisOrange);
-    this.chassisDataBlue = new Texture(bodyAssets.chassisBlue);
+    this.bodyDataOrange = htmlImageToTexture(bodyAssets.bodyOrange);
+    this.bodyDataBlue = htmlImageToTexture(bodyAssets.bodyBlue);
+    this.chassisDataOrange = htmlImageToTexture(bodyAssets.chassisOrange);
+    this.chassisDataBlue = htmlImageToTexture(bodyAssets.chassisBlue);
 
     this.bodyMaterial.map = this.bodyDataBlue;
     this.chassisMaterial.map = this.chassisDataBlue;
+    this.lensMaterial.color.setRGB(0, 0, 0.8);
     this.applyTextures();
+  }
+
+  protected applyAssets() {
+    this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
+    this.chassisMaterial.normalMap.needsUpdate = true;
   }
 
   protected initBodySkin(bodyAssets: SlimeAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {

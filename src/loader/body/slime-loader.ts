@@ -15,6 +15,10 @@ export const SlimeLoader: BodyLoader = {
     const bodyBlueTask = textureLoader.load(getAssetUrl(BODY_BLUE, rocketConfig));
     const chassisOrangeTask = textureLoader.load(getAssetUrl(CHASSIS_ORANGE, rocketConfig));
     const chassisBlueTask = textureLoader.load(getAssetUrl(CHASSIS_BLUE, rocketConfig));
+    const baseSkin = textureLoader.load(getAssetUrl(body.base_skin, rocketConfig));
+    const blankSkin = textureLoader.load(getAssetUrl(body.blank_skin, rocketConfig));
+    const chassisD = textureLoader.load(getAssetUrl(body.chassis_base, rocketConfig));
+    const chassisN = textureLoader.load(getAssetUrl(body.chassis_n, rocketConfig));
 
     const a = new SlimeAssets();
     a.gltf = await modelTask;
@@ -22,6 +26,10 @@ export const SlimeLoader: BodyLoader = {
     a.bodyBlue = await bodyBlueTask;
     a.chassisOrange = await chassisOrangeTask;
     a.chassisBlue = await chassisBlueTask;
+    a.baseSkin = await baseSkin;
+    a.blankSkin = await blankSkin;
+    a.chassisD = await chassisD;
+    a.chassisN = await chassisN;
     return a;
   }
 };

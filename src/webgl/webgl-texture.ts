@@ -117,6 +117,7 @@ export class WebGLCanvasTexture {
     if (this.texture == undefined) {
       this.init();
     }
+    this.texture.needsUpdate = true;
     return this.texture;
   }
 
