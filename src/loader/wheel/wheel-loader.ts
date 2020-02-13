@@ -1,4 +1,7 @@
-import { getAssetUrl, PromiseLoader, RocketConfig, Wheel } from '../..';
+import { getAssetUrl } from '../../utils/network';
+import { Wheel } from '../../model/wheel';
+import { RocketConfig } from '../../model/rocket-config';
+import { PromiseLoader } from '../../utils/loader';
 import { WheelAssets } from './wheel-assets';
 
 export interface WheelLoader {

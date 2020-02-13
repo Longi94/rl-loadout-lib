@@ -9,7 +9,7 @@ import { Wheel } from '../model/wheel';
 import { createBodyModel } from '../3d/body/factory';
 import { createWheelsModel } from '../3d/wheel/factory';
 import { getBodyLoader } from '../loader/body/mapping';
-import { MultiImageLoader, PromiseLoader } from '..';
+import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { StaticDecalLoader } from '../loader/decal/decal-loader';
 import { getWheelLoader } from '../loader/wheel/mapping';
 

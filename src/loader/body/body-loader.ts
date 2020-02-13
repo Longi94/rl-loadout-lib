@@ -1,4 +1,6 @@
-import { Body, PromiseLoader, RocketConfig } from '../..';
+import { Body } from '../../model/body';
+import { RocketConfig } from '../../model/rocket-config';
+import { PromiseLoader } from '../../utils/loader';
 import { BodyAssets } from './body-assets';
 import { getAssetUrl } from '../../utils/network';
 
