@@ -1,5 +1,3 @@
-import { RocketConfig } from '../model/rocket-config';
-import { MultiImageLoader, PromiseLoader } from '../utils/loader';
 import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { createOffscreenCanvas } from '../utils/offscreen-canvas';
@@ -25,12 +23,8 @@ const FRAGMENT_SHADER = () => `
 
 export class WebGLCanvasTexture {
 
-  protected readonly loader: PromiseLoader;
-
   protected vertexShader: () => string = VERTEX_SHADER;
   protected fragmentShader: () => string = FRAGMENT_SHADER;
-
-  protected base: HTMLImageElement;
 
   protected canvas: OffscreenCanvas | HTMLCanvasElement;
   protected gl: WebGLRenderingContext;
@@ -45,13 +39,7 @@ export class WebGLCanvasTexture {
 
   private baseLocation: WebGLUniformLocation;
 
-  constructor(private readonly baseUrl: string, rocketConfig: RocketConfig) {
-    this.loader = new PromiseLoader(new MultiImageLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-  }
-
-  async load() {
-    const baseTask = this.loader.load(this.baseUrl);
-    this.base = await baseTask;
+  constructor(protected base?: HTMLImageElement) {
   }
 
   private init() {
@@ -156,5 +144,15 @@ export class WebGLCanvasTexture {
       this.gl.deleteBuffer(this.positionBuffer);
     }
     disposeIfExists(this.texture);
+  }
+
+  protected copy(other: WebGLCanvasTexture) {
+    this.base = other.base.cloneNode(true) as HTMLImageElement;
+  }
+
+  clone(): WebGLCanvasTexture {
+    const t = new WebGLCanvasTexture();
+    t.copy(this);
+    return t;
   }
 }

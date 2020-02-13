@@ -1,17 +1,16 @@
 import { Color, Texture } from 'three';
-import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
 
 export interface TireTexture {
-  load();
-
   setPaint(color: Color);
 
   dispose();
 
   getTexture(): Texture;
+
+  clone();
 }
 
 // language=GLSL
@@ -45,8 +44,6 @@ const FRAGMENT_SHADER = `
 
 export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture {
 
-  private normal: HTMLImageElement;
-
   private paintLocation: WebGLUniformLocation;
   private normalLocation: WebGLUniformLocation;
 
@@ -55,17 +52,9 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
   protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}${this.useN ? 'normal' :
     'base'}.${this.maskChannel}`);
 
-  constructor(baseUrl: string, private normalUrl: string, private paint: Color, rocketConfig: RocketConfig, private maskChannel: string,
+  constructor(base?: HTMLImageElement, private normal?: HTMLImageElement, private paint?: Color, private maskChannel?: string,
               private useN: boolean = false, private invertMask: boolean = false) {
-    super(baseUrl, rocketConfig);
-  }
-
-  async load() {
-    const superTask = super.load();
-    const normalTask = this.loader.load(this.normalUrl);
-
-    this.normal = await normalTask;
-    await superTask;
+    super(base);
   }
 
   protected initWebGL() {
@@ -107,11 +96,26 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
       this.gl.deleteTexture(this.normalTexture);
     }
   }
+
+  protected copy(other: WebGLTireTexture) {
+    super.copy(other);
+    this.normal = other.normal.cloneNode(true) as HTMLImageElement;
+    this.paint = other.paint.clone();
+    this.maskChannel = other.maskChannel;
+    this.useN = other.useN;
+    this.invertMask = other.invertMask;
+  }
+
+  clone(): WebGLTireTexture {
+    const t = new WebGLTireTexture();
+    t.copy(this);
+    return t;
+  }
 }
 
 export class WebGLUnpaintableTireTexture extends WebGLTireTexture {
-  constructor(baseUrl: string, normalUrl: string, rocketConfig: RocketConfig) {
-    super(baseUrl, normalUrl, undefined, rocketConfig, 'a');
+  constructor(base?: HTMLImageElement, normal?: HTMLImageElement) {
+    super(base, normal, undefined, 'a');
   }
 
   setPaint(color: Color) {

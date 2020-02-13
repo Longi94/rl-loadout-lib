@@ -1,8 +1,6 @@
 import { TireTexture } from '../../webgl/tire-texture';
 import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { BASIC_VERT_SHADER } from '../../webgl/include/vertex';
-import { MultiImageLoader, PromiseLoader } from '../../utils/loader';
-import { RocketConfig } from '../../model/rocket-config';
 import { createOffscreenCanvas } from '../../utils/offscreen-canvas';
 import { bindColor, createTextureFromImage, initShaderProgram, setRectangle } from '../../utils/webgl';
 import { disposeIfExists } from '../../utils/util';
@@ -34,10 +32,6 @@ const FRAGMENT_SHADER = () => `
 
 export class ChewyTireTexture implements TireTexture {
 
-  protected readonly loader: PromiseLoader;
-
-  protected normal: HTMLImageElement;
-
   protected canvas: OffscreenCanvas | HTMLCanvasElement;
   protected gl: WebGLRenderingContext;
   protected program: WebGLProgram;
@@ -52,13 +46,7 @@ export class ChewyTireTexture implements TireTexture {
   private paintLocation: WebGLUniformLocation;
   private normalLocation: WebGLUniformLocation;
 
-  constructor(private readonly normalUrl: string, private paint: Color, rocketConfig: RocketConfig, private invertMask: boolean = false) {
-    this.loader = new PromiseLoader(new MultiImageLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-  }
-
-  async load() {
-    const normalTask = this.loader.load(this.normalUrl);
-    this.normal = await normalTask;
+  constructor(private normal?: HTMLImageElement, private paint?: Color, private invertMask: boolean = false) {
   }
 
   private init() {
@@ -163,5 +151,13 @@ export class ChewyTireTexture implements TireTexture {
       this.gl.deleteBuffer(this.positionBuffer);
     }
     disposeIfExists(this.texture);
+  }
+
+  clone(): ChewyTireTexture {
+    const t = new ChewyTireTexture();
+    t.normal = this.normal.cloneNode(true) as HTMLImageElement;
+    t.paint = this.paint;
+    t.invertMask = this.invertMask;
+    return t;
   }
 }

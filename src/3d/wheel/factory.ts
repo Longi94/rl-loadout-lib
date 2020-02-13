@@ -1,9 +1,9 @@
 import { Wheel } from '../../model/wheel';
-import { RocketConfig } from '../../model/rocket-config';
 import { PaintConfig } from '../../model/paint-config';
 import { ProductID } from '../../utils/ids';
 import { SpinnerModel } from './spinner-model';
 import { WheelsModel } from './wheels-model';
+import { WheelAssets } from '../../loader/wheel/wheel-assets';
 
 /**
  * Create a body model object. This handles unique models that need a custom class to handle it.
@@ -12,11 +12,11 @@ import { WheelsModel } from './wheels-model';
  * @param config configuration used for loading assets
  * @return wheel model
  */
-export function createWheelsModel(wheel: Wheel, paints: PaintConfig, config: RocketConfig): WheelsModel {
+export function createWheelsModel(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): WheelsModel {
   switch (wheel.id) {
     case ProductID.WHEEL_SPINNER:
-      return new SpinnerModel(wheel, paints, config);
+      return new SpinnerModel(wheelAssets, wheel, paints);
     default:
-      return new WheelsModel(wheel, paints, config);
+      return new WheelsModel(wheelAssets, wheel, paints);
   }
 }

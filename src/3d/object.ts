@@ -1,39 +1,26 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LinearEncoding, Mesh, MeshStandardMaterial, Object3D, Scene, Texture } from 'three';
-import { PromiseLoader } from '../utils/loader';
+import { ObjectAssets } from '../loader/object-assets';
+import { SkeletonUtils } from '../utils/three/skeleton';
 
 /**
  * Abstract 3D model object, that loads gltf models.
  */
 export abstract class AbstractObject {
 
-  protected loader: PromiseLoader = new PromiseLoader(this.gltfLoader);
-
-  /**
-   * URL of the gltf file.
-   */
-  url: string;
-
   /**
    * THREE scene that contains this object.
    */
   scene: Scene;
 
-  protected constructor(modelUrl: string, private gltfLoader: GLTFLoader) {
-    this.url = modelUrl;
+  protected constructor(assets?: ObjectAssets) {
+    if (assets != undefined) {
+      this.validate(assets.gltf);
+      this.handleScene(assets.gltf.scene);
+    }
   }
 
-  /**
-   * Load the model asynchronously.
-   */
-  async load() {
-    const gltf = await this.loader.load(this.url);
-    this.handleGltf(gltf);
-  }
-
-  protected handleGltf(gltf) {
-    this.validate(gltf);
-    this.scene = gltf.scene;
+  protected handleScene(scene: Scene) {
+    this.scene = scene;
     traverseMaterials(this.scene, material => {
       if (material.map) {
         material.map.encoding = LinearEncoding;
@@ -45,13 +32,13 @@ export abstract class AbstractObject {
         material.needsUpdate = true;
       }
     });
-    gltf.scene.updateMatrixWorld(true);
-    this.handleModel(gltf.scene);
+    scene.updateMatrixWorld(true);
+    this.handleModel(scene);
   }
 
   private validate(gltf) {
     if (!('KHR_draco_mesh_compression' in gltf.parser.extensions)) {
-      console.warn(`${this.url} is not DRACO compressed.`);
+      console.warn(`Model not DRACO compressed.`);
     }
   }
 
@@ -114,6 +101,16 @@ export abstract class AbstractObject {
   visible(visible: boolean) {
     this.scene.visible = visible;
   }
+
+  protected copy(other: AbstractObject) {
+    const scene = SkeletonUtils.clone(other.scene);
+    this.handleScene(scene);
+  }
+
+  /**
+   * Make a deep copy of the object;
+   */
+  abstract clone();
 }
 
 /**

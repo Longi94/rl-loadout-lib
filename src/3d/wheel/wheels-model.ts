@@ -1,17 +1,15 @@
 import { AbstractObject } from '../object';
 import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../../model/wheel';
-import { getAssetUrl } from '../../utils/network';
 import { SkeletonUtils } from '../../utils/three/skeleton';
 import { disposeIfExists } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { PaintConfig } from '../../model/paint-config';
-import { ImageTextureLoader, PromiseLoader } from '../../utils/loader';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH } from '../constants';
-import { RocketConfig } from '../../model/rocket-config';
 import { RimTexture } from '../../webgl/rim-texture';
 import { TireTexture } from '../../webgl/tire-texture';
 import { getRimTexture, getTireTexture } from './texture-factory';
+import { WheelAssets } from '../../loader/wheel/wheel-assets';
 
 class WheelModel {
   model: Object3D;
@@ -24,39 +22,44 @@ class WheelModel {
  */
 export class WheelsModel extends AbstractObject implements Paintable {
 
-  private readonly textureLoader: PromiseLoader;
-
+  config: WheelConfig[];
   wheels: WheelModel[] = [];
+
   rimMaterial: MeshStandardMaterial;
+  tireMaterial: MeshStandardMaterial;
+
   rimSkin: RimTexture;
   tireTexture: TireTexture | Color;
 
-  tireMaterial: MeshStandardMaterial;
-
-  private readonly rimBaseUrl: string;
-  private readonly rimNUrl: string;
-  private readonly tireNUrl: string;
-
   protected roll = 0;
 
-  /**
-   * Create a wheels model object. You should **not** use this unless you know what you are doing. Use {@link createWheelsModel} instead.
-   * @param wheel the wheel
-   * @param paints the paint config to apply the wheel paint
-   * @param rocketConfig configuration used for loading assets
-   */
-  constructor(wheel: Wheel, paints: PaintConfig, rocketConfig: RocketConfig) {
-    super(getAssetUrl(wheel.model, rocketConfig), rocketConfig.gltfLoader);
-    this.textureLoader = new PromiseLoader(new ImageTextureLoader(rocketConfig.textureFormat, rocketConfig.loadingManager));
-    this.rimSkin = getRimTexture(wheel, paints, rocketConfig);
-    if (this.rimSkin == undefined) {
-      this.rimBaseUrl = getAssetUrl(wheel.rim_base, rocketConfig);
+  constructor(assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig) {
+    super(assets);
+    if (assets != undefined) {
+      this.rimSkin = getRimTexture(wheel, assets, paints);
+      this.tireTexture = getTireTexture(wheel, assets, paints);
+
+      if (this.tireTexture != undefined) {
+        if (!(this.tireTexture instanceof Color)) {
+          this.tireMaterial.map = this.tireTexture.getTexture();
+        } else if (this.tireTexture instanceof Color) {
+          this.tireMaterial.color = this.tireTexture;
+        }
+      }
+      if (this.tireMaterial != undefined) {
+        this.tireMaterial.normalMap = new Texture(assets.tireN);
+      }
+
+      if (this.rimMaterial != undefined) {
+        this.rimMaterial.normalMap = new Texture(assets.rimN);
+        if (this.rimSkin) {
+          this.rimMaterial.map = this.rimSkin.getTexture();
+          this.rimMaterial.needsUpdate = true;
+        } else {
+          this.rimMaterial.map = new Texture(assets.rimD);
+        }
+      }
     }
-
-    this.tireTexture = getTireTexture(wheel, paints, rocketConfig);
-
-    this.rimNUrl = getAssetUrl(wheel.rim_n, rocketConfig);
-    this.tireNUrl = getAssetUrl(wheel.tire_n, rocketConfig);
   }
 
   dispose() {
@@ -64,51 +67,6 @@ export class WheelsModel extends AbstractObject implements Paintable {
     disposeIfExists(this.rimMaterial);
     disposeIfExists(this.rimSkin);
     this.wheels = [];
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rimNTask = this.textureLoader.load(this.rimNUrl);
-    const tireNTask = this.textureLoader.load(this.tireNUrl);
-
-    let tireBaseTask: Promise<void>;
-    let rimBaseTask: Promise<Texture>;
-
-    if (this.tireTexture != undefined && !(this.tireTexture instanceof Color)) {
-      tireBaseTask = this.tireTexture.load();
-    }
-
-    if (this.rimSkin != undefined) {
-      await this.rimSkin.load();
-    } else {
-      rimBaseTask = this.textureLoader.load(this.rimBaseUrl);
-    }
-
-    await superTask;
-    if (tireBaseTask != undefined) {
-      await tireBaseTask;
-    }
-
-    if (this.tireTexture != undefined) {
-      if (!(this.tireTexture instanceof Color)) {
-        this.tireMaterial.map = this.tireTexture.getTexture();
-      } else if (this.tireTexture instanceof Color) {
-        this.tireMaterial.color = this.tireTexture;
-      }
-    }
-    if (this.tireMaterial != undefined) {
-      this.tireMaterial.normalMap = await tireNTask;
-    }
-
-    if (this.rimMaterial != undefined) {
-      this.rimMaterial.normalMap = await rimNTask;
-      if (this.rimSkin) {
-        this.rimMaterial.map = this.rimSkin.getTexture();
-        this.rimMaterial.needsUpdate = true;
-      } else {
-        this.rimMaterial.map = await rimBaseTask;
-      }
-    }
   }
 
   handleModel(scene: Scene) {
@@ -129,6 +87,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
    * @param config wheel configuration of the car body
    */
   applyWheelConfig(config: WheelConfig[]) {
+    this.config = config;
     this.wheels = [];
     for (const conf of config) {
       const widthScale = conf.width / BASE_WHEEL_MESH_WIDTH;
@@ -150,7 +109,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
       wheel.scale.set(radiusScale, radiusScale, widthScale);
       wheel.position.copy(position);
 
-      let spinnerJoint: Bone;
+      let spinnerJoint: Bone = undefined;
       wheel.traverse(object => {
         if (object['isBone']) {
           if (object.name === 'spinner_jnt') {
@@ -232,5 +191,23 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (this.rimSkin != undefined) {
       this.rimSkin.animate(t);
     }
+  }
+
+  protected copy(other: WheelsModel) {
+    super.copy(other);
+    if (other.tireTexture != undefined) {
+      this.tireTexture = other.tireTexture.clone();
+    }
+    if (other.rimSkin != undefined) {
+      this.rimSkin = other.rimSkin.clone();
+    }
+    this.applyWheelConfig(other.config);
+    this.roll = other.roll;
+  }
+
+  clone(): WheelsModel {
+    const m = new WheelsModel();
+    m.copy(this);
+    return m;
   }
 }

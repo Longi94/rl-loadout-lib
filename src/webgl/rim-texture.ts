@@ -1,19 +1,22 @@
 import { Color, Texture } from 'three';
-import { RocketConfig } from '../model/rocket-config';
 import { bindColor, createTextureFromImage } from '../utils/webgl';
 import { WebGLCanvasTexture } from './webgl-texture';
 import { COLOR_INCLUDE } from './include/color';
 
 export interface RimTexture {
-  load();
   setPaint(color: Color);
+
   /**
    * Animate the rim texture. This is a no-op function unless overridden.
    * @param t time in milliseconds
    */
   animate(t: number);
+
   dispose();
+
   getTexture(): Texture;
+
+  clone();
 }
 
 // language=GLSL
@@ -47,8 +50,6 @@ const FRAGMENT_SHADER = `
 
 export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
 
-  private rgbaMap: HTMLImageElement;
-
   protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}rgba_map.${this.maskChannel}`);
 
   private paintLocation: WebGLUniformLocation;
@@ -56,16 +57,9 @@ export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(baseUrl, private readonly rgbaMapUrl, protected paint: Color, rocketConfig: RocketConfig, private maskChannel: string, private invertMask: boolean = false) {
-    super(baseUrl, rocketConfig);
-  }
-
-  async load() {
-    const superTask = super.load();
-    const rgbaMapTask = this.loader.load(this.rgbaMapUrl);
-
-    this.rgbaMap = await rgbaMapTask;
-    await superTask;
+  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, protected paint?: Color, private maskChannel?: string,
+              private invertMask = false) {
+    super(base);
   }
 
   protected initWebGL() {
@@ -109,5 +103,16 @@ export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
+  }
+
+  protected copy(other: WebGLRimTexture) {
+    super.copy(other);
+    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
+  }
+
+  clone(): WebGLRimTexture {
+    const t = new WebGLRimTexture();
+    t.copy(this);
+    return t;
   }
 }
