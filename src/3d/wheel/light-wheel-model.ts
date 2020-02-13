@@ -1,7 +1,6 @@
 import { WebGLRimTexture } from '../../webgl/rim-texture';
 import { Color } from 'three';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
-import { WheelAssets } from '../../loader/wheel/wheel-assets';
 
 const ANIM_INTERVAL = 1000.0;
 
@@ -47,8 +46,8 @@ export class LightWheelRimTexture extends WebGLRimTexture {
 
   private animOffsetLocation: WebGLUniformLocation;
 
-  constructor(wheelAssets?: WheelAssets, protected paint?: Color) {
-    super(wheelAssets, paint);
+  constructor(base?: HTMLImageElement, rgbaMap?: HTMLImageElement, protected paint?: Color) {
+    super(base, rgbaMap, paint);
     if (this.paint == undefined) {
       this.paint = new Color(0, 1, 1);
     }

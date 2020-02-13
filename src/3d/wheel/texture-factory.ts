@@ -13,7 +13,7 @@ import { WheelAssets } from '../../loader/wheel/wheel-assets';
 export function getRimTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimTexture {
   switch (wheel.id) {
     case ProductID.WHEEL_LIGHT_WHEEL:
-      return new LightWheelRimTexture(wheelAssets, paints.wheel);
+      return new LightWheelRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel);
     case ProductID.WHEEL_LONE_WOLF:
     case ProductID.WHEEL_EXOTIC:
     case ProductID.WHEEL_7SPOKE:
