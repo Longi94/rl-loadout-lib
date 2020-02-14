@@ -3,7 +3,6 @@ import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 't
 import { BASIC_VERT_SHADER } from '../../webgl/include/vertex';
 import { createOffscreenCanvas } from '../../utils/offscreen-canvas';
 import { bindColor, createTextureFromImage, initShaderProgram, setRectangle } from '../../utils/webgl';
-import { disposeIfExists } from '../../utils/util';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
 
 // language=GLSL
@@ -46,7 +45,8 @@ export class ChewyTireTexture implements TireTexture {
   private paintLocation: WebGLUniformLocation;
   private normalLocation: WebGLUniformLocation;
 
-  constructor(private normal?: HTMLImageElement, private paint?: Color, private invertMask: boolean = false) {
+  constructor(private normal?: HTMLImageElement, private paint?: Color, private invertMask: boolean = false,
+              private keepContextAlive = false) {
   }
 
   private init() {
@@ -73,6 +73,10 @@ export class ChewyTireTexture implements TireTexture {
     this.texture.encoding = LinearEncoding;
     this.texture.flipY = false;
     this.update();
+
+    if (!this.keepContextAlive) {
+      this.dispose();
+    }
   }
 
   protected initWebGL() {
@@ -150,7 +154,9 @@ export class ChewyTireTexture implements TireTexture {
       this.gl.deleteBuffer(this.texCoordBuffer);
       this.gl.deleteBuffer(this.positionBuffer);
     }
-    disposeIfExists(this.texture);
+    this.normalTexture = undefined;
+    this.texCoordBuffer = undefined;
+    this.positionBuffer = undefined;
   }
 
   clone(): ChewyTireTexture {

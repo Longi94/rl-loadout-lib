@@ -20,18 +20,23 @@ export class TopperModel extends AbstractObject implements Paintable {
    * @param topper the topper
    * @param topperAssets topper assets
    * @param paints the paint config to apply the topper paint
+   * @param keepContextAlive of true, the webgl contexts for textures are kept alive for fast color updates
    */
-  constructor(topper?: Topper, topperAssets?: TopperAssets, paints?: PaintConfig) {
+  constructor(topper?: Topper, topperAssets?: TopperAssets, paints?: PaintConfig, protected keepContextAlive = false) {
     super(topperAssets);
     if (topperAssets != undefined) {
       if (topperAssets.rgbaMap) {
         this.skin = new TopperTexture(
           topperAssets.diffuse,
           topperAssets.rgbaMap,
-          paints.topper
+          paints.topper,
+          keepContextAlive
         );
         this.material.map = this.skin.getTexture();
         this.material.needsUpdate = true;
+        if (!keepContextAlive) {
+          this.skin = undefined;
+        }
       } else {
         this.material.map = htmlImageToTexture(topperAssets.diffuse);
       }
@@ -54,6 +59,9 @@ export class TopperModel extends AbstractObject implements Paintable {
   }
 
   setPaintColor(color: Color) {
+    if (!this.keepContextAlive) {
+      throw new Error('Topper color not updatable');
+    }
     if (this.skin) {
       this.skin.setPaint(color);
     }
@@ -61,13 +69,11 @@ export class TopperModel extends AbstractObject implements Paintable {
 
   protected copy(other: TopperModel) {
     super.copy(other);
-    if (this.skin != undefined) {
-      this.skin = other.skin.clone();
-    }
   }
 
   clone(): TopperModel {
     const m = new TopperModel();
+    m.keepContextAlive = this.keepContextAlive;
     m.copy(this);
     return m;
   }

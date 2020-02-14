@@ -46,8 +46,8 @@ export class LightWheelRimTexture extends WebGLRimTexture {
 
   private animOffsetLocation: WebGLUniformLocation;
 
-  constructor(base?: HTMLImageElement, rgbaMap?: HTMLImageElement, protected paint?: Color) {
-    super(base, rgbaMap, paint);
+  constructor(base: HTMLImageElement, rgbaMap: HTMLImageElement, protected paint: Color, keepContextAlive = false) {
+    super(base, rgbaMap, paint, undefined, false, keepContextAlive);
     if (this.paint == undefined) {
       this.paint = new Color(0, 1, 1);
     }

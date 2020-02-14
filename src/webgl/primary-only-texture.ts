@@ -14,8 +14,9 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(base?: HTMLImageElement, private bodyBlankSkin?: HTMLImageElement, paints?: PaintConfig, fragmentShader?: () => string) {
-    super(base);
+  constructor(base: HTMLImageElement, private bodyBlankSkin: HTMLImageElement, paints: PaintConfig, fragmentShader: () => string,
+              keepContextAlive = false) {
+    super(base, keepContextAlive);
     this.fragmentShader = fragmentShader;
     this.primary = paints.primary;
   }
@@ -53,6 +54,7 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
+    this.rgbaMapTexture = undefined;
   }
 
   setAccent(color: Color) {
@@ -67,18 +69,5 @@ export class PrimaryOnlyTexture extends WebGLCanvasTexture implements BodyTextur
   setPrimary(color: Color) {
     this.primary = color;
     this.update();
-  }
-
-  protected copy(other: PrimaryOnlyTexture) {
-    super.copy(other);
-    this.primary = other.primary.clone();
-    this.bodyBlankSkin = other.bodyBlankSkin.cloneNode(true) as HTMLImageElement;
-    this.fragmentShader = other.fragmentShader;
-  }
-
-  clone(): PrimaryOnlyTexture {
-    const t = new PrimaryOnlyTexture();
-    t.copy(this);
-    return t;
   }
 }

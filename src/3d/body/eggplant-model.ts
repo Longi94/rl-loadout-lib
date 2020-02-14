@@ -41,7 +41,7 @@ const FRAGMENT_SHADER = () => `
 export class EggplantModel extends BodyModel {
 
   protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
-    return new PrimaryOnlyTexture(bodyAssets.baseSkin, bodyAssets.blankSkin, paints, FRAGMENT_SHADER);
+    return new PrimaryOnlyTexture(bodyAssets.baseSkin, bodyAssets.blankSkin, paints, FRAGMENT_SHADER, this.keepContextAlive);
   }
 
   setPaintColor(color: Color) {

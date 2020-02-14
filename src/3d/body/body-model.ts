@@ -1,4 +1,4 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Texture } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
 import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
@@ -50,9 +50,10 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param bodyAssets body assets
    * @param decalAssets decal assets
    * @param paints paints to be applied to the body
+   * @param keepContextAlive if true, the webgl contexts for textures are kept alive for fast color updates
    */
   constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets,
-              paints?: PaintConfig) {
+              paints?: PaintConfig, protected keepContextAlive = false) {
     super(bodyAssets);
 
     if (bodyAssets != undefined) {
@@ -79,9 +80,9 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
     if (decalAssets.baseTexture != undefined) {
-      return new StaticDecalTexture(decalAssets.baseTexture, decalAssets.rgbaMap, bodyAssets.blankSkin, paints);
+      return new StaticDecalTexture(decalAssets.baseTexture, decalAssets.rgbaMap, bodyAssets.blankSkin, paints, this.keepContextAlive);
     } else {
-      return new StaticDecalTexture(bodyAssets.baseSkin, decalAssets.rgbaMap, bodyAssets.blankSkin, paints);
+      return new StaticDecalTexture(bodyAssets.baseSkin, decalAssets.rgbaMap, bodyAssets.blankSkin, paints, this.keepContextAlive);
     }
   }
 
@@ -253,7 +254,7 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param paints paint config needed for decal colors
    */
   changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
-    this.bodySkin.dispose();
+    this.bodySkin?.dispose();
     this.bodySkin = this.initBodySkin(this.bodyAssets, decalAssets, paints);
     this.applyDecal();
   }
@@ -263,6 +264,9 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setPrimaryColor(color: Color) {
+    if (!this.keepContextAlive) {
+      throw new Error('Body color not updatable');
+    }
     this.bodySkin.setPrimary(color);
   }
 
@@ -271,6 +275,9 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setAccentColor(color: Color) {
+    if (!this.keepContextAlive) {
+      throw new Error('Body color not updatable');
+    }
     this.bodySkin.setAccent(color);
     this.chassisSkin.setAccent(color);
   }
@@ -280,6 +287,9 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setDecalPaintColor(color: Color) {
+    if (!this.keepContextAlive) {
+      throw new Error('Body color not updatable');
+    }
     this.bodySkin.setPaint(color);
   }
 
@@ -301,19 +311,14 @@ export class BodyModel extends AbstractObject implements Paintable {
   protected copy(other: BodyModel) {
     super.copy(other);
     if (other.wheelsModel != undefined) {
-      this.wheelsModel = other.wheelsModel.clone();
-    }
-    if (other.bodySkin != undefined) {
-      this.bodySkin = other.bodySkin.clone();
-    }
-    if (other.chassisSkin != undefined) {
-      this.chassisSkin = other.chassisSkin.clone();
+      this.addWheelsModel(other.wheelsModel.clone());
     }
     this.applyAssets();
   }
 
   clone(): BodyModel {
     const m = new BodyModel();
+    m.keepContextAlive = false;
     m.copy(this);
     return m;
   }

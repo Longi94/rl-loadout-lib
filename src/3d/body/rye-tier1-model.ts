@@ -2,7 +2,7 @@ import { BodyModel } from './body-model';
 import { Body } from '../../model/body';
 import { Decal } from '../../model/decal';
 import { PaintConfig } from '../../model/paint-config';
-import { MeshStandardMaterial, Scene, Texture } from 'three';
+import { MeshStandardMaterial, Scene } from 'three';
 import { traverseMaterials } from '../object';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { RyeTier1Assets } from '../../loader/body/rye-loader';
@@ -16,8 +16,9 @@ export class RyeTier1Model extends BodyModel {
   lightsMaterial: MeshStandardMaterial;
   grillMaterial: MeshStandardMaterial;
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: RyeTier1Assets, decalAssets?: DecalAssets, paints?: PaintConfig) {
-    super(body, decal, bodyAssets, decalAssets, paints);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: RyeTier1Assets, decalAssets?: DecalAssets, paints?: PaintConfig,
+              keepContextAlive = false) {
+    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     this.init();
   }
 

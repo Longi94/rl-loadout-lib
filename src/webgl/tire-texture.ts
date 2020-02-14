@@ -9,8 +9,6 @@ export interface TireTexture {
   dispose();
 
   getTexture(): Texture;
-
-  clone();
 }
 
 // language=GLSL
@@ -52,9 +50,9 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
   protected fragmentShader = () =>
     FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}${this.useN ? 'normal' : 'base'}.${this.maskChannel}`);
 
-  constructor(base?: HTMLImageElement, private normal?: HTMLImageElement, private paint?: Color, private maskChannel?: string,
-              private useN: boolean = false, private invertMask: boolean = false) {
-    super(base);
+  constructor(base: HTMLImageElement, private normal: HTMLImageElement, private paint: Color, private maskChannel: string,
+              private useN: boolean = false, private invertMask: boolean = false, keepContextAlive = false) {
+    super(base, keepContextAlive);
   }
 
   protected initWebGL() {
@@ -85,8 +83,10 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
   }
 
   protected update() {
-    bindColor(this.gl, this.paintLocation, this.paint);
-    super.update();
+    if (this.updatable) {
+      bindColor(this.gl, this.paintLocation, this.paint);
+      super.update();
+    }
   }
 
   dispose() {
@@ -95,27 +95,13 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.normalTexture);
     }
-  }
-
-  protected copy(other: WebGLTireTexture) {
-    super.copy(other);
-    this.normal = other.normal.cloneNode(true) as HTMLImageElement;
-    this.paint = other.paint.clone();
-    this.maskChannel = other.maskChannel;
-    this.useN = other.useN;
-    this.invertMask = other.invertMask;
-  }
-
-  clone(): WebGLTireTexture {
-    const t = new WebGLTireTexture();
-    t.copy(this);
-    return t;
+    this.normalTexture = undefined;
   }
 }
 
 export class WebGLUnpaintableTireTexture extends WebGLTireTexture {
-  constructor(base?: HTMLImageElement, normal?: HTMLImageElement) {
-    super(base, normal, undefined, 'a');
+  constructor(base?: HTMLImageElement, normal?: HTMLImageElement, keepContextAlive = false) {
+    super(base, normal, undefined, 'a', keepContextAlive);
   }
 
   setPaint(color: Color) {

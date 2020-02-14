@@ -1,7 +1,6 @@
 import { Color } from 'three';
 import { COLOR_INCLUDE } from './include/color';
 import { WebGLRimTexture } from './rim-texture';
-import { WheelAssets } from '../loader/wheel/wheel-assets';
 
 // language=GLSL
 const FRAGMENT_SHADER = () => `
@@ -37,7 +36,7 @@ const FRAGMENT_SHADER = () => `
 export class ShadedPaintableTexture extends WebGLRimTexture {
   fragmentShader = FRAGMENT_SHADER;
 
-  constructor(base?: HTMLImageElement, rgbaMap?: HTMLImageElement, protected paint?: Color) {
-    super(base, rgbaMap, paint, undefined, false);
+  constructor(base: HTMLImageElement, rgbaMap: HTMLImageElement, protected paint: Color, keepContextAlive = false) {
+    super(base, rgbaMap, paint, undefined, false, keepContextAlive);
   }
 }

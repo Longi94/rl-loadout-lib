@@ -27,32 +27,33 @@ import { RonAssets } from '../../loader/body/ron-loader';
  * @param bodyAssets body assets
  * @param decalAssets decal assets
  * @param paints paints to be applied to the body
+ * @param keepContextAlive if true, the webgl contexts for textures are kept alive for fast color updates
  * @return body model
  */
 export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets, decalAssets: DecalAssets,
-                                paints: PaintConfig): BodyModel {
+                                paints: PaintConfig, keepContextAlive = false): BodyModel {
   switch (body.id) {
     case ProductID.BODY_MAPLE:
-      return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints);
+      return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_DARK_CAR:
-      return new DarkCarModel(body, decal, bodyAssets, decalAssets, paints);
+      return new DarkCarModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_EGGPLANT:
-      return new EggplantModel(body, decal, bodyAssets, decalAssets, paints);
+      return new EggplantModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_SLIME:
-      return new SlimeModel(body, decal, bodyAssets as SlimeAssets, decalAssets, paints);
+      return new SlimeModel(body, decal, bodyAssets as SlimeAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_BERRY:
-      return new BerryModel(body, decal, bodyAssets, decalAssets, paints);
+      return new BerryModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_FELINE:
-      return new FelineModel(body, decal, bodyAssets, decalAssets, paints);
+      return new FelineModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_GREY_CAR:
-      return new GreyCarModel(body, decal, bodyAssets, decalAssets, paints);
+      return new GreyCarModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_RYE_TIER1:
-      return new RyeTier1Model(body, decal, bodyAssets as RyeTier1Assets, decalAssets, paints);
+      return new RyeTier1Model(body, decal, bodyAssets as RyeTier1Assets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_RYE_TIER2:
-      return new RyeTier2Model(body, decal, bodyAssets as RyeTier2Assets, decalAssets, paints);
+      return new RyeTier2Model(body, decal, bodyAssets as RyeTier2Assets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_RON:
-      return new RonModel(body, decal, bodyAssets as RonAssets, decalAssets, paints);
+      return new RonModel(body, decal, bodyAssets as RonAssets, decalAssets, paints, keepContextAlive);
     default:
-      return new BodyModel(body, decal, bodyAssets, decalAssets, paints);
+      return new BodyModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
   }
 }

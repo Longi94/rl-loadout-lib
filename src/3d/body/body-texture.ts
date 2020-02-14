@@ -38,6 +38,4 @@ export interface BodyTexture {
    * Get the texture object that can be applied to THREE materials.
    */
   getTexture(): Texture;
-
-  clone();
 }

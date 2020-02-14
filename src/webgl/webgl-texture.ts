@@ -1,7 +1,6 @@
 import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
 import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { createOffscreenCanvas } from '../utils/offscreen-canvas';
-import { disposeIfExists } from '../utils/util';
 import { BASIC_VERT_SHADER } from './include/vertex';
 
 // language=GLSL
@@ -39,7 +38,7 @@ export class WebGLCanvasTexture {
 
   private baseLocation: WebGLUniformLocation;
 
-  constructor(protected base?: HTMLImageElement) {
+  constructor(protected base: HTMLImageElement, protected keepContextAlive = false) {
   }
 
   private init() {
@@ -61,6 +60,10 @@ export class WebGLCanvasTexture {
     this.texture.encoding = LinearEncoding;
     this.texture.flipY = false;
     this.update();
+
+    if (!this.keepContextAlive) {
+      this.dispose();
+    }
   }
 
   protected initWebGL() {
@@ -144,16 +147,9 @@ export class WebGLCanvasTexture {
       this.gl.deleteBuffer(this.texCoordBuffer);
       this.gl.deleteBuffer(this.positionBuffer);
     }
-    disposeIfExists(this.texture);
-  }
 
-  protected copy(other: WebGLCanvasTexture) {
-    this.base = other.base.cloneNode(true) as HTMLImageElement;
-  }
-
-  clone(): WebGLCanvasTexture {
-    const t = new WebGLCanvasTexture();
-    t.copy(this);
-    return t;
+    this.baseTexture = undefined;
+    this.texCoordBuffer = undefined;
+    this.positionBuffer = undefined;
   }
 }

@@ -86,9 +86,9 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
   private rgbaMapTexture: WebGLTexture;
   private decalMapTexture: WebGLTexture;
 
-  constructor(base?: HTMLImageElement, private decalRgbaMap?: HTMLImageElement, private bodyBlankSkin?: HTMLImageElement,
-              paints?: PaintConfig) {
-    super(base);
+  constructor(base: HTMLImageElement, private decalRgbaMap: HTMLImageElement, private bodyBlankSkin: HTMLImageElement,
+              paints: PaintConfig, keepContextAlive = false) {
+    super(base, keepContextAlive);
 
     this.primary = paints.primary;
     this.accent = paints.accent;
@@ -172,23 +172,7 @@ export class StaticDecalTexture extends WebGLCanvasTexture implements BodyTextur
       this.gl.deleteTexture(this.rgbaMapTexture);
       this.gl.deleteTexture(this.decalMapTexture);
     }
-  }
-
-  protected copy(other: StaticDecalTexture) {
-    super.copy(other);
-    this.primary = other.primary.clone();
-    this.accent = other.accent.clone();
-    this.paint = other.paint.clone();
-    this.bodyPaint = other.bodyPaint.clone();
-    this.bodyBlankSkin = other.bodyBlankSkin.cloneNode(true) as HTMLImageElement;
-    if (other.decalRgbaMap) {
-      this.decalRgbaMap = other.decalRgbaMap.cloneNode(true) as HTMLImageElement;
-    }
-  }
-
-  clone(): StaticDecalTexture {
-    const t = new StaticDecalTexture();
-    t.copy(this);
-    return t;
+    this.rgbaMapTexture = undefined;
+    this.decalMapTexture = undefined;
   }
 }

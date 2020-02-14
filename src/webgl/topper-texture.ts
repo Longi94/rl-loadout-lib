@@ -41,8 +41,8 @@ export class TopperTexture extends WebGLCanvasTexture {
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, private paint?: Color) {
-    super(base);
+  constructor(base: HTMLImageElement, private rgbaMap: HTMLImageElement, private paint: Color, keepContextAlive = false) {
+    super(base, keepContextAlive);
   }
 
   protected initWebGL() {
@@ -73,8 +73,10 @@ export class TopperTexture extends WebGLCanvasTexture {
   }
 
   protected update() {
-    bindColor(this.gl, this.paintLocation, this.paint);
-    super.update();
+    if (this.updatable) {
+      bindColor(this.gl, this.paintLocation, this.paint);
+      super.update();
+    }
   }
 
   dispose() {
@@ -83,17 +85,6 @@ export class TopperTexture extends WebGLCanvasTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
-  }
-
-  protected copy(other: TopperTexture) {
-    super.copy(other);
-    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
-    this.paint = other.paint.clone();
-  }
-
-  clone(): TopperTexture {
-    const t = new TopperTexture();
-    t.copy(this);
-    return t;
+    this.rgbaMapTexture = undefined;
   }
 }

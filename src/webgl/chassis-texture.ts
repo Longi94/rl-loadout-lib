@@ -56,8 +56,9 @@ export class ChassisTexture extends WebGLCanvasTexture {
 
   private rgbaMapTexture: WebGLTexture;
 
-  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, private readonly paintable?: boolean, paints?: PaintConfig) {
-    super(base);
+  constructor(base: HTMLImageElement, private rgbaMap: HTMLImageElement, private readonly paintable: boolean, paints?: PaintConfig,
+              keepContextAlive = false) {
+    super(base, keepContextAlive);
     this.accent = paints.accent;
     this.paint = paints.body;
   }
@@ -112,19 +113,7 @@ export class ChassisTexture extends WebGLCanvasTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
-  }
-
-  protected copy(other: ChassisTexture) {
-    super.copy(other);
-    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
-    this.accent = other.accent.clone();
-    this.paint = other.paint.clone();
-  }
-
-  clone(): ChassisTexture {
-    const t = new ChassisTexture();
-    t.copy(this);
-    return t;
+    this.rgbaMapTexture = undefined;
   }
 }
 

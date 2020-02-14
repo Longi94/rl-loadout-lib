@@ -1,5 +1,5 @@
 import { AbstractObject } from '../object';
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Texture, Vector3 } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from 'three';
 import { Wheel, WheelConfig } from '../../model/wheel';
 import { SkeletonUtils } from '../../utils/three/skeleton';
 import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
@@ -33,11 +33,12 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   protected roll = 0;
 
-  constructor(protected assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig) {
+  constructor(protected assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig, protected keepContextAlive = false) {
     super(assets);
     if (assets != undefined) {
-      this.rimSkin = getRimTexture(wheel, assets, paints);
-      this.tireTexture = getTireTexture(wheel, assets, paints);
+      this.rimSkin = getRimTexture(wheel, assets, paints, keepContextAlive);
+      this.tireTexture = getTireTexture(wheel, assets, paints, keepContextAlive);
+
     }
     this.init();
   }
@@ -67,6 +68,11 @@ export class WheelsModel extends AbstractObject implements Paintable {
         this.rimMaterial.needsUpdate = true;
       }
     }
+
+    if (!this.keepContextAlive) {
+      this.tireTexture = undefined;
+      this.rimSkin = undefined;
+    }
   }
 
   dispose() {
@@ -94,6 +100,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
    * @param config wheel configuration of the car body
    */
   applyWheelConfig(config: WheelConfig[]) {
+    if (config == undefined) {
+      return;
+    }
     this.config = config;
     this.wheels = [];
     for (const conf of config) {
@@ -152,6 +161,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
   }
 
   setPaintColor(paint: Color) {
+    if (!this.keepContextAlive) {
+      throw new Error('Wheel color not updatable');
+    }
     if (this.rimSkin != undefined) {
       this.rimSkin.setPaint(paint);
     }
@@ -202,12 +214,6 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   protected copy(other: WheelsModel) {
     super.copy(other);
-    if (other.tireTexture != undefined) {
-      this.tireTexture = other.tireTexture.clone();
-    }
-    if (other.rimSkin != undefined) {
-      this.rimSkin = other.rimSkin.clone();
-    }
     this.applyWheelConfig(other.config);
     this.roll = other.roll;
     this.init();

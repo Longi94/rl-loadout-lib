@@ -15,8 +15,6 @@ export interface RimTexture {
   dispose();
 
   getTexture(): Texture;
-
-  clone();
 }
 
 // language=GLSL
@@ -57,9 +55,9 @@ export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
 
   protected fragmentShader = () => FRAGMENT_SHADER.replace('mask', `${this.invertMask ? '1.0 - ' : ''}rgba_map.${this.maskChannel}`);
 
-  constructor(base?: HTMLImageElement, private rgbaMap?: HTMLImageElement, protected paint?: Color, private maskChannel?: string,
-              private invertMask = false) {
-    super(base);
+  constructor(base: HTMLImageElement, private rgbaMap: HTMLImageElement, protected paint: Color, private maskChannel: string,
+              private invertMask = false, keepContextAlive = false) {
+    super(base, keepContextAlive);
   }
 
   protected initWebGL() {
@@ -103,16 +101,6 @@ export class WebGLRimTexture extends WebGLCanvasTexture implements RimTexture {
     if (this.gl != undefined) {
       this.gl.deleteTexture(this.rgbaMapTexture);
     }
-  }
-
-  protected copy(other: WebGLRimTexture) {
-    super.copy(other);
-    this.rgbaMap = other.rgbaMap.cloneNode(true) as HTMLImageElement;
-  }
-
-  clone(): WebGLRimTexture {
-    const t = new WebGLRimTexture();
-    t.copy(this);
-    return t;
+    this.rgbaMapTexture = undefined;
   }
 }
