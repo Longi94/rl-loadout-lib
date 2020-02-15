@@ -1,4 +1,4 @@
-import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh } from 'three';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene, SkinnedMesh, Vector3 } from 'three';
 import { AbstractObject } from '../object';
 import { Body } from '../../model/body';
 import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
@@ -12,12 +12,18 @@ import { WheelConfig } from '../../model/wheel';
 import { WheelsModel } from '../wheel/wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
-import { MAX_WHEEL_YAW } from '../constants';
+import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH, MAX_WHEEL_YAW } from '../constants';
 import { StaticDecalTexture } from '../../webgl/static-decal-texture';
 import { ChassisTexture } from '../../webgl/chassis-texture';
 import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
+import { SkeletonUtils } from '../../utils/three/skeleton';
 
+class WheelModelInternal {
+  model: Object3D;
+  config: WheelConfig;
+  spinnerJoint: Bone;
+}
 
 /**
  * Class that handles loading the 3D model of the car body.
@@ -34,6 +40,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
   wheelConfig: WheelConfig[];
+  wheels: WheelModelInternal[];
   frontPivots: Bone[] = [];
 
   hatSocket: Object3D;
@@ -73,9 +80,11 @@ export class BodyModel extends AbstractObject implements Paintable {
   protected applyAssets() {
     this.applyDecal();
 
-    this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
-    this.chassisMaterial.map = this.chassisSkin.getTexture();
-    this.chassisMaterial.needsUpdate = true;
+    if (this.bodyAssets != undefined) {
+      this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
+      this.chassisMaterial.map = this.chassisSkin.getTexture();
+      this.chassisMaterial.needsUpdate = true;
+    }
   }
 
   protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
@@ -175,19 +184,69 @@ export class BodyModel extends AbstractObject implements Paintable {
    */
   addWheelsModel(wheelsModel: WheelsModel) {
     this.clearWheelsModel();
+
     this.wheelsModel = wheelsModel;
-    this.wheelsModel.applyWheelConfig(this.wheelConfig);
-    this.wheelsModel.addToJoints();
+    this.applyWheelConfig();
+
+    for (const wheel of this.wheels) {
+      wheel.config.joint.add(wheel.model);
+    }
+  }
+
+  private applyWheelConfig() {
+    if (this.wheelConfig == undefined) {
+      return;
+    }
+    const config = this.wheelConfig;
+    this.wheels = [];
+    for (const conf of config) {
+      const widthScale = conf.width / BASE_WHEEL_MESH_WIDTH;
+      const radiusScale = conf.radius / BASE_WHEEL_MESH_RADIUS;
+      const offset = conf.offset;
+
+      const wheel = SkeletonUtils.clone(this.wheelsModel.scene) as Object3D;
+      const position = new Vector3();
+      position.copy(conf.position);
+
+      if (!conf.right) {
+        wheel.rotation.set(-Math.PI / 2, 0, Math.PI);
+        position.add(new Vector3(0, offset, 0));
+      } else {
+        wheel.rotation.set(Math.PI / 2, 0, 0);
+        position.add(new Vector3(0, -offset, 0));
+      }
+
+      wheel.scale.set(radiusScale, radiusScale, widthScale);
+      wheel.position.copy(position);
+
+      let spinnerJoint: Bone;
+      wheel.traverse(object => {
+        if (object['isBone']) {
+          if (object.name === 'spinner_jnt') {
+            spinnerJoint = object as Bone;
+          }
+        }
+      });
+
+      this.wheels.push({
+        model: wheel,
+        config: conf,
+        spinnerJoint
+      });
+    }
   }
 
   /**
    * Remove the wheels from the body.
    */
   clearWheelsModel() {
-    if (this.wheelsModel != undefined) {
-      this.wheelsModel.removeFromJoints();
-      this.wheelsModel = undefined;
+    for (const conf of this.wheelConfig) {
+      for (let i = conf.joint.children.length - 1; i >= 0; i--) {
+        conf.joint.remove(conf.joint.children[i]);
+      }
     }
+    this.wheels = [];
+    this.wheelsModel = undefined;
   }
 
   /**
@@ -308,12 +367,35 @@ export class BodyModel extends AbstractObject implements Paintable {
     }
   }
 
+  /**
+   * Set roll rotation of the wheels.
+   * @param angle roll angle in radians
+   */
+  setWheelRoll(angle: number) {
+    for (const wheel of this.wheels) {
+      if (wheel.config.right) {
+        wheel.model.rotation.z = -angle;
+      } else {
+        wheel.model.rotation.z = Math.PI + angle;
+      }
+
+      if (wheel.spinnerJoint != undefined) {
+        if (wheel.config.right) {
+          wheel.spinnerJoint.rotation.y = angle;
+        } else {
+          wheel.spinnerJoint.rotation.y = -angle;
+        }
+      }
+    }
+  }
+
   protected copy(other: BodyModel) {
     super.copy(other);
+    this.clearWheelsModel();
+    this.bodyAssets = other.bodyAssets;
     if (other.wheelsModel != undefined) {
       this.addWheelsModel(other.wheelsModel.clone());
     }
-    this.applyAssets();
   }
 
   clone(): BodyModel {
