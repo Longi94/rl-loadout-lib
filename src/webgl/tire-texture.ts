@@ -83,10 +83,8 @@ export class WebGLTireTexture extends WebGLCanvasTexture implements TireTexture 
   }
 
   protected update() {
-    if (this.updatable) {
-      bindColor(this.gl, this.paintLocation, this.paint);
-      super.update();
-    }
+    bindColor(this.gl, this.paintLocation, this.paint);
+    super.update();
   }
 
   dispose() {
