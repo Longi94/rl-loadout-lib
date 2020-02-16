@@ -35,7 +35,7 @@ export class BodyModel extends AbstractObject implements Paintable {
   wheelSettings: WheelSettings;
   wheelConfig: WheelConfig[];
   wheels: WheelModelInternal[];
-  frontPivots: Bone[] = [];
+  frontPivots: Bone[];
 
   hatSocket: Object3D;
   antennaSocket: Object3D;
