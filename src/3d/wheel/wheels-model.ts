@@ -1,6 +1,6 @@
 import { AbstractObject } from '../object';
-import { Color, Mesh, MeshStandardMaterial, Scene } from 'three';
-import { Wheel } from '../../model/wheel';
+import { Bone, Color, Mesh, MeshStandardMaterial, Object3D, Scene } from 'three';
+import { Wheel, WheelConfig } from '../../model/wheel';
 import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { PaintConfig } from '../../model/paint-config';
@@ -8,6 +8,12 @@ import { RimTexture } from '../../webgl/rim-texture';
 import { TireTexture } from '../../webgl/tire-texture';
 import { getRimTexture, getTireTexture } from './texture-factory';
 import { WheelAssets } from '../../loader/wheel/wheel-assets';
+
+export class WheelModelInternal {
+  model: Object3D;
+  config: WheelConfig;
+  spinnerJoint: Bone;
+}
 
 /**
  * Class that handles loading the 3D model of the car wheels.
@@ -96,8 +102,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
   /**
    * Animate the wheels. This is a safe no-op if the wheels are not animated.
    * @param t time in milliseconds
+   * @param wheel the thing containing the wheel to animate
+   * @param roll of the wheel
    */
-  animate(t: number) {
+  animate(t: number, wheel: WheelModelInternal, roll: number) {
     if (this.rimSkin != undefined) {
       this.rimSkin.animate(t);
     }

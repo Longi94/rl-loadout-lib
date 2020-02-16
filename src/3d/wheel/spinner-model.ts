@@ -1,4 +1,4 @@
-import { WheelsModel } from './wheels-model';
+import { WheelModelInternal, WheelsModel } from './wheels-model';
 
 const ANIM_INTERVAL = 1000;
 
@@ -7,16 +7,14 @@ const ANIM_INTERVAL = 1000;
  */
 export class SpinnerModel extends WheelsModel {
 
-  animate(t: number) {
+  animate(t: number, wheel: WheelModelInternal, roll: number) {
     const dt = t % ANIM_INTERVAL;
     const angle = 2 * Math.PI * (dt / ANIM_INTERVAL);
 
-    for (const wheel of this.wheels) {
-      if (wheel.config.right) {
-        wheel.spinnerJoint.rotation.y = this.roll - angle;
-      } else {
-        wheel.spinnerJoint.rotation.y = -this.roll + angle;
-      }
+    if (wheel.config.right) {
+      wheel.spinnerJoint.rotation.y = roll - angle;
+    } else {
+      wheel.spinnerJoint.rotation.y = -roll + angle;
     }
   }
 }
