@@ -9,7 +9,7 @@ import { PaintConfig } from '../../model/paint-config';
 import { AxleSettings, WheelSettings } from '../../model/axle-settings';
 import { HitboxConfig } from '../../model/hitbox-config';
 import { WheelConfig } from '../../model/wheel';
-import { WheelsModel } from '../wheel/wheels-model';
+import { WheelModelInternal, WheelsModel } from '../wheel/wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH, MAX_WHEEL_YAW } from '../constants';
@@ -18,12 +18,6 @@ import { ChassisTexture } from '../../webgl/chassis-texture';
 import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { SkeletonUtils } from '../../utils/three/skeleton';
-
-class WheelModelInternal {
-  model: Object3D;
-  config: WheelConfig;
-  spinnerJoint: Bone;
-}
 
 /**
  * Class that handles loading the 3D model of the car body.
@@ -49,6 +43,8 @@ export class BodyModel extends AbstractObject implements Paintable {
   wheelsModel: WheelsModel;
   topperModel: TopperModel;
   antennaModel: AntennaModel;
+
+  wheelRoll = 0;
 
   /**
    * Create a body model object. You should **not** use this unless you know what you are doing. Use {@link createBodyModel} instead.
@@ -372,6 +368,7 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param angle roll angle in radians
    */
   setWheelRoll(angle: number) {
+    this.wheelRoll = angle;
     for (const wheel of this.wheels) {
       if (wheel.config.right) {
         wheel.model.rotation.z = -angle;
@@ -385,6 +382,14 @@ export class BodyModel extends AbstractObject implements Paintable {
         } else {
           wheel.spinnerJoint.rotation.y = -angle;
         }
+      }
+    }
+  }
+
+  animate(time: number) {
+    if (this.wheels != undefined) {
+      for (const wheel of this.wheels) {
+        this.wheelsModel?.animate(time, wheel, this.wheelRoll);
       }
     }
   }
