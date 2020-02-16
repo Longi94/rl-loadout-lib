@@ -30,3 +30,5 @@ export * from './utils/network';
 export * from './loader/body/mapping';
 export * from './loader/wheel/mapping';
 export * from './loader/decal/decal-loader';
+
+export * from './webgl/global-context';
