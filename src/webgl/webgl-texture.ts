@@ -1,7 +1,8 @@
 import { createTextureFromImage, initShaderProgram, setRectangle } from '../utils/webgl';
-import { CanvasTexture, LinearEncoding, RepeatWrapping, Texture } from 'three';
+import { CanvasTexture, DataTexture, LinearEncoding, RepeatWrapping, RGBAFormat, Texture } from 'three';
 import { createOffscreenCanvas } from '../utils/offscreen-canvas';
 import { BASIC_VERT_SHADER } from './include/vertex';
+import { GlobalWebGLContext } from './global-context';
 
 // language=GLSL
 const VERTEX_SHADER = () => BASIC_VERT_SHADER;
@@ -45,25 +46,37 @@ export class WebGLCanvasTexture {
     const width = this.base.width;
     const height = this.base.height;
 
-    this.canvas = createOffscreenCanvas(width, height);
+    if (this.keepContextAlive) {
+      this.canvas = createOffscreenCanvas(width, height);
+      this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
+    } else {
+      this.gl = GlobalWebGLContext.get();
+      this.canvas = GlobalWebGLContext.canvas;
+    }
 
-    this.gl = this.canvas.getContext('webgl', {premultipliedAlpha: false});
     this.program = initShaderProgram(this.gl, this.vertexShader(), this.fragmentShader());
     this.gl.useProgram(this.program);
+    this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
 
     this.initWebGL();
+    this.update();
 
-    // @ts-ignore
-    this.texture = new CanvasTexture(this.canvas);
+    if (this.keepContextAlive) {
+      // @ts-ignore
+      this.texture = new CanvasTexture(this.canvas);
+      this.texture.flipY = false;
+    } else {
+      const pixels = new Uint8Array(this.gl.drawingBufferWidth * this.gl.drawingBufferHeight * 4);
+      this.gl.readPixels(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixels);
+      this.texture = new DataTexture(pixels, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, RGBAFormat);
+      this.texture.flipY = true;
+      this.dispose();
+    }
+
     this.texture.wrapS = RepeatWrapping;
     this.texture.wrapT = RepeatWrapping;
     this.texture.encoding = LinearEncoding;
-    this.texture.flipY = false;
-    this.update();
-
-    if (!this.keepContextAlive) {
-      this.dispose();
-    }
+    this.texture.needsUpdate = true;
   }
 
   protected initWebGL() {
@@ -127,7 +140,9 @@ export class WebGLCanvasTexture {
   protected update() {
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    this.texture.needsUpdate = true;
+    if (this.texture != undefined) {
+      this.texture.needsUpdate = true;
+    }
   }
 
   dispose() {
@@ -146,8 +161,10 @@ export class WebGLCanvasTexture {
       this.gl.deleteTexture(this.baseTexture);
       this.gl.deleteBuffer(this.texCoordBuffer);
       this.gl.deleteBuffer(this.positionBuffer);
+      this.gl.deleteProgram(this.program);
     }
 
+    this.program = undefined;
     this.baseTexture = undefined;
     this.texCoordBuffer = undefined;
     this.positionBuffer = undefined;
