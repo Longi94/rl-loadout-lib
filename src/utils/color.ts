@@ -295,7 +295,7 @@ export const PAINT_GREY = 11;
 export const PAINT_TITANIUM_WHITE = 12;
 export const PAINT_SAFFRON = 13;
 
-export const PAINT_COLORS = Array(14);
+export const PAINT_COLORS = Array<string>(14);
 PAINT_COLORS[PAINT_BLACK] = '#000000';
 PAINT_COLORS[PAINT_TITANIUM_WHITE] = '#ffffff';
 PAINT_COLORS[PAINT_GREY] = '#8f8f8f';

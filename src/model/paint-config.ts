@@ -78,24 +78,24 @@ export function createPaintConfig(
 
   config.accent = new Color(accentColorId != undefined ? ACCENT_COLORS[accentColorId] : ACCENT_COLORS[0]);
 
-  if (bodyPaintId != undefined) {
-    config.body = PAINT_COLORS[bodyPaintId];
+  if (bodyPaintId != undefined && bodyPaintId > 0) {
+    config.body = new Color(PAINT_COLORS[bodyPaintId]);
   }
 
-  if (decalPaintId != undefined) {
-    config.decal = PAINT_COLORS[bodyPaintId];
+  if (decalPaintId != undefined && decalPaintId > 0) {
+    config.decal = new Color(PAINT_COLORS[decalPaintId]);
   }
 
-  if (wheelPaintId != undefined) {
-    config.wheel = PAINT_COLORS[bodyPaintId];
+  if (wheelPaintId != undefined && wheelPaintId > 0) {
+    config.wheel = new Color(PAINT_COLORS[wheelPaintId]);
   }
 
-  if (topperPaintId != undefined) {
-    config.topper = PAINT_COLORS[bodyPaintId];
+  if (topperPaintId != undefined && topperPaintId > 0) {
+    config.topper = new Color(PAINT_COLORS[topperPaintId]);
   }
 
-  if (antennaPaintId != undefined) {
-    config.antenna = PAINT_COLORS[bodyPaintId];
+  if (antennaPaintId != undefined && antennaPaintId > 0) {
+    config.antenna = new Color(PAINT_COLORS[antennaPaintId]);
   }
 
   return config;
