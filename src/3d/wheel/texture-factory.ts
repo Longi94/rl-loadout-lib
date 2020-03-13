@@ -7,6 +7,7 @@ import { WheelAssets } from '../../loader/wheel/wheel-assets';
 import { RimMaterial } from '../../webgl/rim-material';
 import { TireMaterial } from '../../webgl/tire-material';
 import { LightWheelRimMaterial } from './light-wheel-model';
+import { ChewyTireMaterial } from './chewy-model';
 
 export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimMaterial {
   let material: RimMaterial;
@@ -92,9 +93,11 @@ export function getTireMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: 
       material = new TireMaterial('r', true, false);
       break;
     case ProductID.WHEEL_CHEWY:
-    //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, true, keepContextAlive);
+      material = new ChewyTireMaterial(true);
+      break;
     case ProductID.WHEEL_ENSPIER:
-    //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, false, keepContextAlive);
+      material = new ChewyTireMaterial(false);
+      break;
     case ProductID.WHEEL_SHURIKEN:
     //return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
     default:

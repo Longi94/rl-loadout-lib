@@ -1,4 +1,3 @@
-import { COLOR_INCLUDE } from '../../webgl/include/color';
 import { RimMaterial } from '../../webgl/rim-material';
 
 const ANIM_INTERVAL = 1000.0;
