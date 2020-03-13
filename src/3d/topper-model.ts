@@ -1,19 +1,19 @@
 import { AbstractObject } from './object';
-import { Color, Mesh, MeshStandardMaterial, Scene, Texture } from 'three';
+import { Color, Mesh, Scene } from 'three';
 import { Topper } from '../model/topper';
 import { disposeIfExists, htmlImageToTexture } from '../utils/util';
 import { Paintable } from './paintable';
 import { PaintConfig } from '../model/paint-config';
-import { TopperTexture } from '../webgl/topper-texture';
 import { TopperAssets } from '../loader/topper/topper-assets';
+import { TopperMaterial } from '../webgl/topper-material';
 
 /**
  * Class that handles loading the 3D model of the car topper.
  */
 export class TopperModel extends AbstractObject implements Paintable {
 
-  material: MeshStandardMaterial;
-  skin: TopperTexture;
+  mesh: Mesh;
+  material: TopperMaterial;
 
   /**
    * Create an topper object.
@@ -25,45 +25,31 @@ export class TopperModel extends AbstractObject implements Paintable {
   constructor(topper?: Topper, topperAssets?: TopperAssets, paints?: PaintConfig, protected keepContextAlive = false) {
     super(topperAssets);
     if (topperAssets != undefined) {
-      if (topperAssets.rgbaMap) {
-        this.skin = new TopperTexture(
-          topperAssets.diffuse,
-          topperAssets.rgbaMap,
-          paints.topper,
-          keepContextAlive
-        );
-        this.material.map = this.skin.getTexture();
-        this.material.needsUpdate = true;
-        if (!keepContextAlive) {
-          this.skin = undefined;
-        }
-      } else {
-        this.material.map = htmlImageToTexture(topperAssets.diffuse);
-      }
+      this.material = new TopperMaterial();
       this.material.normalMap = htmlImageToTexture(topperAssets.normalMap);
+      this.material.map = htmlImageToTexture(topperAssets.diffuse);
+      this.material.rgbaMap = htmlImageToTexture(topperAssets.rgbaMap);
+      this.material.needsUpdate = true;
+      this.mesh.material = this.material;
     }
   }
 
   dispose() {
     super.dispose();
     disposeIfExists(this.material);
-    disposeIfExists(this.skin);
   }
 
   handleModel(scene: Scene) {
     scene.traverse(object => {
       if (object['isMesh']) {
-        this.material = (object as Mesh).material as MeshStandardMaterial;
+        this.mesh = object as Mesh;
       }
     });
   }
 
   setPaintColor(color: Color) {
-    if (!this.keepContextAlive) {
-      throw new Error('Topper color not updatable');
-    }
-    if (this.skin) {
-      this.skin.setPaint(color);
+    if (this.material != undefined) {
+      this.material.paintColor = color;
     }
   }
 
