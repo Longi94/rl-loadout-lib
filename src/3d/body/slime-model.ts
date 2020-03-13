@@ -2,7 +2,6 @@ import { BodyModel } from './body-model';
 import { Color, MeshStandardMaterial, Scene, Texture } from 'three';
 import { Decal } from '../../model/decal';
 import { COLOR_MAPLE_ORANGE } from '../../utils/color';
-import { BodyTexture } from './body-texture';
 import { traverseMaterials } from '../object';
 import { PaintConfig } from '../../model/paint-config';
 import { Body } from '../../model/body';
@@ -40,10 +39,6 @@ export class SlimeModel extends BodyModel {
   protected applyAssets() {
     this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
     this.chassisMaterial.normalMap.needsUpdate = true;
-  }
-
-  protected initBodySkin(bodyAssets: SlimeAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
-    return undefined;
   }
 
   dispose() {

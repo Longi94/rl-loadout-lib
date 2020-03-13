@@ -2,7 +2,7 @@ import { BodyModel } from './body-model';
 import { Body } from '../../model/body';
 import { Decal } from '../../model/decal';
 import { PaintConfig } from '../../model/paint-config';
-import { MeshStandardMaterial, Scene, Texture } from 'three';
+import { MeshStandardMaterial, Scene } from 'three';
 import { traverseMaterials } from '../object';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { RonAssets } from '../../loader/body/ron-loader';

@@ -1,11 +1,7 @@
 import { BodyModel } from './body-model';
-import { Decal } from '../../model/decal';
-import { BodyTexture } from './body-texture';
 import { Color } from 'three';
 import { PaintConfig } from '../../model/paint-config';
-import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
-import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 
 // language=GLSL
@@ -47,9 +43,6 @@ const FRAGMENT_SHADER = () => `
  * Class for the 3D model of K.I.T.T. Needed because of custom coloring.
  */
 export class FelineModel extends BodyModel {
-  protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
-    return new PrimaryOnlyTexture(bodyAssets.baseSkin, bodyAssets.blankSkin, paints, FRAGMENT_SHADER, this.keepContextAlive);
-  }
 
   setPaintColor(color: Color) {
   }

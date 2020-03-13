@@ -4,7 +4,6 @@ import { Body } from '../../model/body';
 import { disposeIfExists, htmlImageToTexture } from '../../utils/util';
 import { Paintable } from '../paintable';
 import { Decal } from '../../model/decal';
-import { BodyTexture } from './body-texture';
 import { PaintConfig } from '../../model/paint-config';
 import { AxleSettings, WheelSettings } from '../../model/axle-settings';
 import { HitboxConfig } from '../../model/hitbox-config';
@@ -13,7 +12,6 @@ import { WheelModelInternal, WheelsModel } from '../wheel/wheels-model';
 import { TopperModel } from '../topper-model';
 import { AntennaModel } from '../antenna-model';
 import { BASE_WHEEL_MESH_RADIUS, BASE_WHEEL_MESH_WIDTH, MAX_WHEEL_YAW } from '../constants';
-import { StaticDecalTexture } from '../../webgl/static-decal-texture';
 import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { SkeletonUtils } from '../../utils/three/skeleton';
@@ -83,14 +81,6 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.bodyMaterial.paintColor = paints.decal;
     this.bodyMaterial.bodyPaintColor = paints.body;
     this.bodyMaterial.needsUpdate = true;
-  }
-
-  protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
-    if (decalAssets.baseTexture != undefined) {
-      return new StaticDecalTexture(decalAssets.baseTexture, decalAssets.rgbaMap, bodyAssets.blankSkin, paints, this.keepContextAlive);
-    } else {
-      return new StaticDecalTexture(bodyAssets.baseSkin, decalAssets.rgbaMap, bodyAssets.blankSkin, paints, this.keepContextAlive);
-    }
   }
 
   dispose() {

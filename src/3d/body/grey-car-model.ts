@@ -1,10 +1,8 @@
 import { BodyModel } from './body-model';
 import { Color } from 'three';
 import { Decal } from '../../model/decal';
-import { BodyTexture } from './body-texture';
 import { Body } from '../../model/body';
 import { PaintConfig } from '../../model/paint-config';
-import { PrimaryOnlyTexture } from '../../webgl/primary-only-texture';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
 import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
@@ -50,10 +48,6 @@ export class GreyCarModel extends BodyModel {
               keepContextAlive = false) {
     super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     this.setPrimaryColor(this.bodyMaterial.primaryColor);
-  }
-
-  protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
-    return new PrimaryOnlyTexture(bodyAssets.baseSkin, bodyAssets.blankSkin, paints, FRAGMENT_SHADER, this.keepContextAlive);
   }
 
   setPaintColor(color: Color) {
