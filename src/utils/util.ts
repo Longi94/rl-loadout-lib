@@ -15,6 +15,9 @@ export const StringUtil = {
 };
 
 export function htmlImageToTexture(image: HTMLImageElement) {
+  if (image == undefined) {
+    return undefined;
+  }
   const t = new Texture(image);
   t.wrapS = RepeatWrapping;
   t.wrapT = RepeatWrapping;

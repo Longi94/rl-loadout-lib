@@ -65,7 +65,6 @@ const FRAGMENT_SHADER = `
 
   ` + COLOR_INCLUDE + `
 
-  uniform sampler2D baseMap;
   uniform sampler2D rgbaMap;
 
   uniform vec3 accentColor;
@@ -81,7 +80,7 @@ const FRAGMENT_SHADER = `
     #include <logdepthbuf_fragment>
 
     // Get color from base map
-    vec4 texelColor = texture2D(baseMap, vUv);
+    vec4 texelColor = texture2D(map, vUv);
 
     // get color from rgba map
     vec4 rgbaMapColor = texture2D(rgbaMap, vUv);
@@ -154,7 +153,6 @@ export class ChassisMaterial extends ShaderMaterial {
           roughness: {value: 0.5},
           metalness: {value: 0},
           envMapIntensity: {value: 1}, // temporary
-          baseMap: {value: null},
           rgbaMap: {value: null},
           accentColor: {value: new Color()},
           paintColor: {value: new Color()},
@@ -165,13 +163,13 @@ export class ChassisMaterial extends ShaderMaterial {
     });
   }
 
-  get baseMap(): Texture {
-    return this.uniforms.baseMap.value;
+  get map(): Texture {
+    return this.uniforms.map.value;
   }
 
-  set baseMap(baseMap: Texture) {
-    this.uniforms.baseMap.value = baseMap;
-    this.uniforms.hasAlpha.value = hasAlpha(baseMap.image) ? 1 : 0;
+  set map(map: Texture) {
+    this.uniforms.map.value = map;
+    this.uniforms.hasAlpha.value = hasAlpha(map.image) ? 1 : 0;
   }
 
   get rgbaMap(): Texture {

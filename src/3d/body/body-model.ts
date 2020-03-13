@@ -60,24 +60,28 @@ export class BodyModel extends AbstractObject implements Paintable {
   }
 
   protected applyAssets(paints: PaintConfig, decalAssets: DecalAssets) {
-    this.chassisMaterial.baseMap = htmlImageToTexture(this.bodyAssets.chassisD);
+    this.chassisMaterial.map = htmlImageToTexture(this.bodyAssets.chassisD);
     this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
     this.chassisMaterial.rgbaMap = htmlImageToTexture(this.bodyAssets.chassisN);
     this.chassisMaterial.paintable = this.body.chassis_paintable;
     this.chassisMaterial.accentColor = paints.accent;
     this.chassisMaterial.paintColor = paints.body;
     this.chassisMaterial.needsUpdate = true;
-    //this.applyDecalAssets(paints, decalAssets);
+    this.applyDecalAssets(paints, decalAssets);
   }
 
   protected applyDecalAssets(paints: PaintConfig, decalAssets: DecalAssets) {
     if (decalAssets.baseTexture) {
-      this.bodyMaterial.baseMap = htmlImageToTexture(decalAssets.baseTexture);
+      this.bodyMaterial.map = htmlImageToTexture(decalAssets.baseTexture);
     } else {
-      this.bodyMaterial.baseMap = htmlImageToTexture(this.bodyAssets.baseSkin);
+      this.bodyMaterial.map = htmlImageToTexture(this.bodyAssets.baseSkin);
     }
     this.bodyMaterial.rgbaMap = htmlImageToTexture(this.bodyAssets.blankSkin);
     this.bodyMaterial.decalMap = htmlImageToTexture(decalAssets.rgbaMap);
+    this.bodyMaterial.primaryColor = paints.primary;
+    this.bodyMaterial.accentColor = paints.accent;
+    this.bodyMaterial.paintColor = paints.decal;
+    this.bodyMaterial.bodyPaintColor = paints.body;
     this.bodyMaterial.needsUpdate = true;
   }
 
@@ -122,7 +126,7 @@ export class BodyModel extends AbstractObject implements Paintable {
         const matName = mat.name.toLowerCase();
         if (matName.includes('body')) {
           this.bodyMaterial = new StaticDecalMaterial();
-          //(object as SkinnedMesh).material = this.bodyMaterial;
+          (object as SkinnedMesh).material = this.bodyMaterial;
         } else if (matName.includes('chassis')) {
           const mesh = object as SkinnedMesh;
           this.chassisMaterial = new ChassisMaterial();

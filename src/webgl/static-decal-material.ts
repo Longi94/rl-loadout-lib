@@ -64,7 +64,6 @@ const FRAGMENT_SHADER = `
 
   ` + COLOR_INCLUDE + `
 
-  uniform sampler2D baseMap;
   uniform sampler2D rgbaMap;
   uniform sampler2D decalMap;
 
@@ -84,7 +83,7 @@ const FRAGMENT_SHADER = `
     #include <logdepthbuf_fragment>
 
     // Get color from base map
-    vec4 texelColor = texture2D(baseMap, vUv);
+    vec4 texelColor = texture2D(map, vUv);
     vec4 rgbaMapColor = texture2D(rgbaMap, vUv);
     vec4 decalMapColor = texture2D(decalMap, vUv);
 
@@ -173,9 +172,8 @@ export class StaticDecalMaterial extends ShaderMaterial {
         {
           emissive: {value: new Color(0x000000)},
           roughness: {value: 0.5},
-          metalness: {value: 0.5},
+          metalness: {value: 0},
           envMapIntensity: {value: 1}, // temporary
-          baseMap: {value: null},
           rgbaMap: {value: null},
           decalMap: {value: null},
           primaryColor: {value: new Color()},
@@ -190,12 +188,12 @@ export class StaticDecalMaterial extends ShaderMaterial {
     });
   }
 
-  get baseMap(): Texture {
-    return this.uniforms.baseMap.value;
+  get map(): Texture {
+    return this.uniforms.map.value;
   }
 
-  set baseMap(baseMap: Texture) {
-    this.uniforms.baseMap.value = baseMap;
+  set map(map: Texture) {
+    this.uniforms.map.value = map;
   }
 
   get rgbaMap(): Texture {
