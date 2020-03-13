@@ -1,14 +1,13 @@
 import { PaintConfig } from '../../model/paint-config';
 import { Wheel } from '../../model/wheel';
 import { htmlImageToTexture, StringUtil } from '../../utils/util';
-import { LightWheelRimTexture } from './light-wheel-model';
 import { TireTexture, WebGLTireTexture, WebGLUnpaintableTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
-import { ShadedPaintableTexture } from '../../webgl/shaded-paintable-texture';
 import { ChewyTireTexture } from './chewy-model';
 import { WheelAssets } from '../../loader/wheel/wheel-assets';
 import { RimMaterial } from '../../webgl/rim-material';
+import { TireMaterial } from '../../webgl/tire-material';
 
 export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimMaterial {
   let material: RimMaterial;
@@ -62,7 +61,8 @@ export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: P
   return material;
 }
 
-export function getTireTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig, keepContextAlive = false): TireTexture | Color {
+export function getTireMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): TireMaterial {
+  let material: TireMaterial;
   switch (wheel.id) {
     case ProductID.WHEEL_EXOTIC:
     case ProductID.WHEEL_7SPOKE:
@@ -73,10 +73,14 @@ export function getTireTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: P
     case ProductID.WHEEL_REAPER:
     case ProductID.WHEEL_ZTEIGHTEEN:
     case ProductID.WHEEL_INN:
-      return new WebGLTireTexture(wheelAssets.tireD, wheelAssets.tireN, paints.wheel, 'r', true, true, keepContextAlive);
+      material = new TireMaterial('r', true, true);
+      break;
     case ProductID.WHEEL_SEASTAR:
     case ProductID.WHEEL_OBSCURE:
-      return new Color('#141414');
+      material = new TireMaterial('a');
+      material.colorOnly = true;
+      material.color = new Color('#141414');
+      break;
     case ProductID.WHEEL_PEPPERMINT:
     case ProductID.WHEEL_LEAN:
     case ProductID.WHEEL_TREBLE_MEGA:
@@ -84,17 +88,27 @@ export function getTireTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: P
     case ProductID.WHEEL_BLENDER:
     case ProductID.WHEEL_GS:
     case ProductID.WHEEL_FR01:
-      return new WebGLTireTexture(wheelAssets.tireD, wheelAssets.tireN, paints.wheel, 'r', true, false, keepContextAlive);
+      material = new TireMaterial('r', true, false);
+      break;
     case ProductID.WHEEL_CHEWY:
-      return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, true, keepContextAlive);
+      //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, true, keepContextAlive);
     case ProductID.WHEEL_ENSPIER:
-      return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, false, keepContextAlive);
+      //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, false, keepContextAlive);
     case ProductID.WHEEL_SHURIKEN:
-      return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
+      //return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
-        return new WebGLTireTexture(wheelAssets.tireD, wheelAssets.tireN, paints.wheel, 'a', false, true, keepContextAlive);
+        material = new TireMaterial('a', false, true);
       }
-      return undefined;
+      break;
   }
+
+  if (material != undefined) {
+    material.normalMap = htmlImageToTexture(wheelAssets.tireN);
+    material.map = htmlImageToTexture(wheelAssets.tireD);
+    material.paintColor = paints.wheel;
+    material.needsUpdate = true;
+  }
+
+  return material;
 }

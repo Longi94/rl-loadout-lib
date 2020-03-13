@@ -1,4 +1,3 @@
-import { WebGLRimTexture } from '../../webgl/rim-texture';
 import { Color } from 'three';
 import { COLOR_INCLUDE } from '../../webgl/include/color';
 
@@ -41,34 +40,34 @@ const FRAGMENT_SHADER = () => `
 /**
  * Animated rim texture for Photon wheels.
  */
-export class LightWheelRimTexture extends WebGLRimTexture {
-  fragmentShader = FRAGMENT_SHADER;
-
-  private animOffsetLocation: WebGLUniformLocation;
-
-  constructor(base: HTMLImageElement, rgbaMap: HTMLImageElement, protected paint: Color, keepContextAlive = false) {
-    super(base, rgbaMap, paint, undefined, false, keepContextAlive);
-    if (this.paint == undefined) {
-      this.paint = new Color(0, 1, 1);
-    }
-  }
-
-  protected initWebGL() {
-    this.animOffsetLocation = this.gl.getUniformLocation(this.program, 'u_anim_offset');
-    super.initWebGL();
-  }
-
-  animate(t: number) {
-    if (this.gl != undefined) {
-      this.gl.uniform1f(this.animOffsetLocation, (t % ANIM_INTERVAL) / ANIM_INTERVAL);
-      this.update();
-    }
-  }
-
-  setPaint(color: Color) {
-    if (color == undefined) {
-      color = new Color(0, 1, 1);
-    }
-    super.setPaint(color);
-  }
-}
+// export class LightWheelRimTexture extends WebGLRimTexture {
+//   fragmentShader = FRAGMENT_SHADER;
+//
+//   private animOffsetLocation: WebGLUniformLocation;
+//
+//   constructor(base: HTMLImageElement, rgbaMap: HTMLImageElement, protected paint: Color, keepContextAlive = false) {
+//     super(base, rgbaMap, paint, undefined, false, keepContextAlive);
+//     if (this.paint == undefined) {
+//       this.paint = new Color(0, 1, 1);
+//     }
+//   }
+//
+//   protected initWebGL() {
+//     this.animOffsetLocation = this.gl.getUniformLocation(this.program, 'u_anim_offset');
+//     super.initWebGL();
+//   }
+//
+//   animate(t: number) {
+//     if (this.gl != undefined) {
+//       this.gl.uniform1f(this.animOffsetLocation, (t % ANIM_INTERVAL) / ANIM_INTERVAL);
+//       this.update();
+//     }
+//   }
+//
+//   setPaint(color: Color) {
+//     if (color == undefined) {
+//       color = new Color(0, 1, 1);
+//     }
+//     super.setPaint(color);
+//   }
+// }
