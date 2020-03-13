@@ -31,7 +31,7 @@ export class SlimeModel extends BodyModel {
     this.chassisDataOrange = htmlImageToTexture(bodyAssets.chassisOrange);
     this.chassisDataBlue = htmlImageToTexture(bodyAssets.chassisBlue);
 
-    this.bodyMaterial.map = this.bodyDataBlue;
+    this.bodyMaterial.baseMap = this.bodyDataBlue;
     this.chassisMaterial.baseMap = this.chassisDataBlue;
     this.lensMaterial.color.setRGB(0, 0, 0.8);
     this.applyTextures();
@@ -73,16 +73,16 @@ export class SlimeModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
+  changeDecal(decalAssets: DecalAssets, paints: PaintConfig) {
   }
 
   setPrimaryColor(color: Color) {
     if (`#${color.getHexString()}` === COLOR_MAPLE_ORANGE) {
-      this.bodyMaterial.map = this.bodyDataOrange;
+      this.bodyMaterial.baseMap = this.bodyDataOrange;
       this.chassisMaterial.baseMap = this.chassisDataOrange;
       this.lensMaterial.color.setRGB(0.8, 0, 0);
     } else {
-      this.bodyMaterial.map = this.bodyDataBlue;
+      this.bodyMaterial.baseMap = this.bodyDataBlue;
       this.chassisMaterial.baseMap = this.chassisDataBlue;
       this.lensMaterial.color.setRGB(0, 0, 0.8);
     }

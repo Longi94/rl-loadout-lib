@@ -66,10 +66,15 @@ const FRAGMENT_SHADER = `
 
   uniform sampler2D baseMap;
   uniform sampler2D rgbaMap;
+  uniform sampler2D decalMap;
 
+  uniform vec3 primaryColor;
   uniform vec3 accentColor;
   uniform vec3 paintColor;
+  uniform vec3 bodyPaintColor;
+  uniform int bodyPainted;
   uniform int painted;
+  uniform int isBlank;
 
   void main() {
     #include <clipping_planes_fragment>
@@ -80,13 +85,38 @@ const FRAGMENT_SHADER = `
 
     // Get color from base map
     vec4 texelColor = texture2D(baseMap, vUv);
-
-    // get color from rgba map
     vec4 rgbaMapColor = texture2D(rgbaMap, vUv);
+    vec4 decalMapColor = texture2D(decalMap, vUv);
 
-    if (painted == 1) {
-        texelColor.rgb = blendNormal(texelColor.rgb, paintColor.rgb, rgbaMapColor.r);
+    if (bodyPainted == 1) {
+      texelColor.rgb = blendNormal(texelColor.rgb, bodyPaintColor.rgb, 1.0 - rgbaMapColor.r);
     }
+
+    // primary color
+    float primaryMask = rgbaMapColor.r;
+
+    if (isBlank == 0) {
+      primaryMask = decalMapColor.r;
+    }
+
+    if (primaryMask > 0.58823529411) { // red 150
+      texelColor.rgb = blendNormal(texelColor.rgb, primaryColor.rgb, primaryMask);
+    }
+
+    if (isBlank == 0) {
+      // accent color
+      if (primaryMask > 0.58823529411) {
+        texelColor.rgb = blendNormal(texelColor.rgb, accentColor.rgb, decalMapColor.a);
+      }
+
+      // decal paint
+      if (painted == 1) {
+        texelColor.rgb = blendNormal(texelColor.rgb, paintColor.rgb, decalMapColor.g);
+      }
+    }
+
+    // accent color on body
+    texelColor.rgb = blendNormal(texelColor.rgb, accentColor.rgb, rgbaMapColor.g);
 
     texelColor = mapTexelToLinear(texelColor);
     diffuseColor *= texelColor;
@@ -119,7 +149,7 @@ const FRAGMENT_SHADER = `
   }
 `;
 
-export class ChassisMaterial extends ShaderMaterial {
+export class StaticDecalMaterial extends ShaderMaterial {
 
   lights = true;
 
@@ -147,9 +177,14 @@ export class ChassisMaterial extends ShaderMaterial {
           envMapIntensity: {value: 1}, // temporary
           baseMap: {value: null},
           rgbaMap: {value: null},
+          decalMap: {value: null},
+          primaryColor: {value: new Color()},
           accentColor: {value: new Color()},
           paintColor: {value: new Color()},
-          painted: {value: 0}
+          bodyPaintColor: {value: new Color()},
+          painted: {value: 0},
+          isBlank: {value: 0},
+          bodyPainted: {value: 0}
         },
       ]),
     });
@@ -169,6 +204,27 @@ export class ChassisMaterial extends ShaderMaterial {
 
   set rgbaMap(rgbaMap: Texture) {
     this.uniforms.rgbaMap.value = rgbaMap;
+  }
+
+  get decalMap(): Texture {
+    return this.uniforms.decalMap.value;
+  }
+
+  set decalMap(decalMap: Texture) {
+    this.uniforms.decalMap.value = decalMap;
+    this.uniforms.isBlank.value = decalMap != undefined ? 0 : 1;
+  }
+
+  get primaryColor(): Color {
+    return this.uniforms.primaryColor.value;
+  }
+
+  set primaryColor(primaryColor: Color) {
+    if (primaryColor != undefined) {
+      this.uniforms.primaryColor.value.copy(primaryColor);
+    } else {
+      this.uniforms.primaryColor.value.setRGB(0, 0, 0);
+    }
   }
 
   get accentColor(): Color {
@@ -192,7 +248,20 @@ export class ChassisMaterial extends ShaderMaterial {
       this.uniforms.accentColor.value.copy(paintColor);
       this.uniforms.painted.value = 1;
     } else {
-      this.uniforms.painted.value = 0;
+      this.uniforms.painted.value = 0.0;
+    }
+  }
+
+  get bodyPaintColor(): Color {
+    return this.uniforms.bodyPaintColor.value;
+  }
+
+  set bodyPaintColor(bodyPaintColor: Color) {
+    if (bodyPaintColor != undefined) {
+      this.uniforms.bodyPaintColor.value.copy(bodyPaintColor);
+      this.uniforms.bodyPainted.value = 1;
+    } else {
+      this.uniforms.bodyPainted.value = 0;
     }
   }
 

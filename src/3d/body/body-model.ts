@@ -18,6 +18,7 @@ import { BodyAssets } from '../../loader/body/body-assets';
 import { DecalAssets } from '../../loader/decal/decal-assets';
 import { SkeletonUtils } from '../../utils/three/skeleton';
 import { ChassisMaterial } from '../../webgl/chassis-material';
+import { StaticDecalMaterial } from '../../webgl/static-decal-material';
 
 /**
  * Class that handles loading the 3D model of the car body.
@@ -25,10 +26,8 @@ import { ChassisMaterial } from '../../webgl/chassis-material';
 export class BodyModel extends AbstractObject implements Paintable {
 
   skeleton: Bone;
-  bodyMaterial: MeshStandardMaterial;
+  bodyMaterial: StaticDecalMaterial;
   chassisMaterial: ChassisMaterial;
-
-  bodySkin: BodyTexture;
 
   hitboxConfig: HitboxConfig;
   wheelSettings: WheelSettings;
@@ -57,22 +56,27 @@ export class BodyModel extends AbstractObject implements Paintable {
   constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets,
               paints?: PaintConfig, protected keepContextAlive = false) {
     super(bodyAssets);
-
-    if (bodyAssets != undefined) {
-      this.bodySkin = this.initBodySkin(bodyAssets, decalAssets, paints);
-    }
-
-    this.applyAssets(paints);
+    this.applyAssets(paints, decalAssets);
   }
 
-  protected applyAssets(paints: PaintConfig) {
+  protected applyAssets(paints: PaintConfig, decalAssets: DecalAssets) {
     this.chassisMaterial.baseMap = htmlImageToTexture(this.bodyAssets.chassisD);
     this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
     this.chassisMaterial.accentColor = paints.accent;
     this.chassisMaterial.paintColor = paints.body;
     this.chassisMaterial.needsUpdate = true;
+    //this.applyDecalAssets(paints, decalAssets);
+  }
 
-    this.applyDecal();
+  protected applyDecalAssets(paints: PaintConfig, decalAssets: DecalAssets) {
+    if (decalAssets.baseTexture) {
+      this.bodyMaterial.baseMap = htmlImageToTexture(decalAssets.baseTexture);
+    } else {
+      this.bodyMaterial.baseMap = htmlImageToTexture(this.bodyAssets.baseSkin);
+    }
+    this.bodyMaterial.rgbaMap = htmlImageToTexture(this.bodyAssets.blankSkin);
+    this.bodyMaterial.decalMap = htmlImageToTexture(decalAssets.rgbaMap);
+    this.bodyMaterial.needsUpdate = true;
   }
 
   protected initBodySkin(bodyAssets: BodyAssets, decalAssets: DecalAssets, paints: PaintConfig): BodyTexture {
@@ -87,7 +91,6 @@ export class BodyModel extends AbstractObject implements Paintable {
     super.dispose();
     disposeIfExists(this.bodyMaterial);
     disposeIfExists(this.chassisMaterial);
-    disposeIfExists(this.bodySkin);
     this.wheelsModel = undefined;
   }
 
@@ -116,7 +119,8 @@ export class BodyModel extends AbstractObject implements Paintable {
         const mat = (object as Mesh).material as MeshStandardMaterial;
         const matName = mat.name.toLowerCase();
         if (matName.includes('body')) {
-          this.bodyMaterial = mat;
+          this.bodyMaterial = new StaticDecalMaterial();
+          //(object as SkinnedMesh).material = this.bodyMaterial;
         } else if (matName.includes('chassis')) {
           const mesh = object as SkinnedMesh;
           this.chassisMaterial = new ChassisMaterial();
@@ -283,27 +287,19 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color paint color
    */
   setPaintColor(color: Color) {
-    this.bodySkin.setBodyPaint(color);
+    this.bodyMaterial.bodyPaintColor = color;
+    this.bodyMaterial.needsUpdate = true;
     this.chassisMaterial.paintColor = color;
     this.chassisMaterial.needsUpdate = true;
   }
 
-  private applyDecal() {
-    if (this.bodySkin != undefined) {
-      this.bodyMaterial.map = this.bodySkin.getTexture();
-    }
-  }
-
   /**
    * Replace the current decal with a new one.
-   * @param decal new decal
    * @param decalAssets decal assets
    * @param paints paint config needed for decal colors
    */
-  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
-    this.bodySkin?.dispose();
-    this.bodySkin = this.initBodySkin(this.bodyAssets, decalAssets, paints);
-    this.applyDecal();
+  changeDecal(decalAssets: DecalAssets, paints: PaintConfig) {
+    this.applyDecalAssets(paints, decalAssets);
   }
 
   /**
@@ -311,10 +307,8 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setPrimaryColor(color: Color) {
-    if (!this.keepContextAlive) {
-      throw new Error('Body color not updatable');
-    }
-    this.bodySkin.setPrimary(color);
+    this.bodyMaterial.primaryColor = color;
+    this.bodyMaterial.needsUpdate = true;
   }
 
   /**
@@ -322,10 +316,8 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setAccentColor(color: Color) {
-    if (!this.keepContextAlive) {
-      throw new Error('Body color not updatable');
-    }
-    this.bodySkin.setAccent(color);
+    this.bodyMaterial.accentColor = color;
+    this.bodyMaterial.needsUpdate = true;
   }
 
   /**
@@ -333,10 +325,8 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param color THREE Color object
    */
   setDecalPaintColor(color: Color) {
-    if (!this.keepContextAlive) {
-      throw new Error('Body color not updatable');
-    }
-    this.bodySkin.setPaint(color);
+    this.bodyMaterial.paintColor = color;
+    this.bodyMaterial.needsUpdate = true;
   }
 
   /**

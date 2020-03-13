@@ -50,11 +50,11 @@ export class DarkCarModel extends BodyModel {
   setPaintColor(color: Color) {
   }
 
-  changeDecal(decal: Decal, decalAssets: DecalAssets, paints: PaintConfig) {
+  changeDecal(decalAssets: DecalAssets, paints: PaintConfig) {
   }
 
   setPrimaryColor(color: Color) {
-    this.bodySkin.setPrimary(color);
+    //this.bodySkin.setPrimary(color);
   }
 
   setAccentColor(color: Color) {
