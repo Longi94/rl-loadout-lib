@@ -64,6 +64,7 @@ export class BodyModel extends AbstractObject implements Paintable {
     this.chassisMaterial.paintable = this.body.chassis_paintable;
     this.chassisMaterial.accentColor = paints.accent;
     this.chassisMaterial.paintColor = paints.body;
+    this.chassisMaterial.skinning = true;
     this.chassisMaterial.needsUpdate = true;
     this.applyDecalAssets(paints, decalAssets);
   }
