@@ -17,6 +17,7 @@ import { DecalAssets } from '../../loader/decal/decal-assets';
 import { SkeletonUtils } from '../../utils/three/skeleton';
 import { ChassisMaterial } from '../../webgl/chassis-material';
 import { StaticDecalMaterial } from '../../webgl/static-decal-material';
+import { getBodyMaterial } from './material-factory';
 
 /**
  * Class that handles loading the 3D model of the car body.
@@ -24,6 +25,9 @@ import { StaticDecalMaterial } from '../../webgl/static-decal-material';
 export class BodyModel extends AbstractObject implements Paintable {
 
   skeleton: Bone;
+  bodyMesh: Mesh;
+  chassisMesh: Mesh;
+
   bodyMaterial: StaticDecalMaterial;
   chassisMaterial: ChassisMaterial;
 
@@ -54,6 +58,10 @@ export class BodyModel extends AbstractObject implements Paintable {
   constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets,
               paints?: PaintConfig, protected keepContextAlive = false) {
     super(bodyAssets);
+    this.bodyMaterial = getBodyMaterial(body);
+    this.bodyMesh.material = this.bodyMaterial;
+    this.chassisMaterial = new ChassisMaterial();
+    this.chassisMesh.material = this.chassisMaterial;
     this.applyAssets(paints, decalAssets);
   }
 
@@ -116,12 +124,10 @@ export class BodyModel extends AbstractObject implements Paintable {
         const mat = (object as Mesh).material as MeshStandardMaterial;
         const matName = mat.name.toLowerCase();
         if (matName.includes('body')) {
-          this.bodyMaterial = new StaticDecalMaterial();
-          (object as SkinnedMesh).material = this.bodyMaterial;
+          this.bodyMesh = object as Mesh;
         } else if (matName.includes('chassis')) {
           const mesh = object as SkinnedMesh;
-          this.chassisMaterial = new ChassisMaterial();
-          mesh.material = this.chassisMaterial;
+          this.chassisMesh = mesh;
           // @ts-ignore
           this.frontPivots.push(mesh.skeleton.getBoneByName('FL_Pivot_jnt'));
           // @ts-ignore
@@ -305,7 +311,6 @@ export class BodyModel extends AbstractObject implements Paintable {
    */
   setPrimaryColor(color: Color) {
     this.bodyMaterial.primaryColor = color;
-    this.bodyMaterial.needsUpdate = true;
   }
 
   /**
@@ -314,7 +319,6 @@ export class BodyModel extends AbstractObject implements Paintable {
    */
   setAccentColor(color: Color) {
     this.bodyMaterial.accentColor = color;
-    this.bodyMaterial.needsUpdate = true;
   }
 
   /**
@@ -323,7 +327,6 @@ export class BodyModel extends AbstractObject implements Paintable {
    */
   setDecalPaintColor(color: Color) {
     this.bodyMaterial.paintColor = color;
-    this.bodyMaterial.needsUpdate = true;
   }
 
   /**

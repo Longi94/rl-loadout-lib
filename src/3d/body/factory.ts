@@ -4,10 +4,7 @@ import { Body } from '../../model/body';
 import { ProductID } from '../../utils/ids';
 import { PaintConfig } from '../../model/paint-config';
 import { MapleModel } from './maple-model';
-import { DarkCarModel } from './dark-car-model';
-import { EggplantModel } from './eggplant-model';
 import { SlimeModel } from './slime-model';
-import { FelineModel } from './feline-model';
 import { GreyCarModel } from './grey-car-model';
 import { BerryModel } from './berry-model';
 import { RyeTier2Model } from './rye-tier2-model';
@@ -35,16 +32,10 @@ export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets
   switch (body.id) {
     case ProductID.BODY_MAPLE:
       return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints, keepContextAlive);
-    case ProductID.BODY_DARK_CAR:
-      return new DarkCarModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
-    case ProductID.BODY_EGGPLANT:
-      return new EggplantModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_SLIME:
       return new SlimeModel(body, decal, bodyAssets as SlimeAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_BERRY:
       return new BerryModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
-    case ProductID.BODY_FELINE:
-      return new FelineModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_GREY_CAR:
       return new GreyCarModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
     case ProductID.BODY_RYE_TIER1:
