@@ -43,7 +43,6 @@ export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: P
     case ProductID.WHEEL_DONUT:
       material = new ShadedPaintableMaterial();
       break;
-    //return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
     case ProductID.WHEEL_STORMDRAIN:
     case ProductID.WHEEL_ALLSPARK:
       material = new RimMaterial('a', false);

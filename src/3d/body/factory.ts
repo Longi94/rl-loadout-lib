@@ -24,27 +24,26 @@ import { RonAssets } from '../../loader/body/ron-loader';
  * @param bodyAssets body assets
  * @param decalAssets decal assets
  * @param paints paints to be applied to the body
- * @param keepContextAlive if true, the webgl contexts for textures are kept alive for fast color updates
  * @return body model
  */
 export function createBodyModel(body: Body, decal: Decal, bodyAssets: BodyAssets, decalAssets: DecalAssets,
-                                paints: PaintConfig, keepContextAlive = false): BodyModel {
+                                paints: PaintConfig): BodyModel {
   switch (body.id) {
     case ProductID.BODY_MAPLE:
-      return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints, keepContextAlive);
+      return new MapleModel(body, decal, bodyAssets as MapleAssets, decalAssets, paints);
     case ProductID.BODY_SLIME:
-      return new SlimeModel(body, decal, bodyAssets as SlimeAssets, decalAssets, paints, keepContextAlive);
+      return new SlimeModel(body, decal, bodyAssets as SlimeAssets, decalAssets, paints);
     case ProductID.BODY_BERRY:
-      return new BerryModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+      return new BerryModel(body, decal, bodyAssets, decalAssets, paints);
     case ProductID.BODY_GREY_CAR:
-      return new GreyCarModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+      return new GreyCarModel(body, decal, bodyAssets, decalAssets, paints);
     case ProductID.BODY_RYE_TIER1:
-      return new RyeTier1Model(body, decal, bodyAssets as RyeTier1Assets, decalAssets, paints, keepContextAlive);
+      return new RyeTier1Model(body, decal, bodyAssets as RyeTier1Assets, decalAssets, paints);
     case ProductID.BODY_RYE_TIER2:
-      return new RyeTier2Model(body, decal, bodyAssets as RyeTier2Assets, decalAssets, paints, keepContextAlive);
+      return new RyeTier2Model(body, decal, bodyAssets as RyeTier2Assets, decalAssets, paints);
     case ProductID.BODY_RON:
-      return new RonModel(body, decal, bodyAssets as RonAssets, decalAssets, paints, keepContextAlive);
+      return new RonModel(body, decal, bodyAssets as RonAssets, decalAssets, paints);
     default:
-      return new BodyModel(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+      return new BodyModel(body, decal, bodyAssets, decalAssets, paints);
   }
 }

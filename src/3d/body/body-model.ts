@@ -53,10 +53,9 @@ export class BodyModel extends AbstractObject implements Paintable {
    * @param bodyAssets body assets
    * @param decalAssets decal assets
    * @param paints paints to be applied to the body
-   * @param keepContextAlive if true, the webgl contexts for textures are kept alive for fast color updates
    */
   constructor(private readonly body?: Body, decal?: Decal, protected bodyAssets?: BodyAssets, decalAssets?: DecalAssets,
-              paints?: PaintConfig, protected keepContextAlive = false) {
+              paints?: PaintConfig) {
     super(bodyAssets);
     this.bodyMaterial = getBodyMaterial(body);
     this.bodyMesh.material = this.bodyMaterial;
@@ -386,7 +385,6 @@ export class BodyModel extends AbstractObject implements Paintable {
 
   clone(): BodyModel {
     const m = new BodyModel();
-    m.keepContextAlive = false;
     m.copy(this);
     return m;
   }

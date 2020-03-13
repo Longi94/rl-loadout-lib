@@ -18,9 +18,8 @@ export class MapleModel extends BodyModel {
   private chassisDataOrange: Texture;
   private chassisDataBlue: Texture;
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: MapleAssets, decalAssets?: DecalAssets, paints?: PaintConfig,
-              keepContextAlive = false) {
-    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: MapleAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
     this.bodyDataOrange = htmlImageToTexture(bodyAssets.bodyOrange);
     this.bodyDataBlue = htmlImageToTexture(bodyAssets.bodyBlue);
     this.chassisDataOrange = htmlImageToTexture(bodyAssets.chassisOrange);

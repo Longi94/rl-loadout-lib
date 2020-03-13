@@ -17,9 +17,8 @@ export class RonModel extends BodyModel {
   decalsMaterial: MeshStandardMaterial;
   tilingMaterial: MeshStandardMaterial;
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: RonAssets, decalAssets?: DecalAssets, paints?: PaintConfig,
-              keepContextAlive = false) {
-    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: RonAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
     this.init();
   }
 

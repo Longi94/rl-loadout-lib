@@ -15,9 +15,8 @@ export class RyeTier2Model extends RyeTier1Model {
 
   kitMaterial: MeshStandardMaterial;
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: RyeTier2Assets, decalAssets?: DecalAssets, paints?: PaintConfig,
-              keepContextAlive = false) {
-    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: RyeTier2Assets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
     this.init();
   }
 

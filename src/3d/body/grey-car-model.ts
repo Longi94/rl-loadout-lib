@@ -44,9 +44,8 @@ const FRAGMENT_SHADER = () => `
  */
 export class GreyCarModel extends BodyModel {
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: BodyAssets, decalAssets?: DecalAssets, paints?: PaintConfig,
-              keepContextAlive = false) {
-    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: BodyAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
     this.setPrimaryColor(this.bodyMaterial.primaryColor);
   }
 

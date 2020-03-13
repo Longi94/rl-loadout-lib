@@ -10,15 +10,13 @@ import { WheelAssets } from '../../loader/wheel/wheel-assets';
  * @param wheel the wheel
  * @param wheelAssets downloaded models and textures
  * @param paints the paint config to apply the wheel paint
- * @param keepContextAlive if true, the webgl contexts for textures are kept alive for fast color updates
  * @return wheel model
  */
-export function createWheelsModel(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig,
-                                  keepContextAlive = false): WheelsModel {
+export function createWheelsModel(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): WheelsModel {
   switch (wheel.id) {
     case ProductID.WHEEL_SPINNER:
-      return new SpinnerModel(wheelAssets, wheel, paints, keepContextAlive);
+      return new SpinnerModel(wheelAssets, wheel, paints);
     default:
-      return new WheelsModel(wheelAssets, wheel, paints, keepContextAlive);
+      return new WheelsModel(wheelAssets, wheel, paints);
   }
 }

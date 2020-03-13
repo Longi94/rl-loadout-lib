@@ -22,9 +22,8 @@ export class SlimeModel extends BodyModel {
 
   private lensMaterial: MeshStandardMaterial;
 
-  constructor(body?: Body, decal?: Decal, bodyAssets?: SlimeAssets, decalAssets?: DecalAssets, paints?: PaintConfig,
-              keepContextAlive = false) {
-    super(body, decal, bodyAssets, decalAssets, paints, keepContextAlive);
+  constructor(body?: Body, decal?: Decal, bodyAssets?: SlimeAssets, decalAssets?: DecalAssets, paints?: PaintConfig) {
+    super(body, decal, bodyAssets, decalAssets, paints);
     this.bodyDataOrange = htmlImageToTexture(bodyAssets.bodyOrange);
     this.bodyDataBlue = htmlImageToTexture(bodyAssets.bodyBlue);
     this.chassisDataOrange = htmlImageToTexture(bodyAssets.chassisOrange);

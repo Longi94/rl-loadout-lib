@@ -26,7 +26,7 @@ export class WheelsModel extends AbstractObject implements Paintable {
   rimMaterial: RimMaterial;
   tireMaterial: TireMaterial;
 
-  constructor(protected assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig, protected keepContextAlive = false) {
+  constructor(protected assets?: WheelAssets, wheel?: Wheel, paints?: PaintConfig) {
     super(assets);
     if (assets != undefined) {
       this.rimMaterial = getRimMaterial(wheel, assets, paints);
