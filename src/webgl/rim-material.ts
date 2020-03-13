@@ -1,7 +1,7 @@
 import { ExtendedMeshStandardMaterial } from './extended-mesh-standard-material';
 import { Color, Texture } from 'three';
 
-const UNIFORMS = `
+export const UNIFORMS = `
   uniform sampler2D rgbaMap;
   uniform vec3 paintColor;
   uniform int painted;

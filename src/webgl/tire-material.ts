@@ -61,3 +61,17 @@ export class TireMaterial extends ExtendedMeshStandardMaterial {
     this.uniforms.colorOnly.value = colorOnly ? 1 : 0;
   }
 }
+
+export class UnpaintableTireMaterial extends TireMaterial {
+  constructor() {
+    super('a');
+  }
+
+  get paintColor(): Color {
+    return undefined;
+  }
+
+  set paintColor(paintColor: Color) {
+    super.paintColor = undefined;
+  }
+}

@@ -31,8 +31,10 @@ export class WheelsModel extends AbstractObject implements Paintable {
     if (assets != undefined) {
       this.rimMaterial = getRimMaterial(wheel, assets, paints);
       this.rimMesh.material = this.rimMaterial;
-      this.tireMaterial = getTireMaterial(wheel, assets, paints);
-      this.tireMesh.material = this.tireMaterial;
+      if (this.tireMesh != undefined) {
+        this.tireMaterial = getTireMaterial(wheel, assets, paints);
+        this.tireMesh.material = this.tireMaterial;
+      }
     }
   }
 
@@ -56,7 +58,9 @@ export class WheelsModel extends AbstractObject implements Paintable {
 
   setPaintColor(paint: Color) {
     this.rimMaterial.paintColor = paint;
-    this.tireMaterial.paintColor = paint;
+    if (this.tireMaterial != undefined) {
+      this.tireMaterial.paintColor = paint;
+    }
   }
 
   /**

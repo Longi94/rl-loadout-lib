@@ -5,9 +5,10 @@ import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
 import { WheelAssets } from '../../loader/wheel/wheel-assets';
 import { RimMaterial } from '../../webgl/rim-material';
-import { TireMaterial } from '../../webgl/tire-material';
+import { TireMaterial, UnpaintableTireMaterial } from '../../webgl/tire-material';
 import { LightWheelRimMaterial } from './light-wheel-model';
 import { ChewyTireMaterial } from './chewy-model';
+import { ShadedPaintableMaterial } from '../../webgl/shaded-paintable-material';
 
 export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimMaterial {
   let material: RimMaterial;
@@ -40,6 +41,8 @@ export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: P
       material = new RimMaterial('a', true);
       break;
     case ProductID.WHEEL_DONUT:
+      material = new ShadedPaintableMaterial();
+      break;
     //return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
     case ProductID.WHEEL_STORMDRAIN:
     case ProductID.WHEEL_ALLSPARK:
@@ -99,7 +102,8 @@ export function getTireMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: 
       material = new ChewyTireMaterial(false);
       break;
     case ProductID.WHEEL_SHURIKEN:
-    //return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
+      material = new UnpaintableTireMaterial();
+      break;
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
         material = new TireMaterial('a', false, true);
