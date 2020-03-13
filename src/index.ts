@@ -31,5 +31,3 @@ export * from './loader/body/mapping';
 export * from './loader/wheel/mapping';
 export * from './loader/decal/decal-loader';
 export * from './loader/topper/topper-loader';
-
-export * from './webgl/global-context';
