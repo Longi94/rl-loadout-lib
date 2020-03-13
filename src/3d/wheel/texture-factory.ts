@@ -1,7 +1,6 @@
-import { RimTexture, WebGLRimTexture } from '../../webgl/rim-texture';
 import { PaintConfig } from '../../model/paint-config';
 import { Wheel } from '../../model/wheel';
-import { StringUtil } from '../../utils/util';
+import { htmlImageToTexture, StringUtil } from '../../utils/util';
 import { LightWheelRimTexture } from './light-wheel-model';
 import { TireTexture, WebGLTireTexture, WebGLUnpaintableTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
@@ -9,18 +8,21 @@ import { ProductID } from '../../utils/ids';
 import { ShadedPaintableTexture } from '../../webgl/shaded-paintable-texture';
 import { ChewyTireTexture } from './chewy-model';
 import { WheelAssets } from '../../loader/wheel/wheel-assets';
+import { RimMaterial } from '../../webgl/rim-material';
 
-export function getRimTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig, keepContextAlive = false): RimTexture {
+export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimMaterial {
+  let material: RimMaterial;
   switch (wheel.id) {
     case ProductID.WHEEL_LIGHT_WHEEL:
-      return new LightWheelRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
+      //return new LightWheelRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
     case ProductID.WHEEL_LONE_WOLF:
     case ProductID.WHEEL_EXOTIC:
     case ProductID.WHEEL_7SPOKE:
     case ProductID.WHEEL_GLASSY:
     case ProductID.WHEEL_PUMPERNICKEL:
     case ProductID.WHEEL_DAISUKE:
-      return new WebGLRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, 'r', keepContextAlive);
+      material = new RimMaterial('r');
+      break;
     case ProductID.WHEEL_GETSI:
     case ProductID.WHEEL_RAZZLEMADOO:
     case ProductID.WHEEL_FOLLIN:
@@ -35,18 +37,29 @@ export function getRimTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: Pa
     case ProductID.WHEEL_ENSPIER:
     case ProductID.WHEEL_SPECTRAL:
     case ProductID.WHEEL_IGTYJR:
-      return new WebGLRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, 'a', true, keepContextAlive);
+      material =  new RimMaterial('a', true);
+      break;
     case ProductID.WHEEL_DONUT:
-      return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
+      //return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
     case ProductID.WHEEL_STORMDRAIN:
     case ProductID.WHEEL_ALLSPARK:
-      return new WebGLRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, 'a', false, keepContextAlive);
+      material = new RimMaterial('a', false);
+      break;
     default:
       if (!StringUtil.nullOrEmpty(wheel.rim_rgb_map)) {
-        return new WebGLRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, 'r', true, keepContextAlive);
+        material = new RimMaterial('r', true);
       }
-      return undefined;
+      break;
   }
+
+  if (material != undefined) {
+    material.map = htmlImageToTexture(wheelAssets.rimD);
+    material.rgbaMap = htmlImageToTexture(wheelAssets.rimRgba);
+    material.paintColor = paints.wheel;
+    material.needsUpdate = true;
+  }
+
+  return material;
 }
 
 export function getTireTexture(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig, keepContextAlive = false): TireTexture | Color {
