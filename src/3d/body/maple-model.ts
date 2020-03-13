@@ -28,7 +28,7 @@ export class MapleModel extends BodyModel {
     this.chassisDataBlue = htmlImageToTexture(bodyAssets.chassisBlue);
 
     this.bodyMaterial.map = this.bodyDataBlue;
-    this.chassisMaterial.map = this.chassisDataBlue;
+    this.chassisMaterial.baseMap = this.chassisDataBlue;
     this.applyTextures();
   }
 
@@ -63,10 +63,10 @@ export class MapleModel extends BodyModel {
   setPrimaryColor(color: Color) {
     if (`#${color.getHexString()}` === COLOR_MAPLE_ORANGE) {
       this.bodyMaterial.map = this.bodyDataOrange;
-      this.chassisMaterial.map = this.chassisDataOrange;
+      this.chassisMaterial.baseMap = this.chassisDataOrange;
     } else {
       this.bodyMaterial.map = this.bodyDataBlue;
-      this.chassisMaterial.map = this.chassisDataBlue;
+      this.chassisMaterial.baseMap = this.chassisDataBlue;
     }
     this.applyTextures();
   }

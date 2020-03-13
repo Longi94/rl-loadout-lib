@@ -64,7 +64,7 @@ export class GreyCarModel extends BodyModel {
 
   setPrimaryColor(color: Color) {
     this.bodySkin.setPrimary(color);
-    this.chassisSkin.setPaint(color);
+    //this.chassisSkin.setPaint(color);
   }
 
   setAccentColor(color: Color) {

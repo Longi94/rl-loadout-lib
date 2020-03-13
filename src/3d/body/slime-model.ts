@@ -32,7 +32,7 @@ export class SlimeModel extends BodyModel {
     this.chassisDataBlue = htmlImageToTexture(bodyAssets.chassisBlue);
 
     this.bodyMaterial.map = this.bodyDataBlue;
-    this.chassisMaterial.map = this.chassisDataBlue;
+    this.chassisMaterial.baseMap = this.chassisDataBlue;
     this.lensMaterial.color.setRGB(0, 0, 0.8);
     this.applyTextures();
   }
@@ -79,11 +79,11 @@ export class SlimeModel extends BodyModel {
   setPrimaryColor(color: Color) {
     if (`#${color.getHexString()}` === COLOR_MAPLE_ORANGE) {
       this.bodyMaterial.map = this.bodyDataOrange;
-      this.chassisMaterial.map = this.chassisDataOrange;
+      this.chassisMaterial.baseMap = this.chassisDataOrange;
       this.lensMaterial.color.setRGB(0.8, 0, 0);
     } else {
       this.bodyMaterial.map = this.bodyDataBlue;
-      this.chassisMaterial.map = this.chassisDataBlue;
+      this.chassisMaterial.baseMap = this.chassisDataBlue;
       this.lensMaterial.color.setRGB(0, 0, 0.8);
     }
     this.applyTextures();
