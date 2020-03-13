@@ -1,9 +1,10 @@
-import { Color, IUniform, ShaderLib, ShaderMaterial, Texture, UniformsLib, UniformsUtils } from 'three';
+import { Color, IUniform, ShaderLib, ShaderMaterial, TangentSpaceNormalMap, Texture, UniformsLib, UniformsUtils } from 'three';
 import { COLOR_INCLUDE } from './include/color';
 
 export class ExtendedMeshStandardMaterial extends ShaderMaterial {
 
   lights = true;
+  normalMapType = TangentSpaceNormalMap;
 
   constructor(extraUniforms: { [name: string]: IUniform }, uniformsShader: string, diffuseShader: string) {
     super({
