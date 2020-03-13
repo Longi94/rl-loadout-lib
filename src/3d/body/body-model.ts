@@ -62,6 +62,8 @@ export class BodyModel extends AbstractObject implements Paintable {
   protected applyAssets(paints: PaintConfig, decalAssets: DecalAssets) {
     this.chassisMaterial.baseMap = htmlImageToTexture(this.bodyAssets.chassisD);
     this.chassisMaterial.normalMap = htmlImageToTexture(this.bodyAssets.chassisN);
+    this.chassisMaterial.rgbaMap = htmlImageToTexture(this.bodyAssets.chassisN);
+    this.chassisMaterial.paintable = this.body.chassis_paintable;
     this.chassisMaterial.accentColor = paints.accent;
     this.chassisMaterial.paintColor = paints.body;
     this.chassisMaterial.needsUpdate = true;

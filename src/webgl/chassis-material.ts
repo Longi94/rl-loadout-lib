@@ -1,5 +1,6 @@
 import { Color, ShaderLib, ShaderMaterial, Texture, UniformsLib, UniformsUtils } from 'three';
 import { COLOR_INCLUDE } from './include/color';
+import { createOffscreenCanvas } from '../utils/offscreen-canvas';
 
 // language=GLSL
 const FRAGMENT_SHADER = `
@@ -70,6 +71,7 @@ const FRAGMENT_SHADER = `
   uniform vec3 accentColor;
   uniform vec3 paintColor;
   uniform int painted;
+  uniform int hasAlpha;
 
   void main() {
     #include <clipping_planes_fragment>
@@ -85,7 +87,12 @@ const FRAGMENT_SHADER = `
     vec4 rgbaMapColor = texture2D(rgbaMap, vUv);
 
     if (painted == 1) {
-        texelColor.rgb = blendNormal(texelColor.rgb, paintColor.rgb, rgbaMapColor.r);
+      texelColor.rgb = blendNormal(texelColor.rgb, paintColor.rgb, rgbaMapColor.r);
+    }
+
+    // accent color on body
+    if (hasAlpha == 1) {
+      texelColor.rgb = blendNormal(texelColor.rgb, accentColor.rgb, texelColor.a);
     }
 
     texelColor = mapTexelToLinear(texelColor);
@@ -123,6 +130,8 @@ export class ChassisMaterial extends ShaderMaterial {
 
   lights = true;
 
+  paintable = false;
+
   constructor() {
     super({
       vertexShader: ShaderLib.standard.vertexShader,
@@ -143,13 +152,14 @@ export class ChassisMaterial extends ShaderMaterial {
         {
           emissive: {value: new Color(0x000000)},
           roughness: {value: 0.5},
-          metalness: {value: 0.5},
+          metalness: {value: 0},
           envMapIntensity: {value: 1}, // temporary
           baseMap: {value: null},
           rgbaMap: {value: null},
           accentColor: {value: new Color()},
           paintColor: {value: new Color()},
-          painted: {value: 0}
+          painted: {value: 0},
+          hasAlpha: {value: 0},
         },
       ]),
     });
@@ -161,6 +171,7 @@ export class ChassisMaterial extends ShaderMaterial {
 
   set baseMap(baseMap: Texture) {
     this.uniforms.baseMap.value = baseMap;
+    this.uniforms.hasAlpha.value = hasAlpha(baseMap.image) ? 1 : 0;
   }
 
   get rgbaMap(): Texture {
@@ -189,8 +200,8 @@ export class ChassisMaterial extends ShaderMaterial {
 
   set paintColor(paintColor: Color) {
     if (paintColor != undefined) {
-      this.uniforms.accentColor.value.copy(paintColor);
-      this.uniforms.painted.value = 1;
+      this.uniforms.paintColor.value.copy(paintColor);
+      this.uniforms.painted.value = this.paintable ? 1 : 0;
     } else {
       this.uniforms.painted.value = 0;
     }
@@ -211,4 +222,21 @@ export class ChassisMaterial extends ShaderMaterial {
   set envMap(envMap: Texture) {
     this.uniforms.envMap.value = envMap;
   }
+}
+
+// so hacky
+function hasAlpha(image): boolean {
+  const canvas = createOffscreenCanvas(image.width, image.height);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  const data = ctx.getImageData(0, 0, image.width, image.height).data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] === 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
