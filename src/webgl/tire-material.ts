@@ -1,5 +1,5 @@
 import { ExtendedMeshStandardMaterial } from './extended-mesh-standard-material';
-import { Color, Texture } from 'three';
+import { Color } from 'three';
 
 const UNIFORMS = `
   uniform vec3 paintColor;
@@ -25,10 +25,11 @@ const DIFFUSE_SHADER = `
 
 export class TireMaterial extends ExtendedMeshStandardMaterial {
   constructor(private maskChannel: string, private useN = false, private invertMask = false) {
-    super({
-      paintColor: {value: new Color()},
-      painted: {value: 0},
-    }, UNIFORMS, DIFFUSE_SHADER.replace('mask', `${invertMask ? '1.0 - ' : ''}${useN ? 'normalMapColor' : 'texelColor'}.${maskChannel}`));
+    super();
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader(UNIFORMS,
+      DIFFUSE_SHADER.replace('mask', `${invertMask ? '1.0 - ' : ''}${useN ? 'normalMapColor' : 'texelColor'}.${maskChannel}`));
+    this.uniforms.paintColor = {value: new Color()};
+    this.uniforms.painted = {value: 0};
   }
 
   get color(): Color {

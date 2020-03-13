@@ -23,11 +23,12 @@ const DIFFUSE_SHADER = `
 
 export class RimMaterial extends ExtendedMeshStandardMaterial {
   constructor(private maskChannel: string, private invertMask = false) {
-    super({
-      rgbaMap: {value: null},
-      paintColor: {value: new Color()},
-      painted: {value: 0},
-    }, UNIFORMS, DIFFUSE_SHADER.replace('mask', `${invertMask ? '1.0 - ' : ''}rgbaMapColor.${maskChannel}`));
+    super();
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader(UNIFORMS,
+      DIFFUSE_SHADER.replace('mask', `${invertMask ? '1.0 - ' : ''}rgbaMapColor.${maskChannel}`));
+    this.uniforms.rgbaMap = {value: null};
+    this.uniforms.paintColor = {value: new Color()};
+    this.uniforms.painted = {value: 0};
   }
 
   get rgbaMap(): Texture {

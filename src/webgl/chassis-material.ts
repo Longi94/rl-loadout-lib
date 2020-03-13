@@ -36,17 +36,13 @@ export class ChassisMaterial extends ExtendedMeshStandardMaterial {
   paintable = false;
 
   constructor() {
-    super(
-      {
-        rgbaMap: {value: null},
-        accentColor: {value: new Color()},
-        paintColor: {value: new Color()},
-        painted: {value: 0},
-        hasAlpha: {value: 0},
-      },
-      UNIFORMS,
-      DIFFUSE_SHADER
-    );
+    super();
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader(UNIFORMS, DIFFUSE_SHADER);
+    this.uniforms.rgbaMap = {value: null};
+    this.uniforms.accentColor = {value: new Color()};
+    this.uniforms.paintColor = {value: new Color()};
+    this.uniforms.painted = {value: 0};
+    this.uniforms.hasAlpha = {value: 0};
   }
 
   get map(): Texture {

@@ -59,21 +59,17 @@ export class StaticDecalMaterial extends ExtendedMeshStandardMaterial {
   lights = true;
 
   constructor() {
-    super(
-      {
-        rgbaMap: {value: null},
-        decalMap: {value: null},
-        primaryColor: {value: new Color()},
-        accentColor: {value: new Color()},
-        paintColor: {value: new Color()},
-        bodyPaintColor: {value: new Color()},
-        painted: {value: 0},
-        isBlank: {value: 0},
-        bodyPainted: {value: 0}
-      },
-      UNIFORMS,
-      DIFFUSE_SHADER
-    );
+    super();
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader(UNIFORMS, DIFFUSE_SHADER);
+    this.uniforms.rgbaMap = {value: null};
+    this.uniforms.decalMap = {value: null};
+    this.uniforms.primaryColor = {value: new Color()};
+    this.uniforms.accentColor = {value: new Color()};
+    this.uniforms.paintColor = {value: new Color()};
+    this.uniforms.bodyPaintColor = {value: new Color()};
+    this.uniforms.painted = {value: 0};
+    this.uniforms.isBlank = {value: 0};
+    this.uniforms.bodyPainted = {value: 0};
   }
 
   get rgbaMap(): Texture {

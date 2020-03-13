@@ -1,15 +1,13 @@
 import { Color, IUniform, ShaderLib, ShaderMaterial, TangentSpaceNormalMap, Texture, UniformsLib, UniformsUtils } from 'three';
 import { COLOR_INCLUDE } from './include/color';
 
-export class ExtendedMeshStandardMaterial extends ShaderMaterial {
+export abstract class ExtendedMeshStandardMaterial extends ShaderMaterial {
 
   lights = true;
   normalMapType = TangentSpaceNormalMap;
 
-  constructor(extraUniforms: { [name: string]: IUniform }, uniformsShader: string, diffuseShader: string) {
+  constructor() {
     super({
-      vertexShader: ShaderLib.standard.vertexShader,
-      fragmentShader: ExtendedMeshStandardMaterial.createFragmentShader(uniformsShader, diffuseShader),
       uniforms: UniformsUtils.merge([
         UniformsLib.common,
         UniformsLib.envmap,
@@ -28,10 +26,11 @@ export class ExtendedMeshStandardMaterial extends ShaderMaterial {
           roughness: {value: 0.5},
           metalness: {value: 0},
           envMapIntensity: {value: 1}, // temporary
-        },
-        extraUniforms
+        }
       ]),
     });
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader("", "");
+    this.vertexShader = ShaderLib.standard.vertexShader;
   }
 
   get map(): Texture {

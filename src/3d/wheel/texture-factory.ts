@@ -3,16 +3,17 @@ import { Wheel } from '../../model/wheel';
 import { htmlImageToTexture, StringUtil } from '../../utils/util';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
-import { ChewyTireTexture } from './chewy-model';
 import { WheelAssets } from '../../loader/wheel/wheel-assets';
 import { RimMaterial } from '../../webgl/rim-material';
 import { TireMaterial } from '../../webgl/tire-material';
+import { LightWheelRimMaterial } from './light-wheel-model';
 
 export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: PaintConfig): RimMaterial {
   let material: RimMaterial;
   switch (wheel.id) {
     case ProductID.WHEEL_LIGHT_WHEEL:
-      //return new LightWheelRimTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
+      material = new LightWheelRimMaterial();
+      break;
     case ProductID.WHEEL_LONE_WOLF:
     case ProductID.WHEEL_EXOTIC:
     case ProductID.WHEEL_7SPOKE:
@@ -35,10 +36,10 @@ export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: P
     case ProductID.WHEEL_ENSPIER:
     case ProductID.WHEEL_SPECTRAL:
     case ProductID.WHEEL_IGTYJR:
-      material =  new RimMaterial('a', true);
+      material = new RimMaterial('a', true);
       break;
     case ProductID.WHEEL_DONUT:
-      //return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
+    //return new ShadedPaintableTexture(wheelAssets.rimD, wheelAssets.rimRgba, paints.wheel, keepContextAlive);
     case ProductID.WHEEL_STORMDRAIN:
     case ProductID.WHEEL_ALLSPARK:
       material = new RimMaterial('a', false);
@@ -91,11 +92,11 @@ export function getTireMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: 
       material = new TireMaterial('r', true, false);
       break;
     case ProductID.WHEEL_CHEWY:
-      //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, true, keepContextAlive);
+    //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, true, keepContextAlive);
     case ProductID.WHEEL_ENSPIER:
-      //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, false, keepContextAlive);
+    //return new ChewyTireTexture(wheelAssets.tireN, paints.wheel, false, keepContextAlive);
     case ProductID.WHEEL_SHURIKEN:
-      //return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
+    //return new WebGLUnpaintableTireTexture(wheelAssets.tireD, wheelAssets.tireN, keepContextAlive);
     default:
       if (!StringUtil.nullOrEmpty(wheel.tire_base)) {
         material = new TireMaterial('a', false, true);
