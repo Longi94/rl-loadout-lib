@@ -1,7 +1,6 @@
 import { PaintConfig } from '../../model/paint-config';
 import { Wheel } from '../../model/wheel';
 import { htmlImageToTexture, StringUtil } from '../../utils/util';
-import { TireTexture, WebGLTireTexture, WebGLUnpaintableTireTexture } from '../../webgl/tire-texture';
 import { Color } from 'three';
 import { ProductID } from '../../utils/ids';
 import { ChewyTireTexture } from './chewy-model';
@@ -54,6 +53,7 @@ export function getRimMaterial(wheel: Wheel, wheelAssets: WheelAssets, paints: P
   if (material != undefined) {
     material.map = htmlImageToTexture(wheelAssets.rimD);
     material.rgbaMap = htmlImageToTexture(wheelAssets.rimRgba);
+    material.normalMap = htmlImageToTexture(wheelAssets.rimN);
     material.paintColor = paints.wheel;
     material.needsUpdate = true;
   }

@@ -76,14 +76,6 @@ export class StaticDecalMaterial extends ExtendedMeshStandardMaterial {
     );
   }
 
-  get map(): Texture {
-    return this.uniforms.map.value;
-  }
-
-  set map(map: Texture) {
-    this.uniforms.map.value = map;
-  }
-
   get rgbaMap(): Texture {
     return this.uniforms.rgbaMap.value;
   }
@@ -149,21 +141,5 @@ export class StaticDecalMaterial extends ExtendedMeshStandardMaterial {
     } else {
       this.uniforms.bodyPainted.value = 0;
     }
-  }
-
-  get normalMap(): Texture {
-    return this.uniforms.normalMap.value;
-  }
-
-  set normalMap(normalMap: Texture) {
-    this.uniforms.normalMap.value = normalMap;
-  }
-
-  get envMap(): Texture {
-    return this.uniforms.envMap.value;
-  }
-
-  set envMap(envMap: Texture) {
-    this.uniforms.envMap.value = envMap;
   }
 }

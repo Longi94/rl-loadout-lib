@@ -58,22 +58,6 @@ export class ChassisMaterial extends ExtendedMeshStandardMaterial {
     this.uniforms.hasAlpha.value = hasAlpha(map.image) ? 1 : 0;
   }
 
-  get normalMap(): Texture {
-    return this.uniforms.normalMap.value;
-  }
-
-  set normalMap(normalMap: Texture) {
-    this.uniforms.normalMap.value = normalMap;
-  }
-
-  get envMap(): Texture {
-    return this.uniforms.envMap.value;
-  }
-
-  set envMap(envMap: Texture) {
-    this.uniforms.envMap.value = envMap;
-  }
-
   get rgbaMap(): Texture {
     return this.uniforms.rgbaMap.value;
   }

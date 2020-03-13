@@ -1,4 +1,3 @@
-import { TireTexture } from '../../webgl/tire-texture';
 import { CanvasTexture, Color, LinearEncoding, RepeatWrapping, Texture } from 'three';
 import { BASIC_VERT_SHADER } from '../../webgl/include/vertex';
 import { createOffscreenCanvas } from '../../utils/offscreen-canvas';
@@ -29,7 +28,7 @@ const FRAGMENT_SHADER = () => `
     }
 `;
 
-export class ChewyTireTexture implements TireTexture {
+export class ChewyTireTexture {
 
   protected canvas: OffscreenCanvas | HTMLCanvasElement;
   protected gl: WebGLRenderingContext;
