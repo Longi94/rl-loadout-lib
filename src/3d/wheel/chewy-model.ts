@@ -21,7 +21,7 @@ const DIFFUSE_SHADER = `
 export class ChewyTireMaterial extends TireMaterial {
   constructor(invertMask: boolean = false) {
     super('r', invertMask);
-    let diffuseShader = invertMask ? DIFFUSE_SHADER.replace('normalColor.r', '1.0-normalColor.r') : DIFFUSE_SHADER;
+    const diffuseShader = invertMask ? DIFFUSE_SHADER.replace('normalColor.r', '1.0-normalColor.r') : DIFFUSE_SHADER;
     this.fragmentShader = RimMaterial.createFragmentShader(UNIFORMS, diffuseShader);
   }
 }

@@ -19,6 +19,6 @@ const DIFFUSE_SHADER = `
 export class ShadedPaintableMaterial extends RimMaterial {
   constructor() {
     super(undefined, false);
-    this.fragmentShader = RimMaterial.createFragmentShader(UNIFORMS, DIFFUSE_SHADER)
+    this.fragmentShader = RimMaterial.createFragmentShader(UNIFORMS, DIFFUSE_SHADER);
   }
 }

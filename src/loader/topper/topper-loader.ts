@@ -9,7 +9,8 @@ export interface TopperLoader {
 }
 
 export const DefaultTopperLoader: TopperLoader = {
-  load: async (topper: Topper, gltfLoader: PromiseLoader, textureLoader: PromiseLoader, rocketConfig: RocketConfig): Promise<TopperAssets> => {
+  load: async (topper: Topper, gltfLoader: PromiseLoader, textureLoader: PromiseLoader, rocketConfig: RocketConfig):
+    Promise<TopperAssets> => {
 
     const gltf = gltfLoader.load(getAssetUrl(topper.model, rocketConfig));
     const baseTexture = textureLoader.load(getAssetUrl(topper.base_texture, rocketConfig));

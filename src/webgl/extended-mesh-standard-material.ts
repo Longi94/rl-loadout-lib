@@ -1,4 +1,4 @@
-import { Color, IUniform, ShaderLib, ShaderMaterial, TangentSpaceNormalMap, Texture, UniformsLib, UniformsUtils } from 'three';
+import { Color, ShaderLib, ShaderMaterial, TangentSpaceNormalMap, Texture, UniformsLib, UniformsUtils } from 'three';
 import { COLOR_INCLUDE } from './include/color';
 
 export abstract class ExtendedMeshStandardMaterial extends ShaderMaterial {
@@ -29,7 +29,7 @@ export abstract class ExtendedMeshStandardMaterial extends ShaderMaterial {
         }
       ]),
     });
-    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader("", "");
+    this.fragmentShader = ExtendedMeshStandardMaterial.createFragmentShader('', '');
     this.vertexShader = ShaderLib.standard.vertexShader;
   }
 
